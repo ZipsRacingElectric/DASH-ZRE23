@@ -1,3 +1,13 @@
+# GUI -----------------------------------------------------------------------------------------------------
+GUI_WIDTH                        = 800
+GUI_HEIGHT                       = 480
+
+DASH_STYLE                       = "style_Dash.json"
+DEBUG_STYLE                      = "style_Debug.json"
+
+# CAN -----------------------------------------------------------------------------------------------------
+CAN_LIBRARY_TYPE                 = "CANLIB"
+
 # CAN Bus -------------------------------------------------------------------------------------------------
 CAN_BITRATE                      = 1000000                     # CAN Bitrate of 1 Megabit per Second
 CAN_ID_INPUT_PEDALS              = 0x005                       # ID of Input_Pedals

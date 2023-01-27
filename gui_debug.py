@@ -3,7 +3,7 @@ import tkinter
 
 # Includes
 import lib_tkinter
-import appCan
+import can_interface
 import gui
 
 class Window(gui.Window):
@@ -173,28 +173,28 @@ class Window(gui.Window):
         apps2  = int(self.apps2Input.get())
         brake1 = int(self.brake1Input.get())
         brake2 = int(self.brake2Input.get())
-        appCan.SendInputPedals(apps1, apps2, brake1, brake2)
+        can_interface.SendInputPedals(apps1, apps2, brake1, brake2)
 
     def SendDataMotor(self):
         motorAngle         = int(self.motorAngleInput.get())
         motorRpm           = int(self.motorRpmInput.get())
         motorFrequency     = int(self.motorFrequencyInput.get())
         motorDeltaResolver = int(self.motorDeltaResolverInput.get())
-        appCan.SendDataMotor(motorAngle, motorRpm, motorFrequency, motorDeltaResolver)
+        can_interface.SendDataMotor(motorAngle, motorRpm, motorFrequency, motorDeltaResolver)
 
     def SendCommandAppsCalibration(self):
         apps1MinValue = int(self.apps1MinInput.get())
         apps1MaxValue = int(self.apps1MaxInput.get())
         apps2MinValue = int(self.apps2MinInput.get())
         apps2MaxValue = int(self.apps2MaxInput.get())
-        appCan.SendCommandAppsCalibration(apps1MinValue, apps1MaxValue, apps2MinValue, apps2MaxValue)
+        can_interface.SendCommandAppsCalibration(apps1MinValue, apps1MaxValue, apps2MinValue, apps2MaxValue)
 
     def SendDataPedals(self):
         apps1Percent  = int(self.apps1PercentInput.get())
         apps2Percent  = int(self.apps2PercentInput.get())
         brake1Percent = int(self.brake1PercentInput.get())
         brake2Percent = int(self.brake2PercentInput.get())
-        appCan.SendDataPedals(apps1Percent, apps2Percent, brake1Percent, brake2Percent)
+        can_interface.SendDataPedals(apps1Percent, apps2Percent, brake1Percent, brake2Percent)
 
     def SendStatusEcu(self):
         driveStateValue    = int(self.driveStateInput.get())
@@ -210,4 +210,4 @@ class Window(gui.Window):
         regenPercentValue  = int(self.regenPercentInput.get())
         voltageLvValue     = float(self.voltageLvInput.get())
         resistanceImdValue = float(self.resistanceImdInput.get())
-        appCan.SendStatusEcu(driveStateValue, acceleratingValue, brakingValue, drsValue, regenValue, is25_5Value, inverterValue, acanValue, is100msValue, torquePercentValue, regenPercentValue, voltageLvValue, resistanceImdValue)
+        can_interface.SendStatusEcu(driveStateValue, acceleratingValue, brakingValue, drsValue, regenValue, is25_5Value, inverterValue, acanValue, is100msValue, torquePercentValue, regenPercentValue, voltageLvValue, resistanceImdValue)

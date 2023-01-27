@@ -7,7 +7,7 @@ from lib_tkinter import Orientation
 import gui
 import config
 
-import appCan
+import can_interface
 
 class CalibrationState(Enum): # State of Calibration
     START                = 0, # - Buffer menu to avoid accidental calibration
@@ -94,7 +94,7 @@ class View(gui.View):
         self.database.apps1Max    = self.apps1CurrentMax
         self.database.apps2RawMin = self.apps2RawCurrentMin
         self.database.apps2RawMax = self.apps2RawCurrentMax
-        appCan.SendCommandAppsCalibration(self.apps1CurrentMin, self.apps1CurrentMax, self.apps2RawCurrentMin, self.apps2RawCurrentMax)
+        can_interface.SendCommandAppsCalibration(self.apps1CurrentMin, self.apps1CurrentMax, self.apps2RawCurrentMin, self.apps2RawCurrentMax)
 
     def Close(self):
         self.calibrationState = CalibrationState.START

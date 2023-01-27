@@ -46,6 +46,8 @@ class Window():
 
 # Imports
 import lib_tkinter
+import config
+
 import gui_menu
 import gui_speed
 import gui_endurance
@@ -60,11 +62,11 @@ FRAMERATE = 32
 def Setup(database):
     # Instance GUI
     gui = Main("Dashboard 2023 - Rev.2", database, FRAMERATE)
-    gui.geometry('1024x600')
+    gui.geometry(f'{config.GUI_WIDTH}x{config.GUI_HEIGHT}')
 
     # Import Styles
-    dash  = lib_tkinter.Style("style_Dash.json")
-    debug = lib_tkinter.Style("style_Debug.json")
+    dash  = lib_tkinter.Style(config.DASH_STYLE)
+    debug = lib_tkinter.Style(config.DEBUG_STYLE)
     
     # Instance Views
     menu = gui_menu.View(gui, id="Menu", style=dash, database=database)
@@ -77,12 +79,13 @@ def Setup(database):
     gui.AppendView(gui_database.View   (gui, id="Database",    style=dash, database=database))
 
     # Setup Menu
-    menu.AppendShortcut(id="Speed",       icon=r'./icons/Speed.png',       iconSampling=(0.5, 0.5))
-    menu.AppendShortcut(id="Endurance",   icon=r'./icons/Endurance.png',   iconSampling=(0.5, 0.5))
-    menu.AppendShortcut(id="Testing",     icon=r'./icons/Testing.png',     iconSampling=(0.5, 0.5))
-    menu.AppendShortcut(id="Bms",         icon=r'./icons/Bms.png',         iconSampling=(0.5, 0.5))
-    menu.AppendShortcut(id="Calibration", icon=r'./icons/Calibration.png', iconSampling=(0.5, 0.5))
-    menu.AppendShortcut(id="Database",    icon=r'./icons/Database.png',    iconSampling=(0.5, 0.5))
+    iconScaling = 0.33
+    menu.AppendShortcut(id="Speed",       icon=r'./icons/Speed.png',       iconSampling=(iconScaling, iconScaling))
+    menu.AppendShortcut(id="Endurance",   icon=r'./icons/Endurance.png',   iconSampling=(iconScaling, iconScaling))
+    menu.AppendShortcut(id="Testing",     icon=r'./icons/Testing.png',     iconSampling=(iconScaling, iconScaling))
+    menu.AppendShortcut(id="Bms",         icon=r'./icons/Bms.png',         iconSampling=(iconScaling, iconScaling))
+    menu.AppendShortcut(id="Calibration", icon=r'./icons/Calibration.png', iconSampling=(iconScaling, iconScaling))
+    menu.AppendShortcut(id="Database",    icon=r'./icons/Database.png',    iconSampling=(iconScaling, iconScaling))
     
     # Open Menu
     gui.CloseViews()

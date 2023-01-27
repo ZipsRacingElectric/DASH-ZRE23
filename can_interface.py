@@ -1,53 +1,49 @@
 # Libraries
-import enum
-from enum import Enum
-
 import time
 
-# Objects -------------------------------------------------------------------------------------------------
-class LibraryType(Enum):
-    EMULATE   = 0
-    CANLIB    = 1
-    INNOMAKER = 2
+# Includes
+import config
 
+# Objects -------------------------------------------------------------------------------------------------
 class CanInterface():
-    def __init__(self, database, channelBitrates=[None], messageHandler=None):        
+    def __init__(self, database, messageHandler=None):        
         self.database = database
         self.channels = []
         self.messageHandler = messageHandler
-        for index in range(len(channelBitrates)):
-            if(channelBitrates[index] == None):
-                continue
-            self.OpenChannel(channelBitrates[index], index)
-    
+        
+    # Channels
     def OpenChannel(self, bitrate, id):
-        self.channels.append(0)
+        self.channels.append(id)
 
-    def CloseChannel(self, channel):
-        return
+    def CloseChannel(self, id):
+        self.channels.remove(id)
 
+    # Main Loop
     def Begin(self):
         return
 
     def Kill(self):
         return
 
-# Imports -----------------------------------------------------------------------------------------------------
-import config
+    # Messages
+    def Transmit(self, id, data):
+        self.Receive(id, data)
+
+    def Receive(self, id, data):
+        self.messageHandler(self.database, id, data)
 
 def Setup(database):
-    library = LibraryType.INNOMAKER
-
-    if(library == LibraryType.EMULATE):
-        return CanInterface(database, channelBitrates=[config.CAN_BITRATE]*2, messageHandler=HandleMessage)
-    if(library == LibraryType.CANLIB):
+    if(config.CAN_LIBRARY_TYPE == "EMULATE"):
+        return CanInterface(database, messageHandler=HandleMessage)
+    
+    if(config.CAN_LIBRARY_TYPE == "CANLIB"):
         import lib_canlib
-        return lib_canlib.Main(database, channelBitrates=[config.CAN_BITRATE]*2, messageHandler=HandleMessage)
-    if(library == LibraryType.INNOMAKER):
+        return lib_canlib.Main(database, messageHandler=HandleMessage)
+    
+    if(config.CAN_LIBRARY_TYPE == "INNOMAKER"):
         import lib_innomaker
-        return lib_innomaker.Main(database, [1000000], HandleMessage)
-    return CanInterface(database, channelBitrates=[], messageHandler=None)
-
+        return lib_innomaker.Main(database, messageHandler=HandleMessage)
+    
 # Message Handling --------------------------------------------------------------------------------------------------------------------
 
 # Handle Message
@@ -62,6 +58,7 @@ def HandleMessage(database, id, data):
     if(id == config.CAN_ID_DATA_PEDALS):  HandleDataPedals(database, data)
     if(id == config.CAN_ID_STATUS_ECU):   HandleStatusEcu(database, data)
     if(id == config.CAN_ID_STATUS_BMS):   HandleStatusBms(database, data)
+    
     for index in range(config.CAN_ID_CELL_VOLTAGES_END - config.CAN_ID_CELL_VOLTAGES_START + 1):
         idIndex = config.CAN_ID_CELL_VOLTAGES_START + index
         if(id == idIndex): HandleCellVoltages(database, data, idIndex)

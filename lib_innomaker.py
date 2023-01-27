@@ -8,7 +8,7 @@ import threading
 from threading import Thread
 
 # Imports
-from appCan import CanInterface
+from can_interface import CanInterface
 
 class Main(CanInterface):
     def __init__(self, database, channelBitrates=[None], messageHandler=None):

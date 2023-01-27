@@ -10,7 +10,7 @@ from canlib import Frame
 from canlib.canlib import ChannelData
 
 # Imports
-from appCan import CanInterface
+from can_interface import CanInterface
 
 CanlibBitrate = {
     10000   : canlib.canBITRATE_10K,
@@ -24,15 +24,15 @@ CanlibBitrate = {
 }
 
 class Main(CanInterface):
-    def __init__(self, database, channelBitrates=[None], messageHandler=None):
+    def __init__(self, database, messageHandler=None):
         print("CAN - Using Kvaser Canlib Library")
-        super().__init__(database, channelBitrates, messageHandler)
+        super().__init__(database, messageHandler)
 
         # Platform Identification
         if(sys.platform == 'win32'):
             print("CAN - Platform: Windows 32-Bit")
             print("CAN - Canlib Version:", canlib.dllversion())
-            return # Complete Setup
+            return
         if(sys.platform == 'linux'):
             print("CAN - Platform: Linux")
             print("CAN - Linux Canlib not Supported")

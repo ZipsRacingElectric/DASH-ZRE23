@@ -12,6 +12,7 @@ from appCan import CanInterface
 
 class Main(CanInterface):
     def __init__(self, database, channelBitrates=[None], messageHandler=None):
+        if(sys.platform == "win32"): return
         print("CAN - Using Innomaker USB-CAN Library")
         super().__init__(database, channelBitrates, messageHandler)
 

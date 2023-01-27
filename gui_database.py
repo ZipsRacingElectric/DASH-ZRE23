@@ -112,7 +112,7 @@ class View(gui.View):
         self.driveStateStat        = lib_tkinter.GetLabelStat(self.display, style=style, column=3, row=1,  sticky="W",                                   styleOverrides=fontOverride)
         self.drsStateStat          = lib_tkinter.GetLabelStat(self.display, style=style, column=3, row=2,  sticky="W",                                   styleOverrides=fontOverride)
         self.regenStateStat        = lib_tkinter.GetLabelStat(self.display, style=style, column=3, row=3,  sticky="W",                                   styleOverrides=fontOverride)
-        self.lvBatteryStat         = lib_tkinter.GetLabelStat(self.display, style=style, column=3, row=4,  sticky="W",                                   styleOverrides=fontOverride)
+        self.lvBatteryStat         = lib_tkinter.GetLabelStat(self.display, style=style, column=3, row=4,  sticky="W", precision=4,                      styleOverrides=fontOverride)
 
         # Accumulator Data
         labelAccumulator           = lib_tkinter.GetLabel    (self.display, style=style, text="Accumulator Data",          column=2, row=5,  sticky="W", styleOverrides=fontBoldOverride)

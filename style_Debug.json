@@ -1,0 +1,12 @@
+{
+    "font"              : {"font" : "consolas", "size" : 10},
+    "textColor"         : "#000000",
+    "background"        : "#F0F0F0",
+    "highlight"         : "#AAAAAA",
+    "lowlight"          : "#444444",
+    "padding"           : 4,
+    "borderWidth"       : 1,
+    "strataSize"        : 8,
+    "strataGap"         : 2,
+    "strataSlope"       : 0
+}

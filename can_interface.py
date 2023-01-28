@@ -28,7 +28,7 @@ class CanInterface():
         return
 
     # Messages
-    def Transmit(self, id, data):
+    def Transmit(self, id, data, channel):
         self.Receive(id, data)
 
     def Receive(self, id, data):
@@ -40,19 +40,24 @@ def Setup(database):
     
     if(config.CAN_LIBRARY_TYPE == "CANLIB"):
         import lib_canlib
-        return lib_canlib.Main(database, messageHandler=HandleMessage)
+        library = lib_canlib.Main(database, messageHandler=HandleMessage)
+        library.OpenChannel(config.CAN_BITRATE, 0)
+        library.OpenChannel(config.CAN_BITRATE, 1)
+        return library
         
     if(config.CAN_LIBRARY_TYPE == "INNOMAKER"):
         if(sys.platform == "win32"):
             import lib_innomaker_win
             library = lib_innomaker_win.Main(database, messageHandler=HandleMessage)
             library.OpenChannel(config.CAN_BITRATE, 0)
+            library.OpenChannel(config.CAN_BITRATE, 1)
             return library
 
         if(sys.platform == "linux"):
             import lib_innomaker_linux
             library = lib_innomaker_linux.Main(database, messageHandler=HandleMessage)
             library.OpenChannel(config.CAN_BITRATE, 0)
+            library.OpenChannel(config.CAN_BITRATE, 1)
             return library
     
 # Message Handling --------------------------------------------------------------------------------------------------------------------
@@ -372,7 +377,7 @@ def RpmToMph(rotationsPerMinute):
 
 # Message Transmitting ----------------------------------------------------------------------------------------------------------------
 def SendMessage(transmitter, id, data, channel=0):
-    if(channel == 0): transmitter.Send(id, data, channel)
+    transmitter.Transmit(id, data, channel)
 
 # Message 0x533
 def SendCommandAppsCalibration(transmitter, apps1MinValue, apps1MaxValue, apps2MinValue, apps2MaxValue):

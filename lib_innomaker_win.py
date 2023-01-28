@@ -30,26 +30,28 @@ class Main(CanInterface):
             return
 
         self.channels[0].stop()
-            
+
     def OpenChannel(self, bitrate, id):
+        if(id < 0 or id >= len(self.channels)): return
         OpenChannel(bitrate, self.channels[id])
 
     def CloseChannel(self, id):
         CloseChannel(self.channels[id])
 
     def Scan(self, index):
-        inFrame = GsUsbFrame()
+        frame = GsUsbFrame()
         while(self.online):
-            self.channels[index].read(inFrame, 1)
-            if(inFrame.can_id & CAN_ERR_FLAG != CAN_EFF_FLAG):
-                self.messageHandler(self.database, inFrame.arbitration_id, inFrame.data)
+            self.channels[index].read(frame, 1)
+            if(frame.can_id & CAN_ERR_FLAG != CAN_EFF_FLAG):
+                self.messageHandler(self.database, frame.arbitration_id, frame.data)
         self.CloseChannel(index)
 
-    def Send(self, id, data, channel):
+    def Transmit(self, id, data, channel):
         if(channel < 0 or channel > len(self.channels)-1): return
         messageFrame = GsUsbFrame(can_id=id, data=data)
 
         self.channels[channel].send(messageFrame)
+        self.Receive(id, data)
 
     def Begin(self):
         self.online = True

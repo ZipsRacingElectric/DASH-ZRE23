@@ -1,6 +1,8 @@
 # Libraries
 import tkinter
 
+import os
+
 # Objects
 class View():
     def __init__(self, parent, id, style, database):
@@ -66,8 +68,10 @@ def Setup(database, can):
     gui.SetFullscreen(True)
 
     # Import Styles
-    dash  = lib_tkinter.Style(config.DASH_STYLE)
-    debug = lib_tkinter.Style(config.DEBUG_STYLE)
+    relativeDirectory = os.path.dirname(os.path.realpath('__file__')) + "/"
+
+    dash  = lib_tkinter.Style(relativeDirectory + config.DASH_STYLE)
+    debug = lib_tkinter.Style(relativeDirectory + config.DEBUG_STYLE)
     
     # Instance Views
     menu = gui_menu.View(gui, id="Menu", style=dash, database=database)
@@ -81,12 +85,12 @@ def Setup(database, can):
 
     # Setup Menu
     iconScaling = 0.33
-    menu.AppendShortcut(id="Speed",       icon=r'./icons/Speed.png',       iconSampling=(iconScaling, iconScaling))
-    menu.AppendShortcut(id="Endurance",   icon=r'./icons/Endurance.png',   iconSampling=(iconScaling, iconScaling))
-    menu.AppendShortcut(id="Testing",     icon=r'./icons/Testing.png',     iconSampling=(iconScaling, iconScaling))
-    menu.AppendShortcut(id="Bms",         icon=r'./icons/Bms.png',         iconSampling=(iconScaling, iconScaling))
-    menu.AppendShortcut(id="Calibration", icon=r'./icons/Calibration.png', iconSampling=(iconScaling, iconScaling))
-    menu.AppendShortcut(id="Database",    icon=r'./icons/Database.png',    iconSampling=(iconScaling, iconScaling))
+    menu.AppendShortcut(id="Speed",       icon=(relativeDirectory + "icons/Speed.png"),       iconSampling=(iconScaling, iconScaling))
+    menu.AppendShortcut(id="Endurance",   icon=(relativeDirectory + "icons/Endurance.png"),   iconSampling=(iconScaling, iconScaling))
+    menu.AppendShortcut(id="Testing",     icon=(relativeDirectory + "icons/Testing.png"),     iconSampling=(iconScaling, iconScaling))
+    menu.AppendShortcut(id="Bms",         icon=(relativeDirectory + "icons/Bms.png"),         iconSampling=(iconScaling, iconScaling))
+    menu.AppendShortcut(id="Calibration", icon=(relativeDirectory + "icons/Calibration.png"), iconSampling=(iconScaling, iconScaling))
+    menu.AppendShortcut(id="Database",    icon=(relativeDirectory + "icons/Database.png"),    iconSampling=(iconScaling, iconScaling))
     
     # Open Menu
     gui.CloseViews()

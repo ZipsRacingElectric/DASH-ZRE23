@@ -17,6 +17,7 @@ class Main(CanInterface):
         self.channels = []
 
     def OpenChannel(self, bitrate, id):
+        if(id < 0 or id >= len(self.channels)): return
         self.channels.append(OpenChannel(id, bitrate=bitrate))
 
     def CloseChannel(self, id):
@@ -26,13 +27,14 @@ class Main(CanInterface):
         while(self.online):
             message = self.channels[index].recv(10.0)
             if(message != None):
-                self.messageHandler(self.database, message.arbitration_id, message.data)
+                self.Receive(message.arbitration_id, message.data)
         self.CloseChannel(index)
 
-    def Send(self, id, data, channel):
+    def Transmit(self, id, data, channel):
         if(channel < 0 or channel > len(self.channels)-1): return
         canFrame = can.Message(arbitration_id=id, data=data, is_extended_id=False)
         self.channels[channel].send(canFrame)
+        self.Receive(id, data)
 
     def Begin(self):
         self.online = True

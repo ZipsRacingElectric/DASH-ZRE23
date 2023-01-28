@@ -63,7 +63,7 @@ def Setup(database, can):
     # Instance GUI
     gui = Main("Dashboard 2023 - Rev.2", database, FRAMERATE)
     gui.geometry(f'{config.GUI_WIDTH}x{config.GUI_HEIGHT}')
-    gui.attributes("-fullscreen", True)
+    gui.SetFullscreen(True)
 
     # Import Styles
     dash  = lib_tkinter.Style(config.DASH_STYLE)
@@ -96,6 +96,7 @@ def Setup(database, can):
     
     # Setup Keybinds
     gui.AppendKeybind("F2", lambda: gui.ToggleWindow("Debug"))
+    gui.AppendKeybind("F1", lambda: gui.ToggleFullscreen())
 
     return gui
 
@@ -103,6 +104,8 @@ class Main(tkinter.Tk):
     def __init__(self, title, database, framerate=0):
         print("GUI - Initializing...")
         super().__init__()
+
+        self.SetFullscreen(False)
 
         self.title(title)
 
@@ -196,6 +199,14 @@ class Main(tkinter.Tk):
     def KeybindInterrupt(self, event):
         for index in range(len(self.keybindValues)):
             if(event.keysym == self.keybindValues[index]): self.keybindCommands[index]()
+
+    def SetFullscreen(self, fullscreen):
+        self.fullscreen = fullscreen
+        self.attributes("-fullscreen", fullscreen)
+
+    def ToggleFullscreen(self):
+        self.fullscreen = not self.fullscreen
+        self.SetFullscreen(self.fullscreen)
 
     # Behavior --------------------------------------------------------------------------------
     def Update(self):

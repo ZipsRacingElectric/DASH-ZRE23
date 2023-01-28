@@ -1,6 +1,8 @@
 # Libraries
 import time
 
+import sys
+
 # Includes
 import config
 
@@ -39,12 +41,19 @@ def Setup(database):
     if(config.CAN_LIBRARY_TYPE == "CANLIB"):
         import lib_canlib
         return lib_canlib.Main(database, messageHandler=HandleMessage)
-    
+        
     if(config.CAN_LIBRARY_TYPE == "INNOMAKER"):
-        import lib_innomaker
-        library = lib_innomaker.Main(database, messageHandler=HandleMessage)
-        library.OpenChannel(1000000, 0)
-        return library
+        if(sys.platform == "win32"):
+            import lib_innomaker_win
+            library = lib_innomaker_win.Main(database, messageHandler=HandleMessage)
+            library.OpenChannel(config.CAN_BITRATE, 0)
+            return library
+
+        if(sys.platform == "linux"):
+            import lib_innomaker_linux
+            library = lib_innomaker_linux.Main(database, messageHandler=HandleMessage)
+            library.OpenChannel(config.CAN_BITRATE, 0)
+            return library
     
 # Message Handling --------------------------------------------------------------------------------------------------------------------
 

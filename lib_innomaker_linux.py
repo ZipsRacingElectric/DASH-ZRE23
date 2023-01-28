@@ -1,6 +1,4 @@
 # Libraries
-import sys
-
 import os
 import can
 
@@ -13,28 +11,23 @@ from can_interface import CanInterface
 class Main(CanInterface):
     def __init__(self, database, messageHandler=None):
         print("CAN - Using Innomaker USB-CAN Library")
-        if(sys.platform == "win32"):
-            print("CAN - Platform: Windows 32-bit")
-            print("CAN - Platform not suppported.")
-            return
-        if(sys.platform == "linux"):
-            print("CAN - Platform: Linux")
-            super().__init__(database, messageHandler)
+        print("CAN - Platform: Linux")
 
-            self.channels = []
-
+        super().__init__(database, messageHandler)
+        self.channels = []
 
     def OpenChannel(self, bitrate, id):
         self.channels.append(OpenChannel(id, bitrate=bitrate))
 
-    # def CloseChannel(self, channel):
-    #     CloseChannel(channel)
+    def CloseChannel(self, id):
+        CloseChannel(id)
 
     def Scan(self, index):
         while(self.online):
             message = self.channels[index].recv(10.0)
             if(message != None):
                 self.messageHandler(self.database, message.arbitration_id, message.data)
+        self.CloseChannel(index)
 
     def Send(self, id, data, channel):
         if(channel < 0 or channel > len(self.channels)-1): return

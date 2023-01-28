@@ -6,7 +6,7 @@ DASH_STYLE                       = "style_Dash.json"
 DEBUG_STYLE                      = "style_Debug.json"
 
 # CAN -----------------------------------------------------------------------------------------------------
-CAN_LIBRARY_TYPE                 = "INNOMAKER"
+CAN_LIBRARY_TYPE                 = "CANLIB"
 
 # CAN Bus -------------------------------------------------------------------------------------------------
 CAN_BITRATE                      = 1000000                     # CAN Bitrate of 1 Megabit per Second

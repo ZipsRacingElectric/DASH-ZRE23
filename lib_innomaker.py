@@ -47,7 +47,7 @@ class Main(CanInterface):
         print("CAN - Terminating...")
         self.online = False
 
-def OpenChannel(bitrate, id):
+def OpenChannel(id, bitrate):
     print(f"CAN - Channel {id} Opening...")
 
     os.system(f'sudo ifconfig can{id} down')

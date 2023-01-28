@@ -7,7 +7,7 @@ class App():
         print("APP - Initializing...")
         self.database = database.Setup()
         self.can = can_interface.Setup(self.database)
-        self.gui = gui.Setup(self.database)
+        self.gui = gui.Setup(self.database, self.can)
         
     def Begin(self):
         print("APP - Begining...")

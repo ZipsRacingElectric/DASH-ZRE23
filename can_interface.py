@@ -42,7 +42,9 @@ def Setup(database):
     
     if(config.CAN_LIBRARY_TYPE == "INNOMAKER"):
         import lib_innomaker
-        return lib_innomaker.Main(database, messageHandler=HandleMessage)
+        library = lib_innomaker.Main(database, messageHandler=HandleMessage)
+        library.OpenChannel(1000000, 0)
+        return library
     
 # Message Handling --------------------------------------------------------------------------------------------------------------------
 

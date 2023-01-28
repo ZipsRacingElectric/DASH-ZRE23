@@ -59,7 +59,7 @@ import gui_debug
 
 FRAMERATE = 32
 
-def Setup(database):
+def Setup(database, can):
     # Instance GUI
     gui = Main("Dashboard 2023 - Rev.2", database, FRAMERATE)
     gui.geometry(f'{config.GUI_WIDTH}x{config.GUI_HEIGHT}')
@@ -92,7 +92,7 @@ def Setup(database):
     gui.CloseViews()
 
     # Instance Sub-Windows
-    gui.AppendWindow(gui_debug.Window(gui, id="Debug", style=debug))
+    gui.AppendWindow(gui_debug.Window(gui, id="Debug", style=debug, can=can))
     
     # Setup Keybinds
     gui.AppendKeybind("F2", lambda: gui.ToggleWindow("Debug"))

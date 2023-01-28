@@ -36,6 +36,11 @@ class Main(CanInterface):
             if(message != None):
                 self.messageHandler(self.database, message.arbitration_id, message.data)
 
+    def Send(self, id, data, channel):
+        if(channel < 0 or channel > len(self.channels)-1): return
+        canFrame = can.Message(arbitration_id=id, data=data, is_extended_id=False)
+        self.channels[channel].send(canFrame)
+
     def Begin(self):
         self.online = True
         

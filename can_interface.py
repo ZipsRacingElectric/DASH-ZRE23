@@ -362,7 +362,7 @@ def RpmToMph(rotationsPerMinute):
     return speedMph
 
 # Message Transmitting ----------------------------------------------------------------------------------------------------------------
-def SendMessage(transmitter, id, data, channel=1):
+def SendMessage(transmitter, id, data, channel=0):
     if(channel == 0): transmitter.Send(id, data, channel)
 
 # Message 0x533

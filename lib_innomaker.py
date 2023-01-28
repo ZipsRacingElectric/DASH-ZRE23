@@ -11,36 +11,53 @@ from threading import Thread
 from can_interface import CanInterface
 
 class Main(CanInterface):
-    def __init__(self, database, channelBitrates=[None], messageHandler=None):
-        if(sys.platform == "win32"): return
+    def __init__(self, database, messageHandler=None):
         print("CAN - Using Innomaker USB-CAN Library")
-        super().__init__(database, channelBitrates, messageHandler)
+        if(sys.platform == "win32"):
+            print("CAN - Platform: Windows 32-bit")
+            print("CAN - Platform not suppported.")
+            return
+        if(sys.platform == "linux"):
+            print("CAN - Platform: Linux")
+            super().__init__(database, messageHandler)
 
-        os.system('sudo ifconfig can0 down')
-        os.system('sudo ip link set can0 type can bitrate ' + str(channelBitrates[0]))
-        os.system('sudo ifconfig can0 txqueuelen 100000')
-        os.system('sudo ifconfig can0 up')
+            self.channels = []
 
-        self.can0 = can.interface.Bus(channel = 'can0', bustype = 'socketcan')
 
-    # def OpenChannel(self, bitrate, id):
-    #     self.channels.append(OpenChannel(id, bitrate=CanlibBitrate[bitrate]))
+    def OpenChannel(self, bitrate, id):
+        self.channels.append(OpenChannel(id, bitrate=bitrate))
 
     # def CloseChannel(self, channel):
     #     CloseChannel(channel)
 
-    def Scan(self):
+    def Scan(self, index):
         while(self.online):
-            message = self.can0.recv(10.0)
+            message = self.channels[index].recv(10.0)
             if(message != None):
                 self.messageHandler(self.database, message.arbitration_id, message.data)
 
     def Begin(self):
         self.online = True
-        print("CAN - Channel", 0, "Thread Starting...")
-        channelThread = Thread(target= lambda: self.Scan())
-        channelThread.start()
+        
+        for index in range(len(self.channels)):
+            channelThread = Thread(target= lambda: self.Scan(index))
+            channelThread.start()
 
     def Kill(self):
         print("CAN - Terminating...")
         self.online = False
+
+def OpenChannel(bitrate, id):
+    print(f"CAN - Channel {id} Opening...")
+
+    os.system(f'sudo ifconfig can{id} down')
+    os.system(f'sudo ip link set can{id} type can bitrate {bitrate}')
+    os.system(f'sudo ifconfig can{id} txqueuelen 100000')
+    os.system(f'sudo ifconfig can{id} up')
+
+    return can.interface.Bus(channel = f'can{id}', bustype = 'socketcan')
+
+def CloseChannel(id):
+    print(f"CAN - Closing Channel {id}")
+
+    os.system(f'sudo ifconfig can{id} down')

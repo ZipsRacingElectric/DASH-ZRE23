@@ -15,8 +15,8 @@ class CanInterface():
     def OpenChannel(self, bitrate, id):
         self.channels.append(id)
 
-    def CloseChannel(self, id):
-        self.channels.remove(id)
+    def CloseChannel(self, channel):
+        self.channels.remove(channel)
 
     # Main Loop
     def Begin(self):

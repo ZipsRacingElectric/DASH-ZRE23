@@ -63,6 +63,7 @@ def Setup(database):
     # Instance GUI
     gui = Main("Dashboard 2023 - Rev.2", database, FRAMERATE)
     gui.geometry(f'{config.GUI_WIDTH}x{config.GUI_HEIGHT}')
+    gui.attributes("-fullscreen", True)
 
     # Import Styles
     dash  = lib_tkinter.Style(config.DASH_STYLE)

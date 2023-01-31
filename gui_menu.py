@@ -1,8 +1,18 @@
+# GUI Menu --------------------------------------------------------------------------------------------------------------------
+# Author: Cole Barach
+# Date Created: 23.01.08
+# Date Updated: 23.01.30
+#   This module contains all objects related to the Menu of the GUI. The View object may be instanced to create an Empty Menu.
+#   Views may be appended to this menu via shortcuts, which will enable them to be opened.
+
+# Libraries -------------------------------------------------------------------------------------------------------------------
 import lib_tkinter
 from lib_tkinter import Orientation
 
+# Includes --------------------------------------------------------------------------------------------------------------------
 import gui
 
+# Objects ---------------------------------------------------------------------------------------------------------------------
 class View(gui.View):
     def __init__(self, parent, id, style, database):
         # Root --------------------------------------------------------------------------------------------------------------------------------------------------------

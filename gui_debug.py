@@ -1,16 +1,26 @@
-# Libraries
+# Debug GUI View ----------------------------------------------------------------------------------------------------------
+# Author: Cole Barach
+# Date Created: 22.11.07
+# Date Updated: 23.01.30
+#   This module contains all objects related to the Debug View of the GUI. The Window object may be instanced to create a
+#   window capable of performing any debug behavior.
+
+# Libraries -------------------------------------------------------------------------------------------------------------------
 import tkinter
-
-# Includes
 import lib_tkinter
-import can_interface
-import gui
 
+# Includes --------------------------------------------------------------------------------------------------------------------
+import gui
+import can_interface
+
+# Objects ---------------------------------------------------------------------------------------------------------------------
 class Window(gui.Window):
+    # Initialization
     def __init__(self, gui, id, style, can):
         super().__init__(gui, id, style)
         self.can = can
 
+    # Open
     def Open(self):
         super().Open()
         self.root.title("Dashboard 2023 - Debug Module")
@@ -33,6 +43,7 @@ class Window(gui.Window):
         self.InitializeDataPedals            (dataPedalsRoot,             column0Width)
         self.InitializeStatusEcu             (statusEcuRoot,              column1Width)
 
+    # Breakout Initializers ---------------------------------------------------------------------------------------------------
     def InitializeInputPedals(self, inputPedalsRoot, width):
         # Partitioning
         buttonWidth = 40
@@ -172,6 +183,7 @@ class Window(gui.Window):
         self.voltageLvInput     = lib_tkinter.GetEntry(statusEcuRoot, minWidth=16, column=1, row=11, value=0, sticky="E", style=self.style)
         self.resistanceImdInput = lib_tkinter.GetEntry(statusEcuRoot, minWidth=16, column=1, row=12, value=0, sticky="E", style=self.style)
 
+    # Transmitters ------------------------------------------------------------------------------------------------------------
     def SendInputPedals(self):
         apps1  = int(self.apps1Input.get())
         apps2  = int(self.apps2Input.get())

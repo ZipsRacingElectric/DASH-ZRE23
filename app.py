@@ -1,25 +1,31 @@
+# App -------------------------------------------------------------------------------------------------------------------------
+# Author: Cole Barach
+# Date Created: 22.09.28
+# Date Updated: 23.01.30
+#   The main file for the application, execute this file to instance the app. This file is responsible for instancing and
+#   initializing the CAN and GUI modules.
+
+# Includes --------------------------------------------------------------------------------------------------------------------
 import gui
 import can_interface
 import database
 
-class App():
-    def __init__(self):
-        print("APP - Initializing...")
-        self.database = database.Setup()
-        self.can = can_interface.Setup(self.database)
-        self.gui = gui.Setup(self.database, self.can)
-        
-    def Begin(self):
-        print("APP - Begining...")
-        self.can.Begin()
-        self.gui.Begin()
-
-    def Kill(self):
-        print("APP - Terminating...")
-        self.can.Kill()
-        print("APP - Terminated.")
-
+# App Execution ---------------------------------------------------------------------------------------------------------------
 if(__name__ == "__main__"):
-    app = App()
-    app.Begin()
-    app.Kill()
+    # Initialization
+    print("APP - Initializing...")
+    mainDatabase = database.Setup()                            # Setup Database
+    mainCan      = can_interface.Setup(mainDatabase)           # Setup CAN Interface
+    mainGui      = gui.Setup(mainDatabase, mainCan)            # Setup GUI
+    
+    # Begin
+    print("APP - Begining...")
+    mainCan.Begin()                                            # Begin CAN
+    mainGui.Begin()                                            # Begin GUI
+
+    # GUI Begin function will not return until app is closed.
+    
+    # Exit
+    print("APP - Terminating...")
+    mainCan.Kill()
+    print("APP - Terminated.")

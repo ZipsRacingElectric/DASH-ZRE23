@@ -1,14 +1,24 @@
-import enum
-from enum import Enum
+# GUI Calibrarion View --------------------------------------------------------------------------------------------------------
+# Author: Cole Barach
+# Date Created: 22.10.14
+# Date Updated: 23.01.30
+#   This module contains all objects related to the Calibrarion View of the GUI. The View object may be instanced to create a
+#   display capable of performing APPS and Brake calibrarion.
 
+# Libraries -------------------------------------------------------------------------------------------------------------------
 import lib_tkinter
 from lib_tkinter import Orientation
 
+import enum
+from enum import Enum
+
+# Includes --------------------------------------------------------------------------------------------------------------------
 import gui
 import config
-
+import database
 import can_interface
 
+# Enumarables -----------------------------------------------------------------------------------------------------------------
 class CalibrationState(Enum): # State of Calibration
     START                = 0, # - Buffer menu to avoid accidental calibration
     REQUEST_APPS_MIN     = 1, # - For minimum values, tells the driver to not touch pedals
@@ -16,15 +26,17 @@ class CalibrationState(Enum): # State of Calibration
     FINISHED             = 3, # - For Valid Calibration Only
     FAILED               = 4  # - For Invalid Calibration
 
+# Objects ---------------------------------------------------------------------------------------------------------------------
 class View(gui.View):
-    def __init__(self, parent, id, style, database):
-        # Root --------------------------------------------------------------------------------------------------------------------------------------------------------
-        super().__init__(parent, id, style, database)
+    def __init__(self, parent, id, style, databaseObj, canTransmitter):
+        # Root --------------------------------------------------------------------------------------------------------------------------------------
+        super().__init__(parent, id, style, databaseObj)
+        self.canTransmitter = canTransmitter
 
-        # Root Partitioning -----------------------------------------------------------------------------------
+        # Root Partitioning -------------------------------------------------------------------------------------------------------------------------
         shortcutCommands = [lambda: self.parent.CloseViews(),
-                            lambda: self.InputInterrupt(0),
-                            lambda: self.InputInterrupt(1),
+                            lambda: self.InputInterrupt(database.InputTypes.BUTTON_WHEEL_RIGHT),
+                            lambda: self.InputInterrupt(database.InputTypes.BUTTON_WHEEL_LEFT),
                             0]
         shortcutLabels   = ["Back", 
                             "Next",
@@ -35,13 +47,14 @@ class View(gui.View):
         self.root.rowconfigure(   index=0, weight=1)
         self.root.rowconfigure(   index=1, weight=0)
 
-        # Root Widgets ----------------------------------------------------------------------------------------
+        # Root Widgets ------------------------------------------------------------------------------------------------------------------------------
         self.message   = lib_tkinter.GetLabel    (self.root, column=0, row=0, style=style, sticky="EW")
-        self.shortcuts = lib_tkinter.GetButtonBar(self.root, column=0, row=1, style=style, sticky="EW", minHeight=80, commands=shortcutCommands, labels=shortcutLabels, orientation=Orientation.HORIZONTAL)
+        self.shortcuts = lib_tkinter.GetButtonBar(self.root, column=0, row=1, style=style, sticky="EW", minHeight=80, commands=shortcutCommands,
+                                                  labels=shortcutLabels, orientation=Orientation.HORIZONTAL)
 
         self.calibrationState = CalibrationState.START
 
-    # View Update Interrupt
+    # Update
     def Update(self):
         if(self.calibrationState == CalibrationState.START):
             # Start Menu
@@ -59,11 +72,14 @@ class View(gui.View):
             # Failed Menu
             self.message['text'] = "Calibration Failed"
 
-    # Inputs
-    def InputInterrupt(self, interruptId):
-        if(interruptId == 1):
+    # Input Interrupt
+    def InputInterrupt(self, input):
+        # Reset Button
+        if(input == database.InputTypes.BUTTON_WHEEL_LEFT):
             self.calibrationState = CalibrationState.START
-        if(interruptId == 0):
+
+        # Continue Button
+        if(input == database.InputTypes.BUTTON_WHEEL_RIGHT):
             if(self.calibrationState == CalibrationState.START):
                 self.calibrationState = CalibrationState.REQUEST_APPS_MIN
 
@@ -78,6 +94,8 @@ class View(gui.View):
                 self.ValidateCalibration()
                 self.ApplyCalibration()
 
+    # Validate Calibration
+    # - Ensures that Calibrated Variables are Valid
     def ValidateCalibration(self):
         self.calibrationState = CalibrationState.FAILED
         if(self.apps1CurrentMin == None):    return
@@ -88,13 +106,15 @@ class View(gui.View):
         if(self.apps2RawCurrentMin >= self.apps2RawCurrentMax): return
         self.calibrationState = CalibrationState.FINISHED
 
+    # Apply Calibration
+    # - Sends new Variables to CAN Bus
     def ApplyCalibration(self):
         if(self.calibrationState != CalibrationState.FINISHED): return
         self.database.apps1Min    = self.apps1CurrentMin
         self.database.apps1Max    = self.apps1CurrentMax
         self.database.apps2RawMin = self.apps2RawCurrentMin
         self.database.apps2RawMax = self.apps2RawCurrentMax
-        can_interface.SendCommandAppsCalibration(self.apps1CurrentMin, self.apps1CurrentMax, self.apps2RawCurrentMin, self.apps2RawCurrentMax)
+        can_interface.SendCommandAppsCalibration(self.canTransmitter, self.apps1CurrentMin, self.apps1CurrentMax, self.apps2RawCurrentMin, self.apps2RawCurrentMax)
 
     def Close(self):
         self.calibrationState = CalibrationState.START

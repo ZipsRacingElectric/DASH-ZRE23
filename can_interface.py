@@ -1,31 +1,42 @@
+# CAN Interface ---------------------------------------------------------------------------------------------------------------
+# Author: Cole Barach
+# Date Created: 22.09.28
+# Date Updated: 23.01.30
+#   This module acts as the manager for anything relating to the CAN communications protocol.
+
 # Libraries
 import time
-
 import sys
+
+import threading
+from threading import Thread
 
 # Includes
 import config
 
-# Objects -------------------------------------------------------------------------------------------------
+# Objects ---------------------------------------------------------------------------------------------------------------------
+# CAN Interface
+# - Interface Object for CAN Libraries
+# - Objects inheriting from this may be used a CAN interface by the application
 class CanInterface():
-    def __init__(self, database, messageHandler=None):        
+    def __init__(self, database, messageHandler=None, timingFunction=None, timingPeriod=None):
+        print("CAN - Initializing...")
         self.database = database
         self.channels = []
         self.messageHandler = messageHandler
-        
-    # Channels
-    def OpenChannel(self, bitrate, id):
-        self.channels.append(id)
-
-    def CloseChannel(self, channel):
-        self.channels.remove(channel)
-
+        self.timingFunction = timingFunction
+        self.timingPeriod   = timingPeriod
+        self.InitializeTimeThread()
+    
     # Main Loop
     def Begin(self):
-        return
+        print("CAN - Beginning...")
+        self.online = True
+        self.BeginTimeThread()
 
     def Kill(self):
-        return
+        print("CAN - Terminating...")
+        self.online = False
 
     # Messages
     def Transmit(self, id, data, channel):
@@ -34,13 +45,32 @@ class CanInterface():
     def Receive(self, id, data):
         self.messageHandler(self.database, id, data)
 
+    # Timing
+    def InitializeTimeThread(self):
+        if(self.timingFunction == None): return
+        self.timeThread = Thread(target=self.TimeThread)
+
+    def BeginTimeThread(self):
+        if(self.timeThread == None): return
+        self.timeThreadOnline = True
+        self.timeThread.start()
+
+    def TimeThread(self):
+        if(self.timeThread == None): return
+        while(self.online):
+            self.timingFunction(self.database)
+            time.sleep(self.timingPeriod)
+    
+# Functions -------------------------------------------------------------------------------------------------------------------
+# - Call this function to get an initialized CAN Interface Object
 def Setup(database):
     if(config.CAN_LIBRARY_TYPE == "EMULATE"):
-        return CanInterface(database, messageHandler=HandleMessage)
+        print("CAN - Using CAN Emulation.")
+        return CanInterface(database, messageHandler=HandleMessage, timingFunction=SetTimeouts, timingPeriod=config.CAN_TIME_PERIOD)
     
     if(config.CAN_LIBRARY_TYPE == "CANLIB"):
         import lib_canlib
-        library = lib_canlib.Main(database, messageHandler=HandleMessage)
+        library = lib_canlib.Main(database, messageHandler=HandleMessage, timingFunction=SetTimeouts, timingPeriod=config.CAN_TIME_PERIOD)
         library.OpenChannel(config.CAN_BITRATE, 0)
         library.OpenChannel(config.CAN_BITRATE, 1)
         return library
@@ -48,19 +78,19 @@ def Setup(database):
     if(config.CAN_LIBRARY_TYPE == "INNOMAKER"):
         if(sys.platform == "win32"):
             import lib_innomaker_win
-            library = lib_innomaker_win.Main(database, messageHandler=HandleMessage)
+            library = lib_innomaker_win.Main(database, messageHandler=HandleMessage, timingFunction=SetTimeouts, timingPeriod=config.CAN_TIME_PERIOD)
             library.OpenChannel(config.CAN_BITRATE, 0)
             library.OpenChannel(config.CAN_BITRATE, 1)
             return library
 
         if(sys.platform == "linux"):
             import lib_innomaker_linux
-            library = lib_innomaker_linux.Main(database, messageHandler=HandleMessage)
+            library = lib_innomaker_linux.Main(database, messageHandler=HandleMessage, timingFunction=SetTimeouts, timingPeriod=config.CAN_TIME_PERIOD)
             library.OpenChannel(config.CAN_BITRATE, 0)
             library.OpenChannel(config.CAN_BITRATE, 1)
             return library
-    
-# Message Handling --------------------------------------------------------------------------------------------------------------------
+
+# Message Handling ------------------------------------------------------------------------------------------------------------
 
 # Handle Message
 # - Call to Interpret a CAN Message
@@ -283,7 +313,7 @@ def HandleStatusBms(database, data):
     # Timeout
     CalculateBmsStats(database) 
 
-# Data Extrapolation ------------------------------------------------------------------------------------------------------------------
+# Data Extrapolation ----------------------------------------------------------------------------------------------------------
 def CalculateInverterStats(database):
     database.inverterTempMean = None
     database.inverterTempMax  = None
@@ -351,21 +381,31 @@ def CalculateBmsStats(database):
         tempCount += 1
     if(tempCount != 0): database.packTemperatureMean /= tempCount
 
-# Message Timeouts ----------------------------------------------------------------------------------------
+# Message Timeouts ------------------------------------------------------------------------------------------------------------
+def SetTimeouts(database):
+    database.time = time.time()
+    if(database.ecuCanTimeout      == None or database.time > database.ecuCanTimeout      + config.CAN_MESSAGE_TIMEOUT): database.ecuCanActive      = False
+    if(database.acanCanTimeout     == None or database.time > database.acanCanTimeout     + config.CAN_MESSAGE_TIMEOUT): database.acanCanActive     = False
+    if(database.inverterCanTimeout == None or database.time > database.inverterCanTimeout + config.CAN_MESSAGE_TIMEOUT): database.inverterCanActive = False
+    if(database.bmsCanTimeout      == None or database.time > database.bmsCanTimeout      + config.CAN_MESSAGE_TIMEOUT): database.bmsCanActive      = False
+
 def ClearTimeoutEcu(database):
     database.ecuCanTimeout = time.time()
     database.ecuCanActive = True
+
 def ClearTimeoutAcan(database):
     database.acanCanTimeout = time.time()
     database.acanCanActive = True
+
 def ClearTimeoutInverter(database):
     database.inverterCanTimeout = time.time()
     database.inverterCanActive = True
+
 def ClearTimeoutBms(database):
     database.bmsCanTimeout = time.time()
     database.bmsCanActive = True
 
-# Data Interpretation -------------------------------------------------------------------------------------
+# Data Interpretation ---------------------------------------------------------------------------------------------------------
 def InterpretSignedNBitInt(value, bitCount=16):
     if(value > 2 ** (bitCount-1)): value -= 2 ** bitCount
     return value
@@ -375,7 +415,7 @@ def RpmToMph(rotationsPerMinute):
     speedMph = radiansPerMinute * config.TIRE_RADIUS_INCHES * config.MINUTES_PER_HOUR / (config.INCHES_PER_FOOT * config.FEET_PER_MILE)
     return speedMph
 
-# Message Transmitting ----------------------------------------------------------------------------------------------------------------
+# Message Transmitting --------------------------------------------------------------------------------------------------------
 def SendMessage(transmitter, id, data, channel=0):
     transmitter.Transmit(id, data, channel)
 

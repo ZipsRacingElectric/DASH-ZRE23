@@ -1,17 +1,24 @@
-# Libraries
-import sys
+# CANLIB Library --------------------------------------------------------------------------------------------------------------
+# Author: Cole Barach
+# Date Created: 22.11.29
+# Date Updated: 23.01.30
+#   This module provides a standard interface for the KVaser CANLIB library. The Main object of this script is a CAN Interface
+#   object which provides members for Transmitting and Receiving Messages.
 
-import threading
-from threading import Thread
-
+# Libraries -------------------------------------------------------------------------------------------------------------------
 import canlib
 from canlib import canlib
 from canlib import Frame
 from canlib.canlib import ChannelData
 
-# Imports
+import threading
+from threading import Thread
+
+# Imports ---------------------------------------------------------------------------------------------------------------------
+import can_interface
 from can_interface import CanInterface
 
+# Enumarables -----------------------------------------------------------------------------------------------------------------
 CanlibBitrate = {
     10000   : canlib.canBITRATE_10K,
     50000   : canlib.canBITRATE_50K,
@@ -23,22 +30,12 @@ CanlibBitrate = {
     1000000 : canlib.canBITRATE_1M
 }
 
+# Objects ---------------------------------------------------------------------------------------------------------------------
 class Main(CanInterface):
-    def __init__(self, database, messageHandler=None):
+    def __init__(self, database, messageHandler=None, timingFunction=None, timingPeriod=None):
         print("CAN - Using Kvaser Canlib Library")
-        super().__init__(database, messageHandler)
-
-        # Platform Identification
-        if(sys.platform == 'win32'):
-            print("CAN - Platform: Windows 32-Bit")
-            print("CAN - Canlib Version:", canlib.dllversion())
-            return
-        if(sys.platform == 'linux'):
-            print("CAN - Platform: Linux")
-            print("CAN - Linux Canlib not Supported")
-            return # Incomplete Setup
-        print("CAN - Unidentified System Platform.")
-        return # Incomplete Setup
+        print("CAN - Canlib Version:", canlib.dllversion())
+        super().__init__(database, messageHandler, timingFunction, timingPeriod)
 
     def OpenChannel(self, bitrate, id):
         self.channels.append(OpenChannel(id, bitrate=CanlibBitrate[bitrate]))
@@ -63,19 +60,16 @@ class Main(CanInterface):
                 print("CAN - Error:", ex)
 
     def Begin(self):
-        self.online = True
+        super().Begin()
 
         for index in range(len(self.channels)):
-            print("CAN - Channel", index, "Thread Starting...")
+            print(f"CAN - Channel {index} Thread Starting...")
             if(self.channels[index] == None): continue
             channelThread = Thread(target= lambda: self.Scan(self.channels[index]))
             channelThread.start()
-            print("CAN - Channel", index, "Thread Started.")
+            print(f"CAN - Channel {index} Thread Started.")
 
-    def Kill(self):
-        print("CAN - Terminating...")
-        self.online = False
-
+# Functions -------------------------------------------------------------------------------------------------------------------
 def OpenChannel(channelId, openFlags=canlib.canOPEN_ACCEPT_VIRTUAL, bitrate=canlib.canBITRATE_500K, bitrateFlags=canlib.canDRIVER_NORMAL):
     channel = canlib.openChannel(channelId, openFlags)
     print("CAN - Device:", ChannelData(channelId).channel_name, "- ID:", ChannelData(channelId).card_upc_no)

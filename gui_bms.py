@@ -1,24 +1,34 @@
-import tkinter
+# GUI BMS View ----------------------------------------------------------------------------------------------------------------
+# Author: Cole Barach
+# Date Created: 22.11.19
+# Date Updated: 23.01.30
+#   This module contains all objects relating to the BMS View of the GUI. The View object may be instanced to create a view
+#   for displaying Accumulator information.
 
-# Includes
-import gui
+# Libraries -------------------------------------------------------------------------------------------------------------------
+import tkinter
 import lib_tkinter
 from lib_tkinter import Orientation
 
+# Includes --------------------------------------------------------------------------------------------------------------------
+import gui
+
+# Constants -------------------------------------------------------------------------------------------------------------------
 CELL_WIDTH_COUNT  = 18
 CELL_HEIGHT_COUNT = 5
 
 TEMP_WIDTH_COUNT = 9
 TEMP_HEIGHT_COUNT = 5
 
+# View Object -----------------------------------------------------------------------------------------------------------------
 class View(gui.View):
+    # Initialization
     def __init__(self, parent, id, style, database):
-        # Root --------------------------------------------------------------------------------------------------------------------------------------------------------
+        # Root --------------------------------------------------------------------------------------------------------------------------------------
         super().__init__(parent, id, style, database)
 
         # Partitioning
         self.root.columnconfigure(0, weight=1)
-
         self.root.rowconfigure   (0, weight=0)
         self.root.rowconfigure   (1, weight=1)
         self.root.rowconfigure   (2, weight=0)
@@ -37,9 +47,10 @@ class View(gui.View):
 
         self.statPanel   = lib_tkinter.GetFrame    (self.root, style=style, column=0, row=0, sticky="EW")
         self.cellPanel   = lib_tkinter.GetFrame    (self.root, style=style, column=0, row=1, sticky="EW")
-        self.buttonPanel = lib_tkinter.GetButtonBar(self.root, style=style, column=0, row=2, sticky="EW", minHeight=style["buttonBarHeight"], orientation=Orientation.HORIZONTAL, commands=buttonCommands, labels=buttonLabels)
+        self.buttonPanel = lib_tkinter.GetButtonBar(self.root, style=style, column=0, row=2, sticky="EW", minHeight=style["buttonBarHeight"],
+                                                    orientation=Orientation.HORIZONTAL, commands=buttonCommands, labels=buttonLabels)
 
-        # Cell Panel --------------------------------------------------------------------------------------------------------------------------------------------------
+        # Cell Panel --------------------------------------------------------------------------------------------------------------------------------
         # Partitioning
         self.cellPanel.columnconfigure(0,                  weight=1) # Padding
         self.cellPanel.columnconfigure(CELL_WIDTH_COUNT+1, weight=1) # Padding
@@ -50,9 +61,10 @@ class View(gui.View):
                 index = x + y*CELL_WIDTH_COUNT
                 self.cellPanel.columnconfigure(x+1, minsize=style["bmsStatSize"]+2)
                 self.cellPanel.rowconfigure   (y+1, minsize=style["bmsStatSize"]+2)
-                self.cellStats[index] = GetCellStat(self.cellPanel, style=style, minWidth=style["bmsStatSize"], minHeight=style["bmsStatSize"], column=x+1, row=y, styleOverrides=[("font", "fontBare")])
+                self.cellStats[index] = GetCellStat(self.cellPanel, style=style, minWidth=style["bmsStatSize"], minHeight=style["bmsStatSize"],
+                                                    column=x+1, row=y, styleOverrides=[("font", "fontBare")])
 
-        # Stat Panel --------------------------------------------------------------------------------------------------------------------------------------------------
+        # Stat Panel --------------------------------------------------------------------------------------------------------------------------------
         # Partitioning
         self.statPanel.columnconfigure(0, weight=1)
         self.statPanel.columnconfigure(1, weight=1)
@@ -101,15 +113,12 @@ class View(gui.View):
         self.Update()
 
     # Set View Type
-    # - Call to Update the View Type of the Display
-    # - Sets the View Type of the CellStat Widgets
+    # - Sets the View Type of the Individual Cell Stats
     def SetViewType(self, viewType):
         for stat in self.cellStats:
             stat.SetViewType(viewType)
 
     # Update
-    # - Sends current data to appropriate widgets
-    # - Can be called when view is open or closed
     def Update(self):
         for index in range(CELL_WIDTH_COUNT*CELL_HEIGHT_COUNT):
             self.cellStats[index].Set(self.database.cellVoltages[index],
@@ -133,16 +142,22 @@ class View(gui.View):
         self.maxDeltaStat.Set   (self.database.cellDeltaMax)
         self.meanDeltaStat.Set  (self.database.cellDeltaMean)
 
+# Getters ---------------------------------------------------------------------------------------------------------------------
 def GetCellStat(parent, style, minWidth=20, minHeight=20, grid=True, column=0, row=0, columnspan=1, rowspan=1, sticky="", styleOverrides=[]):
     style.InsertOverrides(styleOverrides)
-    canvas = CellStat(parent, minWidth=int(minWidth), minHeight=int(minHeight), voltageError=style["voltageErrorColor"], balancePalette=style["balancingPalette"], voltageDomain=style["voltageDomain"], temperaturePalette=style["tempHighlights"], temperatureDomain=style["tempDomain"], fontColor=style["textColor"], borderColor=style["highlight"], font=style["font"], borderWidth=style["borderWidth"])
+    canvas = CellStat(parent, minWidth=int(minWidth), minHeight=int(minHeight), voltageError=style["voltageErrorColor"],
+                      balancePalette=style["balancingPalette"], voltageDomain=style["voltageDomain"], temperaturePalette=style["tempHighlights"],
+                      temperatureDomain=style["tempDomain"], fontColor=style["textColor"], borderColor=style["highlight"], font=style["font"],
+                      borderWidth=style["borderWidth"])
     if(grid):
         canvas.grid(column=column, row=row, columnspan=columnspan, rowspan=rowspan, sticky=sticky)
     style.RemoveOverrides(styleOverrides)
     return canvas
 
+# Widgets ---------------------------------------------------------------------------------------------------------------------
 class CellStat(tkinter.Canvas):
-    def __init__(self, parent, minWidth, minHeight, voltageError=['#FFAAAA'], balancePalette=['#F0F0F0'], temperaturePalette=['#FF0000'], voltageDomain=[1], temperatureDomain=[1], fontColor='#000000', borderColor="#FFFFFF", font=("consolas", 10), borderWidth=2):
+    def __init__(self, parent, minWidth, minHeight, voltageError=['#FFAAAA'], balancePalette=['#F0F0F0'], temperaturePalette=['#FF0000'],
+                 voltageDomain=[1], temperatureDomain=[1], fontColor='#000000', borderColor="#FFFFFF", font=("consolas", 10), borderWidth=2):
         self.width  = minWidth
         self.height = minHeight
 
@@ -242,17 +257,22 @@ class CellStat(tkinter.Canvas):
     def Grid(self, column=0, row=0, columnspan=1, rowspan=1, sticky=""):
         self.canvas.grid(column=column, row=row, columnspan=columnspan, rowspan=rowspan, sticky=sticky)
 
+# Misc Math Functions ---------------------------------------------------------------------------------------------------------
+# Numeric Linerar Interpolation
 def LinearInterpolate(value, min, max):
     return value * (max - min) + min
 
+# Numeric Inverse Linear Interpolation
 def InverseLinearInterpolate(value, min, max):
     return (value - min) / (max - min)
 
+# Numeric Clamping
 def Clamp(value, min, max):
     if(value > max): return max
     if(value < min): return min
     return value
 
+# Hex Color Linear Interpolation
 def ColorLinearInterpolate(value, min, max):
     # Extract Hexadecimal Color Channels to Integer Values
     redMin   = int(min[1:3], 16)

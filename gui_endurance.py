@@ -1,9 +1,19 @@
+# Endurance GUI View ----------------------------------------------------------------------------------------------------------
+# Author: Cole Barach
+# Date Created: 22.11.23
+# Date Updated: 23.01.30
+#   This module contains all objects related to the Endurance View of the GUI. The View object may be instanced to create a
+#   display for running endurance events.
+
+# Libraries -------------------------------------------------------------------------------------------------------------------
 import lib_tkinter
 from lib_tkinter import Orientation
 
+# Includes --------------------------------------------------------------------------------------------------------------------
 import gui
 import config
 
+# Objects ---------------------------------------------------------------------------------------------------------------------
 class View(gui.View):
     def __init__(self, parent, id, style, database):
         # Root --------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -19,12 +29,12 @@ class View(gui.View):
 
         # Widgets
         buttonLabels   = ["Back",
+                          "Testing\nView",
                           "Speed\nView",
-                          "",
                           ""]
         buttonCommands = [lambda: self.parent.CloseViews(),
+                          lambda: self.parent.OpenView("Testing"),
                           lambda: self.parent.OpenView("Speed"),
-                          0,
                           0]
 
         self.brakeBar   = lib_tkinter.GetProgressBar(self.root, column=0, row=0, minWidth=style["sideBarWidth"], sticky="NS", rowspan=2, style=style, orientation=Orientation.VERTICAL, label="BRAKE",    border=True, scaleFactor=100, styleOverrides=[("lowlight", "accentRed")])

@@ -1,3 +1,12 @@
+# TKinter Library -------------------------------------------------------------------------------------------------------------
+# Author: Cole Barach
+# Date Created: 22.09.28
+# Date Updated: 23.01.30
+#   This module provides a standard interface for the TKinter python library. The primative objects of TKinter may be instanced
+#   via Getter functions, which implement a standardized style and geometry. Custom widgets are also defined, which likewise
+#   have their own Getter functions.
+
+# Libraries -------------------------------------------------------------------------------------------------------------------
 import tkinter
 
 import json
@@ -5,7 +14,9 @@ import json
 import enum
 from enum import Enum
 
+# Objects ---------------------------------------------------------------------------------------------------------------------
 class Style(dict):
+    # Initialization
     def __init__(self, filePath=None):
         super().__init__()
         self.__dict__ = self
@@ -15,9 +26,11 @@ class Style(dict):
         else:
             self.LoadJson(filePath)
 
+    # Set Key Pair
     def Set(self, key, value):
         self[key] = value
 
+    # Load Default Keys
     def LoadDefaults(self):
         # Font
         self.Set("font", ('Consolas', 10))
@@ -35,6 +48,7 @@ class Style(dict):
         self.Set("strataGap",   2)
         self.Set("strataSlope", 0)
 
+    # Load from JSON File
     def LoadJson(self, filePath):
         file = open(filePath)
         data = json.load(file)
@@ -44,27 +58,38 @@ class Style(dict):
             else:
                 self.Set(key, item)
 
+    # Insert Override
+    # - Call to temporarily overide a Key Pair
     def InsertOverride(self, key1, key2):
         self.overrides[key1] = self[key1]
         self[key1] = self[key2]
 
+    # Remove Override
+    # - Call to revert a Key Pair
     def RemoveOverride(self, key1):
         self[key1] = self.overrides[key1]
         self.overrides.pop(key1)
 
+    # Insert Overrides
+    # - Call to temporarily overide a List of Key Pairs
     def InsertOverrides(self, overrides):
         for key1, key2 in overrides:
             self.InsertOverride(key1, key2)
 
+    # Call to revert a List of Key Pairs
     def RemoveOverrides(self, overrides):
         for key1, key2 in overrides:
             self.RemoveOverride(key1)
 
+# Enumerables -----------------------------------------------------------------------------------------------------------------
 class Orientation(Enum):
     HORIZONTAL = 0
     VERTICAL   = 1
 
 # Getters ---------------------------------------------------------------------------------------------------------------------------
+# Get Frame
+# - Call to Get and Grid a Frame Object
+# - Use Border to Enable a Border and Padding
 def GetFrame(parent, style, grid=True, column=0, row=0, columnspan=1, rowspan=1, sticky="", border=False, styleOverrides=[]):
     style.InsertOverrides(styleOverrides)
     frame = tkinter.Frame(parent, background=style['background'])
@@ -77,6 +102,9 @@ def GetFrame(parent, style, grid=True, column=0, row=0, columnspan=1, rowspan=1,
     style.RemoveOverrides(styleOverrides)
     return frame
 
+# Get Label Frame
+# - Call to Get and Grid a Label Frame Object
+# - Use Border to Enable a Border and Padding
 def GetLabelFrame(parent, style, grid=True, column=0, row=0, columnspan=1, rowspan=1, sticky="", label="", border=False, styleOverrides=[]):
     style.InsertOverrides(styleOverrides)
     frame = tkinter.LabelFrame(parent, text=label, bg=style["background"], fg=style["textColor"], font=style["font"])
@@ -87,6 +115,10 @@ def GetLabelFrame(parent, style, grid=True, column=0, row=0, columnspan=1, rowsp
     style.RemoveOverrides(styleOverrides)
     return frame
 
+# Get Canvas
+# - Call to Get and Grid a Canvas Object
+# - Use Border to Enable a Border and Padding
+# - Width and Height behave as minimum values
 def GetCanvas(parent, style, width, height, grid=True, column=0, row=0, columnspan=1, rowspan=1, sticky="", border=False, styleOverrides=[]):
     style.InsertOverrides(styleOverrides)
     canvas = tkinter.Canvas(parent, width=int(width), height=int(height), background=style["background"], highlightthickness=0)
@@ -97,6 +129,9 @@ def GetCanvas(parent, style, width, height, grid=True, column=0, row=0, columnsp
     style.RemoveOverrides(styleOverrides)
     return canvas
 
+# Get Divider
+# - Call to Get and Grid a Divider Styled Canvas Object
+# - Use Orientation to indicate direction
 def GetDivider(parent, style, orientation, grid=True, column=0, row=0, columnspan=1, rowspan=1, sticky="", styleOverrides=[]):
     style.InsertOverrides(styleOverrides)
     frame = tkinter.Frame(parent)
@@ -111,6 +146,8 @@ def GetDivider(parent, style, orientation, grid=True, column=0, row=0, columnspa
     style.RemoveOverrides(styleOverrides)
     return frame
 
+# Get Label
+# - Call to Get and Grid a Label Object
 def GetLabel(parent, style, text="", grid=True, column=0, row=0, columnspan=1, rowspan=1, sticky="", styleOverrides=[]):
     style.InsertOverrides(styleOverrides)
     label = tkinter.Label(parent, font=style["font"], text=text, foreground=style["textColor"], background=style["background"])
@@ -119,6 +156,9 @@ def GetLabel(parent, style, text="", grid=True, column=0, row=0, columnspan=1, r
     style.RemoveOverrides(styleOverrides)
     return label
 
+# Get Button
+# - Call to Get and Grid a Button Object
+# - Use Command to provide Functionality
 def GetButton(parent, style, command="", text="", grid=True, column=0, row=0, columnspan=1, rowspan=1, sticky="", styleOverrides=[]):
     style.InsertOverrides(styleOverrides)
     button = tkinter.Button(parent, command=command, text=text, font=style["font"], foreground=style["textColor"], background=style["background"])
@@ -126,6 +166,11 @@ def GetButton(parent, style, command="", text="", grid=True, column=0, row=0, co
     style.RemoveOverrides(styleOverrides)
     return button
 
+# Get Image Button
+# - Call to Get and Grid a Button Object
+# - Returns a Tuple of Button Object and PhotoImage
+# - Do not discard PhotoImage, Garbage Collector will deallocate memory
+# - Use Image Sampling to indicate a size
 def GetImageButton(parent, style, command="", image="", imageSampling=(1,1), grid=True, column=0, row=0, columnspan=1, rowspan=1, sticky="", styleOverrides=[]):
     style.InsertOverrides(styleOverrides)
     
@@ -144,22 +189,35 @@ def GetImageButton(parent, style, command="", image="", imageSampling=(1,1), gri
     style.RemoveOverrides(styleOverrides)
     return (button, tkinterImage)
 
+# Get Radio Button
+# - Call to Get and Grid a Radio Button Object
+# - Use Variable for Functionality
 def GetRadiobutton(parent, style, value="", variable="", text="", grid=True, column=0, row=0, columnspan=1, rowspan=1, sticky=""):
     button = tkinter.Radiobutton(parent, variable=variable, value=value, text=text, font=style["font"], foreground=style["textColor"], background=style["background"])
     if(grid): button.grid(column=column, row=row, columnspan=columnspan, rowspan=rowspan, sticky=sticky)
     return button
 
+# Get Entry
+# - Call to Get and Grid an Entry Object
+# - Use Variable for Functionality
 def GetEntry(parent, style, minWidth, value="", grid=True, column=0, row=0, columnspan=1, rowspan=1, sticky=""):
     entry = tkinter.Entry(parent, width=minWidth, font=style["font"], foreground=style["textColor"], bg=style["background"])
     entry.insert(0,str(value))
     if(grid): entry.grid(column=column, row=row, columnspan=columnspan, rowspan=rowspan, sticky=sticky)
     return entry
 
+# Get Check Button
+# - Call to Get and Grid a Check Button Object
+# - Use Variable for Functionality
 def GetCheckbutton(parent, style, variable, text="", grid=True, column=0, row=0, columnspan=1, rowspan=1, sticky=""):
     button = tkinter.Checkbutton(parent, variable=variable, text=text, font=style["font"], foreground=style["textColor"], background=style["background"])
     if(grid): button.grid(column=column, row=row, columnspan=columnspan, rowspan=rowspan, sticky=sticky)
     return button
 
+# Get Progress Bar
+# - Call to Get and Grid a Progress Bar Object
+# - Use Orientation for Direction
+# - Refer to Progress Bar Object for Info
 def GetProgressBar(parent, style, orientation, grid=True, column=0, row=0, columnspan=1, rowspan=1, sticky="", minWidth=20, minHeight=20, gridPadding=0, scaleFactor=1, offset=0, label="", border=False, styleOverrides=[]):
     style.InsertOverrides(styleOverrides)
     bar = ProgressBar(parent, orientation, minWidth=minWidth, minHeight=minHeight, scaleFactor=scaleFactor, offset=offset, label=label, background=style["background"], outline='#000000', foreground=style["lowlight"], font=style["font"], textColor=style["textColor"], borderWidth=0)
@@ -170,6 +228,10 @@ def GetProgressBar(parent, style, orientation, grid=True, column=0, row=0, colum
     style.RemoveOverrides(styleOverrides)
     return bar
 
+# Get Stratafied Bar
+# - Call to Get and Grid a Stratafied Bar Object
+# - Use Orientation for Direction
+# - Refer to Stratafied Bar Object for Info
 def GetStrataBar(parent, style, orientation, grid=True, column=0, row=0, columnspan=1, rowspan=1, sticky="", minWidth=20, minHeight=20, scaleFactor=1, offset=0, border=False, highlights=["#023399"], lowlights=["#F0F0F0"], domain=[1], mask=[], styleOverrides=[]):
     style.InsertOverrides(styleOverrides)
     bar = StratifiedBar(parent, orientation, minWidth=minWidth, minHeight=minHeight, scaleFactor=scaleFactor, offset=offset, background=style["background"], highlights=highlights, lowlights=lowlights, domain=domain, strataSize=style["strataSize"], strataGap=style["strataGap"], borderWidth=0)
@@ -185,6 +247,12 @@ def GetStrataBar(parent, style, orientation, grid=True, column=0, row=0, columns
     style.RemoveOverrides(styleOverrides)
     return bar
 
+# Get Button Bar
+# - Call to Get and Grid a Button Bar Object
+# - Use Orientation for Direction
+# - Use Command List size to indicate Button Count
+# - Command and Label lists must match size
+# - Refer to Button Bar Object for Info
 def GetButtonBar(parent, style, orientation, commands, labels=[], grid=True, column=0, row=0, columnspan=1, rowspan=1, sticky="", minWidth=20, minHeight=20, border=False, styleOverrides=[]):
     style.InsertOverrides(styleOverrides)
     bar = ButtonBar(parent, orientation, commands, minWidth=minWidth, minHeight=minHeight, labels=labels, background=style["background"], borderColor='#000000', font=style["font"], fontColor=style["textColor"], borderWidth=0)
@@ -195,6 +263,11 @@ def GetButtonBar(parent, style, orientation, commands, labels=[], grid=True, col
     style.RemoveOverrides(styleOverrides)
     return bar
 
+# Get Label Stat
+# - Call to Get and Grid a Label Stat Object
+# - Use Precision for numerics
+# - Use Font Color list and Domain for advanced Coloring
+# - Refer to Label Stat Object for Info
 def GetLabelStat(parent, style, grid=True, column=0, row=0, columnspan=1, rowspan=1, sticky="", precision=0, fontColors=None, domain=[1], styleOverrides=[]):
     style.InsertOverrides(styleOverrides)
     if(fontColors == None):
@@ -205,6 +278,10 @@ def GetLabelStat(parent, style, grid=True, column=0, row=0, columnspan=1, rowspa
     style.RemoveOverrides(styleOverrides)
     return label
 
+# Get Check Stat
+# - Call to Get and Grid a Check Stat Object
+# - Use Inverted to invert Checks and X's
+# - Refer to Check Stat Object for Info
 def GetCheckStat(parent, style, grid=True, column=0, row=0, columnspan=1, rowspan=1, sticky="", inverted=False, styleOverrides=[]):
     style.InsertOverrides(styleOverrides)
     stat = CheckStat(parent, inverted=inverted, foreground=style["textColor"], background=style["background"], font=style["font"])
@@ -213,6 +290,10 @@ def GetCheckStat(parent, style, grid=True, column=0, row=0, columnspan=1, rowspa
     style.RemoveOverrides(styleOverrides)
     return stat
 
+# Get Scroll Frame
+# - Call to Get and Grid a Scroll Frame Object
+# - Use Orientation for Scroll Direction
+# - Refer to Scroll Frame Object for Info
 def GetScrollFrame(parent, style, orientation, grid=True, column=0, row=0, columnspan=1, rowspan=1, sticky="", styleOverrides=[]):
     style.InsertOverrides(styleOverrides)
     frame = ScrollFrame(parent, orientation=orientation, background=style["background"], highlight=style["highlight"])
@@ -222,6 +303,9 @@ def GetScrollFrame(parent, style, orientation, grid=True, column=0, row=0, colum
     return frame
 
 # Widgets ---------------------------------------------------------------------------------------------------------------------------
+# Progress Bar
+# - Use this widget as a progress bar object
+# - Use Scale Factor and Offset for Displaying non-percentages
 class ProgressBar(tkinter.Canvas):
     def __init__(self, parent, orientation, minWidth=20, minHeight=20, scaleFactor=1, offset=0, label="", background='#F0F0F0', outline='#AAAAAA', foreground='#444444', font=("consolas", 10), textColor="#000000", borderWidth=1):
         # Initialize Variables
@@ -278,6 +362,10 @@ class ProgressBar(tkinter.Canvas):
     def Get(self):
         return self.value
 
+# Statafied Bar
+# - Use this widget as a stylized progress bar
+# - Use Highlight and Lowlight Lists for coloring sections
+# - Use Scale Factor and Offset for Displaying non-percentages
 class StratifiedBar(tkinter.Canvas):
     def __init__(self, parent, orientation, minWidth=20, minHeight=20, scaleFactor=1, offset=0, background='#F0F0F0', highlights = ['#023399'], lowlights = ['#F0F0F0'], domain = [1], strataSize = 8, strataGap = 2, borderWidth = 1, borderColor='#AAAAAA'):
         # Initialize Variables
@@ -421,6 +509,10 @@ class StratifiedBar(tkinter.Canvas):
         self.delete(self.mask)
         self.mask = self.create_polygon(x0, y0, xyCoords, fill=self.background)
 
+# Button Bar
+# - Use this widget as a list of Button Objects 
+# - Command List to indicate the number of Buttons to create
+# - If using Label List, it must be of same length as Command List
 class ButtonBar(tkinter.Frame):
     def __init__(self, parent, orientation, commands, minWidth=20, minHeight=20, labels=[], background="#F0F0F0", fontColor="#000000", font=("consolas", 10), borderColor="#444444", borderWidth=1):
         # Root Instantiation
@@ -451,6 +543,10 @@ class ButtonBar(tkinter.Frame):
                 buttons[index] = tkinter.Button(container, command=commands[index], text=labels[index], font=font, foreground=fontColor, background=background, highlightbackground=borderColor, highlightthickness=borderWidth)
                 buttons[index].pack(expand=True, fill="both")
 
+# Label Stat
+# - Use this widget as a Label for a Statistic
+# - Use Precision for floating-point variables
+# - Use Font Color List with Domain List to modify Coloring
 class LabelStat(tkinter.Label):
     def __init__(self, parent, precision=0, fontColors=['#023399'], background='#F0F0F0', domain=[1], font=("consolas", 10)):
         super().__init__(parent, font=font, foreground=fontColors[0], background=background,  text="--")
@@ -483,6 +579,10 @@ class LabelStat(tkinter.Label):
                 return palette[index]
         return palette[len(palette) - 1]
 
+# Check Stat
+# - Use this widget as a Check/X Stat
+# - Default True = Check, False - X
+# - Use Invert to swap values
 class CheckStat(tkinter.Label):
     def __init__(self, parent, inverted=False, background = '#F0F0F0', foreground='#000000', font=("consolas", 10)):
         super().__init__(parent, background=background, foreground=foreground, font=font, text="-")
@@ -502,6 +602,9 @@ class CheckStat(tkinter.Label):
         if(not self.value and self.inverted): return '\u2713'
         return 'X'
 
+# Scroll Frame
+# - Use this widget as a Frame with a Scroll Bar
+# - Use Orientation to indicate a Scrolling Direction
 class ScrollFrame(tkinter.Frame):
     def __init__(self, parent, orientation, background="#F0F0F0", highlight="#AAAAAA"):
         super().__init__(parent, background=background, highlightthickness=0)

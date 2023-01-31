@@ -1,9 +1,19 @@
+# Database GUI View -----------------------------------------------------------------------------------------------------------
+# Author: Cole Barach
+# Date Created: 22.01.15
+# Date Updated: 23.01.30
+#   This module contains all objects related to the Database View of the GUI. The View object may be instanced to create a
+#   display for the entire database. This view will display all relevant information from the database.
+
+# Libraries -------------------------------------------------------------------------------------------------------------------
 import lib_tkinter
 from lib_tkinter import Orientation
 
+# Includes --------------------------------------------------------------------------------------------------------------------
 import gui
 import config
 
+# Objects ---------------------------------------------------------------------------------------------------------------------
 class View(gui.View):
     def __init__(self, parent, id, style, database):
         # Root --------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -173,37 +183,38 @@ class View(gui.View):
 
     def Update(self):
         # Communications
-        self.ecuCanStat.Set     (self.database.ecuCanActive)
-        self.acanCanStat.Set    (self.database.acanCanActive)
-        self.bmsCanStat.Set     (self.database.bmsCanActive)
-        self.inverterCanStat.Set(self.database.inverterCanActive)
-        self.ecuCanTimeStat.Set     (self.database.ecuCanTimeout)
-        self.acanCanTimeStat.Set    (self.database.acanCanTimeout)
-        self.bmsCanTimeStat.Set     (self.database.bmsCanTimeout)
-        self.inverterCanTimeStat.Set(self.database.inverterCanTimeout)
+        self.ecuCanStat.Set              (self.database.ecuCanActive)
+        self.acanCanStat.Set             (self.database.acanCanActive)
+        self.bmsCanStat.Set              (self.database.bmsCanActive)
+        self.inverterCanStat.Set         (self.database.inverterCanActive)
+
+        if(self.database.ecuCanTimeout      != None): self.ecuCanTimeStat.Set     (self.database.time - self.database.ecuCanTimeout)
+        if(self.database.acanCanTimeout     != None): self.acanCanTimeStat.Set    (self.database.time - self.database.acanCanTimeout)
+        if(self.database.bmsCanTimeout      != None): self.bmsCanTimeStat.Set     (self.database.time - self.database.bmsCanTimeout)
+        if(self.database.inverterCanTimeout != None): self.inverterCanTimeStat.Set(self.database.time - self.database.inverterCanTimeout)
 
         # Pedal Info
-        self.apps1Stat.Set        (self.database.apps1)
-        self.apps2Stat.Set        (self.database.apps2Raw)
-        self.brake1Stat.Set       (self.database.brake1)
-        self.brake2Stat.Set       (self.database.brake2)
-        self.apps1PercentStat.Set (self.database.apps1Percent)
-        self.apps2PercentStat.Set (self.database.apps2Percent)
-        self.brake1PercentStat.Set(self.database.brake1Percent)
-        self.brake2PercentStat.Set(self.database.brake2Percent)
-        self.apps1MinStat.Set     (self.database.apps1Min)
-        self.apps1MaxStat.Set     (self.database.apps1Max)
-        self.apps2MinStat.Set     (self.database.apps2RawMin)
-        self.apps2MaxStat.Set     (self.database.apps2RawMax)
-        self.acceleratingStat.Set (self.database.accelerating)
-        self.brakingStat.Set      (self.database.braking)
+        self.apps1Stat.Set               (self.database.apps1)
+        self.apps2Stat.Set               (self.database.apps2Raw)
+        self.brake1Stat.Set              (self.database.brake1)
+        self.brake2Stat.Set              (self.database.brake2)
+        self.apps1PercentStat.Set        (self.database.apps1Percent)
+        self.apps2PercentStat.Set        (self.database.apps2Percent)
+        self.brake1PercentStat.Set       (self.database.brake1Percent)
+        self.brake2PercentStat.Set       (self.database.brake2Percent)
+        self.apps1MinStat.Set            (self.database.apps1Min)
+        self.apps1MaxStat.Set            (self.database.apps1Max)
+        self.apps2MinStat.Set            (self.database.apps2RawMin)
+        self.apps2MaxStat.Set            (self.database.apps2RawMax)
+        self.acceleratingStat.Set        (self.database.accelerating)
+        self.brakingStat.Set             (self.database.braking)
 
         # Motor Info
-        self.rpmStat.Set          (self.database.motorRpm)
-        self.speedStat.Set        (self.database.motorSpeedMph)
-        self.torquePercentStat.Set(self.database.torquePercentageMax)
-        self.regenPercentStat.Set (self.database.torquePercentageRegen)
-        self.motorTempStat.Set    (self.database.motorTemperature)
+        self.rpmStat.Set                 (self.database.motorRpm)
+        self.speedStat.Set               (self.database.motorSpeedMph)
+        self.torquePercentStat.Set       (self.database.torquePercentageMax)
+        self.regenPercentStat.Set        (self.database.torquePercentageRegen)
+        self.motorTempStat.Set           (self.database.motorTemperature)
 
         # ECU Info
         if(self.database.driveState   == self.database.DriveState.INITIALIZING):
@@ -232,30 +243,30 @@ class View(gui.View):
         self.lvBatteryStat.Set(self.database.lvBatteryVoltage)
 
         # Accumulator Data
-        self.socStat.Set           (self.database.stateOfCharge)
-        self.packVoltageStat.Set   (self.database.packVoltage)
-        self.packCurrentStat.Set   (self.database.packCurrent)
-        self.cellVoltageMaxStat.Set(self.database.cellVoltageMax)
-        self.cellVoltageMinStat.Set(self.database.cellVoltageMin)
-        self.cellDeltaMax.Set      (self.database.cellDeltaMax)
-        self.cellDeltaMean.Set     (self.database.cellDeltaMean)
-        self.packTempMaxStat.Set   (self.database.packTemperatureMax)
-        self.packTempMeanStat.Set  (self.database.packTemperatureMean)
+        self.socStat.Set                 (self.database.stateOfCharge)
+        self.packVoltageStat.Set         (self.database.packVoltage)
+        self.packCurrentStat.Set         (self.database.packCurrent)
+        self.cellVoltageMaxStat.Set      (self.database.cellVoltageMax)
+        self.cellVoltageMinStat.Set      (self.database.cellVoltageMin)
+        self.cellDeltaMax.Set            (self.database.cellDeltaMax)
+        self.cellDeltaMean.Set           (self.database.cellDeltaMean)
+        self.packTempMaxStat.Set         (self.database.packTemperatureMax)
+        self.packTempMeanStat.Set        (self.database.packTemperatureMean)
 
         # Inverter Data
-        self.inverterTempGdbStat.Set    (self.database.inverterTempGdb)
-        self.inverterTempModuleAStat.Set(self.database.inverterTempModuleA)
-        self.inverterTempModuleBStat.Set(self.database.inverterTempModuleB)
-        self.inverterTempModuleCStat.Set(self.database.inverterTempModuleC)
-        self.inverterTempCbStat.Set     (self.database.inverterTempCb)
-        self.inverterTempMeanStat.Set   (self.database.inverterTempMean)
-        self.inverterTempMaxStat.Set    (self.database.inverterTempMax)
+        self.inverterTempGdbStat.Set     (self.database.inverterTempGdb)
+        self.inverterTempModuleAStat.Set (self.database.inverterTempModuleA)
+        self.inverterTempModuleBStat.Set (self.database.inverterTempModuleB)
+        self.inverterTempModuleCStat.Set (self.database.inverterTempModuleC)
+        self.inverterTempCbStat.Set      (self.database.inverterTempCb)
+        self.inverterTempMeanStat.Set    (self.database.inverterTempMean)
+        self.inverterTempMaxStat.Set     (self.database.inverterTempMax)
 
         # Errors
-        self.error25_5Stat.Set      (self.database.error25_5Implausible)
-        self.error100MsStat.Set     (self.database.error100MsImplausible)
-        self.errorAcanStat.Set      (self.database.errorAcanImplausible)
-        self.errorBmsSelfStat.Set   (self.database.errorBmsSelfTestFault)
-        self.errorBmsVoltageStat.Set(self.database.errorBmsVoltageFault)
-        self.errorBmsTempStat.Set   (self.database.errorBmsTempFault)
-        self.errorBmsSenseStat.Set  (self.database.errorBmsSenseLineFault)
+        self.error25_5Stat.Set           (self.database.error25_5Implausible)
+        self.error100MsStat.Set          (self.database.error100MsImplausible)
+        self.errorAcanStat.Set           (self.database.errorAcanImplausible)
+        self.errorBmsSelfStat.Set        (self.database.errorBmsSelfTestFault)
+        self.errorBmsVoltageStat.Set     (self.database.errorBmsVoltageFault)
+        self.errorBmsTempStat.Set        (self.database.errorBmsTempFault)
+        self.errorBmsSenseStat.Set       (self.database.errorBmsSenseLineFault)

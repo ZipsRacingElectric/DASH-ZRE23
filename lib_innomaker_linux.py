@@ -1,19 +1,29 @@
-# Libraries
-import os
+# Innomaker USB-CAN Linux Library ---------------------------------------------------------------------------------------------
+# Author: Cole Barach
+# Date Created: 23.01.23
+# Date Updated: 23.01.30
+#   This module provides a standard interface for the Innomaker USB-CAN library. The Main object of this script is a
+#   CAN Interface object which provides members for Transmitting and Receiving Messages.
+
+# Libraries -------------------------------------------------------------------------------------------------------------------
 import can
+
+import os
 
 import threading
 from threading import Thread
 
-# Imports
+# Imports ---------------------------------------------------------------------------------------------------------------------
+import can_interface
 from can_interface import CanInterface
 
+# Objects ---------------------------------------------------------------------------------------------------------------------
 class Main(CanInterface):
-    def __init__(self, database, messageHandler=None):
+    def __init__(self, database, messageHandler=None, timingFunction=None, timingPeriod=None):
         print("CAN - Using Innomaker USB-CAN Library")
         print("CAN - Platform: Linux")
 
-        super().__init__(database, messageHandler)
+        super().__init__(database, messageHandler, timingFunction, timingPeriod)
         self.channels = []
 
     def OpenChannel(self, bitrate, id):
@@ -37,16 +47,15 @@ class Main(CanInterface):
         self.Receive(id, data)
 
     def Begin(self):
-        self.online = True
+        super().Begin()
         
         for index in range(len(self.channels)):
+            print(f"CAN - Channel {index} Thread Starting...")
             channelThread = Thread(target= lambda: self.Scan(index))
             channelThread.start()
+            print(f"CAN - Channel {index} Thread Started.")
 
-    def Kill(self):
-        print("CAN - Terminating...")
-        self.online = False
-
+# Functions -------------------------------------------------------------------------------------------------------------------
 def OpenChannel(id, bitrate):
     print(f"CAN - Channel {id} Opening...")
 

@@ -1,4 +1,11 @@
-# Libraries
+# Innomaker USB-CAN Windows Library -------------------------------------------------------------------------------------------
+# Author: Cole Barach
+# Date Created: 23.01.23
+# Date Updated: 23.01.30
+#   This module provides a standard interface for the Innomaker USB-CAN library. The Main object of this script is a
+#   CAN Interface object which provides members for Transmitting and Receiving Messages.
+
+# Libraries -------------------------------------------------------------------------------------------------------------------
 from gs_usb.gs_usb import GsUsb
 from gs_usb.gs_usb_frame import GsUsbFrame
 from gs_usb.constants import CAN_EFF_FLAG
@@ -9,20 +16,21 @@ from gs_usb.gs_usb import GS_CAN_MODE_LISTEN_ONLY
 from gs_usb.gs_usb import GS_CAN_MODE_LOOP_BACK
 from gs_usb.gs_usb import GS_CAN_MODE_ONE_SHOT
 
-import time
-
 import threading
 from threading import Thread
 
-# Imports
+# Imports ---------------------------------------------------------------------------------------------------------------------
+import can_interface
 from can_interface import CanInterface
 
+# Objects ---------------------------------------------------------------------------------------------------------------------
 class Main(CanInterface):
-    def __init__(self, database, messageHandler=None):
+    def __init__(self, database, messageHandler=None, timingFunction=None, timingPeriod=None):
+        super().__init__(database, messageHandler, timingFunction, timingPeriod)
+
         print("CAN - Using Innomaker USB-CAN Library")
         print("CAN - Platform: Windows")
 
-        super().__init__(database, messageHandler)
         self.channels = GsUsb.scan()
 
         if len(self.channels) == 0:
@@ -54,16 +62,15 @@ class Main(CanInterface):
         self.Receive(id, data)
 
     def Begin(self):
-        self.online = True
+        super().Begin()
         
         for index in range(len(self.channels)):
+            print(f"CAN - Channel {index} Thread Starting...")
             channelThread = Thread(target= lambda: self.Scan(index))
             channelThread.start()
+            print(f"CAN - Channel {index} Thread Started.")
 
-    def Kill(self):
-        print("CAN - Terminating...")
-        self.online = False
-
+# Functions -------------------------------------------------------------------------------------------------------------------
 def OpenChannel(bitrate, channel):
     print(f"CAN - Channel {channel.address} Opening...")
 

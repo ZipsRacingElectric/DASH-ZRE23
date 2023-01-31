@@ -1,9 +1,17 @@
+# Testing GUI View ------------------------------------------------------------------------------------------------------------
+# Author: Cole Barach
+# Date Created: 22.01.31
+# Date Updated: 23.01.31
+
+# Libraries -------------------------------------------------------------------------------------------------------------------
 import lib_tkinter
 from lib_tkinter import Orientation
 
+# Includes --------------------------------------------------------------------------------------------------------------------
 import gui
 import config
 
+# Objects ---------------------------------------------------------------------------------------------------------------------
 class View(gui.View):
     def __init__(self, parent, id, style, database):
         # Root --------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -19,26 +27,26 @@ class View(gui.View):
 
         # Widgets
         buttonLabels   = ["Back",
-                          "",
-                          "",
+                          "Speed\nView",
+                          "Endurance\nView",
                           ""]
         buttonCommands = [lambda: self.parent.CloseViews(),
-                          0,
-                          0,
+                          lambda: self.parent.OpenView("Speed"),
+                          lambda: self.parent.OpenView("Endurance"),
                           0]
 
-        self.brakeBar   = lib_tkinter.GetProgressBar(self.root, column=0, row=0, minWidth=70, sticky="NS", rowspan=2, style=style, orientation=Orientation.VERTICAL, label="BRAKE",    border=True, scaleFactor=100, styleOverrides=[("lowlight", "accentRed")])
-        self.appsBar    = lib_tkinter.GetProgressBar(self.root, column=2, row=0, minWidth=70, sticky="NS", rowspan=2, style=style, orientation=Orientation.VERTICAL, label="THROTTLE", border=True, scaleFactor=100, styleOverrides=[("lowlight", "accentGreen")])
+        self.brakeBar   = lib_tkinter.GetProgressBar(self.root, column=0, row=0, minWidth=style["sideBarWidth"], sticky="NS", rowspan=2, style=style, orientation=Orientation.VERTICAL, label="BRAKE",    border=True, scaleFactor=100, styleOverrides=[("lowlight", "accentRed")])
+        self.appsBar    = lib_tkinter.GetProgressBar(self.root, column=2, row=0, minWidth=style["sideBarWidth"], sticky="NS", rowspan=2, style=style, orientation=Orientation.VERTICAL, label="THROTTLE", border=True, scaleFactor=100, styleOverrides=[("lowlight", "accentGreen")])
         self.display    = lib_tkinter.GetFrame      (self.root, column=1, row=0, sticky="NESW", style=style, border=True)
-        buttonBar       = lib_tkinter.GetButtonBar  (self.root, column=1, row=1, minHeight=80, sticky="EW", style=style, orientation=Orientation.HORIZONTAL, commands=buttonCommands, labels=buttonLabels)
+        buttonBar       = lib_tkinter.GetButtonBar  (self.root, column=1, row=1, minHeight=style["buttonBarHeight"], sticky="EW", style=style, orientation=Orientation.HORIZONTAL, commands=buttonCommands, labels=buttonLabels)
 
         # Display -----------------------------------------------------------------------------------------------------------------------------------------------------
         # Partitioning
-        self.display.columnconfigure(0, weight=0, minsize=224) # Stat Panel
+        self.display.columnconfigure(0, weight=0, minsize=style["statPanelWidth"]) # Stat Panel
         self.display.columnconfigure(1, weight=1)              # Padding
         self.display.columnconfigure(2, weight=0)              # Speed Stat
         self.display.columnconfigure(3, weight=1)              # Padding
-        self.display.columnconfigure(4, weight=0, minsize=160) # Speed Label
+        self.display.columnconfigure(4, weight=0, minsize=style["speedStatWidth"]) # Speed Label
 
         self.display.rowconfigure   (0, weight=0) # RPM Panel
         self.display.rowconfigure   (1, weight=1) # Speed Stat
@@ -65,7 +73,7 @@ class View(gui.View):
         # Partitioning
         rpmPanel.columnconfigure(0, weight=1)
         # Widgets
-        self.rpmBar = lib_tkinter.GetStrataBar(rpmPanel, style, Orientation.HORIZONTAL, column=0, row=0, sticky="EW", minHeight=100, highlights=style["rpmHighlights"], lowlights=style["rpmLowlights"], domain=style["rpmDomain"], mask=style["rpmMask"], scaleFactor=config.RPM_MAX)
+        self.rpmBar = lib_tkinter.GetStrataBar(rpmPanel, style, Orientation.HORIZONTAL, column=0, row=0, sticky="EW", minHeight=style["rpmBarHeight"], highlights=style["rpmHighlights"], lowlights=style["rpmLowlights"], domain=style["rpmDomain"], mask=style["rpmMask"], scaleFactor=config.RPM_MAX)
         rpmDivider  = lib_tkinter.GetDivider  (rpmPanel, style, Orientation.HORIZONTAL, column=0, row=1, sticky="EW")
         
         # Torque Panel ------------------------------------------------------------------------------------------------------------------------------------------------
@@ -73,7 +81,7 @@ class View(gui.View):
         torquePanel.columnconfigure(0, weight=1)
         torquePanel.columnconfigure(1, weight=0)
         # Widgets
-        self.torqueBar = lib_tkinter.GetProgressBar(torquePanel, style, Orientation.HORIZONTAL, minHeight=8, column=0, row=0, sticky="EW", scaleFactor=100, border=True, styleOverrides=[("lowlight", "accentBlue"), ("borderWidth", "borderWidthLight")])
+        self.torqueBar = lib_tkinter.GetProgressBar(torquePanel, style, Orientation.HORIZONTAL, minHeight=style["torqueBarHeight"], column=0, row=0, sticky="EW", scaleFactor=100, border=True, styleOverrides=[("lowlight", "accentBlue"), ("borderWidth", "borderWidthLight")])
         torqueLabel    = lib_tkinter.GetLabel      (torquePanel, style, column=1, row=0, text="T", styleOverrides=[("font", "fontExtraSmall")])
         
         # Regen Panel -------------------------------------------------------------------------------------------------------------------------------------------------
@@ -81,20 +89,20 @@ class View(gui.View):
         regenPanel.columnconfigure(0, weight=1)
         regenPanel.columnconfigure(1, weight=0)
         # Widgets
-        self.regenBar = lib_tkinter.GetProgressBar(regenPanel, style, Orientation.HORIZONTAL, minHeight=8, column=0, row=0, sticky="EW", scaleFactor=100, border=True, styleOverrides=[("lowlight", "accentGreen"), ("borderWidth", "borderWidthLight")])
+        self.regenBar = lib_tkinter.GetProgressBar(regenPanel, style, Orientation.HORIZONTAL, minHeight=style["torqueBarHeight"], column=0, row=0, sticky="EW", scaleFactor=100, border=True, styleOverrides=[("lowlight", "accentGreen"), ("borderWidth", "borderWidthLight")])
         regenLabel    = lib_tkinter.GetLabel      (regenPanel, style, column=1, row=0, text="R", styleOverrides=[("font", "fontExtraSmall")])
         
         # Stat Panel --------------------------------------------------------------------------------------------------------------------------------------------------
         # Partitioning
-        statPanel.columnconfigure(1, minsize=80)
-        statPanel.rowconfigure   (1, minsize=50)
-        statPanel.rowconfigure   (2, minsize=50)
-        statPanel.rowconfigure   (3, minsize=50)
+        statPanel.columnconfigure(1, minsize=style["panelStatWidth"])
+        statPanel.rowconfigure   (1, minsize=style["panelStatHeight"])
+        statPanel.rowconfigure   (2, minsize=style["panelStatHeight"])
+        statPanel.rowconfigure   (3, minsize=style["panelStatHeight"])
         # Widgets
         self.chargeStat   = lib_tkinter.GetLabelStat(statPanel, style=style, column=1, row=1, sticky="E", styleOverrides=[("font", "fontLarge")])
         self.temp1Stat    = lib_tkinter.GetLabelStat(statPanel, style=style, column=1, row=2, sticky="E", styleOverrides=[("font", "fontLarge")])
         self.temp2Stat    = lib_tkinter.GetLabelStat(statPanel, style=style, column=1, row=3, sticky="E", styleOverrides=[("font", "fontLarge")])
-        self.temp3Stat    = lib_tkinter.GetLabelStat(statPanel, style=style, column=1, row=4, sticky="E", styleOverrides=[("font", "fontLarge")])
+        self.temp3Stat    = lib_tkinter.GetLabelStat(statPanel, style=style, column=1, row=4, sticky="E", styleOverrides=[("font", "fontLarge")], precision=0)
         statDividerTop    = lib_tkinter.GetDivider  (statPanel, style=style, column=0, row=0, sticky="EW", orientation=Orientation.HORIZONTAL, columnspan=2)
         chargeLabel       = lib_tkinter.GetLabel    (statPanel, style=style, column=0, row=1, sticky="W", text="SoC:")
         temp1Label        = lib_tkinter.GetLabel    (statPanel, style=style, column=0, row=2, sticky="W", text="Acc. Max:")

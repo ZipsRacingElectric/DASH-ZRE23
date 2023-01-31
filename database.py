@@ -1,18 +1,27 @@
+# Database --------------------------------------------------------------------------------------------------------------------
+# Author: Cole Barach
+# Date Created: 22.09.28
+# Date Updated: 23.01.30
+#   This module is used for interfacing elements of the application. Any data that must be shared between different objects
+#   may be stored in here as to simplify references.
+
+# Libraries -------------------------------------------------------------------------------------------------------------------
 import enum
 from enum import Enum
 
+# Enumerables -----------------------------------------------------------------------------------------------------------------
+class InputTypes(Enum):                              # Input Type Enumerable
+    BUTTON_WHEEL_LEFT  = 0,                          # - Left Button of Steering Wheel
+    BUTTON_WHEEL_RIGHT = 1,                          # - Right Button of Steering Wheel
+    BUTTON_DASH_LEFT   = 2,                          # - Left Button of Dashboard
+    BUTTON_DASH_RIGHT  = 3                           # - Right Button of Dashboard
+
+# Functions -------------------------------------------------------------------------------------------------------------------
 def Setup():
     return CarData()
 
 class CarData():
-    # Input ---------------------------------------------------------------------------------------------------
-    class InputTypes(Enum):                              # Input Type Enumerable
-        BUTTON_WHEEL_LEFT  = 0,                          # - Left Button of Steering Wheel
-        BUTTON_WHEEL_RIGHT = 1,                          # - Right Button of Steering Wheel
-        BUTTON_DASH_LEFT   = 2,                          # - Left Button of Dashboard
-        BUTTON_DASH_RIGHT  = 3                           # - Right Button of Dashboard
-
-    # Communications ------------------------------------------------------------------------------------------
+    # Communications ----------------------------------------------------------------------------------------------------------
     ecuCanActive           = False                       # Activity of the ECU CAN
     acanCanActive          = False                       # Activity of the ACAN CAN
     bmsCanActive           = False                       # Activity of the BMS CAN
@@ -23,7 +32,9 @@ class CarData():
     bmsCanTimeout          = None                        # Time of last BMS CAN message received
     inverterCanTimeout     = None                        # Time of last Inverter CAN message received
 
-    # Pedal Info ----------------------------------------------------------------------------------------------
+    time                   = 0
+
+    # Pedal Info --------------------------------------------------------------------------------------------------------------
     apps1                  = None                        # Real APPS-1 Value from ACAN
     apps2Raw               = None                        # Real APPS-2 Value from ACAN
     brake1                 = None                        # Real Brake-1 Value from ACAN
@@ -42,7 +53,7 @@ class CarData():
     accelerating           = None                        # Acceleration State (True => Accelerating)
     braking                = None                        # Braking State (True => Braking)
 
-    # ECU Info ------------------------------------------------------------------------------------------------
+    # ECU Info ----------------------------------------------------------------------------------------------------------------
     class DriveState(Enum):                              # Drive State Type Enumerable
         INITIALIZING       = 0,                          # - Initialization State of ECU
         LV_DRIVEOFF        = 1,                          # - Low-Voltage State
@@ -54,7 +65,7 @@ class CarData():
     regenState             = None                        # Current Regen Braking State of the Vehicle
     lvBatteryVoltage       = None                        # Voltage of the LV Battery
 
-    # Acumulator Data -----------------------------------------------------------------------------------------
+    # Acumulator Data ---------------------------------------------------------------------------------------------------------
     stateOfCharge          = None                        # State of Charge
     packVoltage            = None                        # Total Voltage of the Accumulator
     packCurrent            = None                        # Current of the Accumulator
@@ -69,7 +80,7 @@ class CarData():
     packTemperatureMean    = None                        # Average Pack Temperature
     segmentSenseLines      = [None]*5                    # Accumulator Segment Sense Line Statuses
 
-    # Inverter Data -------------------------------------------------------------------------------------------
+    # Inverter Data -----------------------------------------------------------------------------------------------------------
     inverterTempGdb        = None                        # Temperature of the Inverter GDB
     inverterTempModuleA    = None                        # Temperature of the Inverter Module A
     inverterTempModuleB    = None                        # Temperature of the Inverter Module B
@@ -78,14 +89,14 @@ class CarData():
     inverterTempMean       = None                        # Average Temperature of the Inverter
     inverterTempMax        = None                        # Maximum Temperature of the Inverter
 
-    # Motor Data ----------------------------------------------------------------------------------------------
+    # Motor Data --------------------------------------------------------------------------------------------------------------
     motorRpm               = None                        # RPM of the Motor
     motorSpeedMph          = None                        # Speed of the Vehicle
     torquePercentageMax    = None                        # Maximum Torque Percentage from ECU
     torquePercentageRegen  = None                        # Maximum Regen Percentage from ECU
     motorTemperature       = None                        # Temperature of the Motor
 
-    # Errors --------------------------------------------------------------------------------------------------
+    # Errors ------------------------------------------------------------------------------------------------------------------
     error25_5Implausible   = None                        # 25/5 APPS Implausibility
     errorInverterFault     = None                        # Inverter Fault Detected
     errorAcanImplausible   = None                        # ACAN Value Implausibility

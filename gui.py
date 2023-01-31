@@ -1,9 +1,18 @@
-# Libraries
+# GUI -------------------------------------------------------------------------------------------------------------------------
+# Author: Cole Barach
+# Date Created: 22.11.23
+# Date Updated: 23.01.30
+#   This module contains all code related to the GUI. Instancing the Main object of this script will create a TK window, which
+#   may have views, windows, and interrupts appended as necessary. Any GUI Views and Windows should inherit from the
+#   respective objects in this script. Call setup to get a configured and initialized Main object.
+
+# Libraries -------------------------------------------------------------------------------------------------------------------
 import tkinter
+import lib_tkinter
 
 import os
 
-# Objects
+# Objects ---------------------------------------------------------------------------------------------------------------------
 class View():
     def __init__(self, parent, id, style, database):
         self.parent   = parent
@@ -46,10 +55,10 @@ class Window():
         else:
             self.Open()
 
-# Imports
-import lib_tkinter
+# Imports ---------------------------------------------------------------------------------------------------------------------
 import config
 
+# Views
 import gui_menu
 import gui_speed
 import gui_endurance
@@ -59,44 +68,41 @@ import gui_bms
 import gui_calibration
 import gui_debug
 
-FRAMERATE = 32
-
+# Functions -------------------------------------------------------------------------------------------------------------------
 def Setup(database, can):
     # Instance GUI
-    gui = Main("Dashboard 2023 - Rev.2", database, FRAMERATE)
+    gui = Main("Dashboard 2023 - Rev.2", database, config.GUI_FRAMERATE)
     gui.geometry(f'{config.GUI_WIDTH}x{config.GUI_HEIGHT}')
     gui.SetFullscreen(True)
 
     # Import Styles
-    relativeDirectory = os.path.dirname(os.path.realpath('__file__')) + "/"
-
-    dash  = lib_tkinter.Style(relativeDirectory + config.DASH_STYLE)
-    debug = lib_tkinter.Style(relativeDirectory + config.DEBUG_STYLE)
+    dashStyle  = lib_tkinter.Style(config.GUI_DASH_STYLE)
+    debugStyle = lib_tkinter.Style(config.GUI_DEBUG_STYLE)
     
     # Instance Views
-    menu = gui_menu.View(gui, id="Menu", style=dash, database=database)
+    menu = gui_menu.View(gui, id="Menu", style=dashStyle, database=database)
     gui.AppendView(menu)
-    gui.AppendView(gui_speed.View      (gui, id="Speed",       style=dash, database=database))
-    gui.AppendView(gui_endurance.View  (gui, id="Endurance",   style=dash, database=database))
-    gui.AppendView(gui_testing.View    (gui, id="Testing",     style=dash, database=database))
-    gui.AppendView(gui_bms.View        (gui, id="Bms",         style=dash, database=database))
-    gui.AppendView(gui_calibration.View(gui, id="Calibration", style=dash, database=database))
-    gui.AppendView(gui_database.View   (gui, id="Database",    style=dash, database=database))
+    gui.AppendView(gui_speed.View      (gui, id="Speed",       style=dashStyle, database=database))
+    gui.AppendView(gui_endurance.View  (gui, id="Endurance",   style=dashStyle, database=database))
+    gui.AppendView(gui_testing.View    (gui, id="Testing",     style=dashStyle, database=database))
+    gui.AppendView(gui_bms.View        (gui, id="Bms",         style=dashStyle, database=database))
+    gui.AppendView(gui_calibration.View(gui, id="Calibration", style=dashStyle, databaseObj=database, canTransmitter=can))
+    gui.AppendView(gui_database.View   (gui, id="Database",    style=dashStyle, database=database))
 
     # Setup Menu
     iconScaling = 0.33
-    menu.AppendShortcut(id="Speed",       icon=(relativeDirectory + "icons/Speed.png"),       iconSampling=(iconScaling, iconScaling))
-    menu.AppendShortcut(id="Endurance",   icon=(relativeDirectory + "icons/Endurance.png"),   iconSampling=(iconScaling, iconScaling))
-    menu.AppendShortcut(id="Testing",     icon=(relativeDirectory + "icons/Testing.png"),     iconSampling=(iconScaling, iconScaling))
-    menu.AppendShortcut(id="Bms",         icon=(relativeDirectory + "icons/Bms.png"),         iconSampling=(iconScaling, iconScaling))
-    menu.AppendShortcut(id="Calibration", icon=(relativeDirectory + "icons/Calibration.png"), iconSampling=(iconScaling, iconScaling))
-    menu.AppendShortcut(id="Database",    icon=(relativeDirectory + "icons/Database.png"),    iconSampling=(iconScaling, iconScaling))
+    menu.AppendShortcut(id="Speed",       icon=("icons/Speed.png"),       iconSampling=(iconScaling, iconScaling))
+    menu.AppendShortcut(id="Endurance",   icon=("icons/Endurance.png"),   iconSampling=(iconScaling, iconScaling))
+    menu.AppendShortcut(id="Testing",     icon=("icons/Testing.png"),     iconSampling=(iconScaling, iconScaling))
+    menu.AppendShortcut(id="Bms",         icon=("icons/Bms.png"),         iconSampling=(iconScaling, iconScaling))
+    menu.AppendShortcut(id="Calibration", icon=("icons/Calibration.png"), iconSampling=(iconScaling, iconScaling))
+    menu.AppendShortcut(id="Database",    icon=("icons/Database.png"),    iconSampling=(iconScaling, iconScaling))
     
     # Open Menu
     gui.CloseViews()
 
     # Instance Sub-Windows
-    gui.AppendWindow(gui_debug.Window(gui, id="Debug", style=debug, can=can))
+    gui.AppendWindow(gui_debug.Window(gui, id="Debug", style=debugStyle, can=can))
     
     # Setup Keybinds
     gui.AppendKeybind("F2", lambda: gui.ToggleWindow("Debug"))
@@ -104,6 +110,7 @@ def Setup(database, can):
 
     return gui
 
+# GUI Object ------------------------------------------------------------------------------------------------------------------
 class Main(tkinter.Tk):
     def __init__(self, title, database, framerate=0):
         print("GUI - Initializing...")

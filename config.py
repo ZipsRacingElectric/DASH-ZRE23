@@ -34,7 +34,8 @@ CAN_ID_STATUS_BMS                = 0x440                       # ID of Status_BM
 CAN_ID_DATA_PEDALS               = 0x701                       # ID of Data_Pedals
 CAN_ID_STATUS_ECU                = 0x703                       # ID of Status_ECU
 
-CAN_ID_COMMAND_APPS_CALIBRATION  = 0x533                       # ID of Command_APPS_Calibration
+CAN_ID_CALIBRATE_APPS_RANGE      = 0x533                       # ID of Calibrate_APPS_Range
+CAN_ID_CALIBRATE_BRAKE_RANGE     = 0x534                       # ID of Calibrate_Brake_Range
 
 CAN_MESSAGE_TIMEOUT              = 1                           # Length of Time for CAN Activity to Expire
 CAN_TIME_PERIOD                  = 0.01                        # Period of Time Thread Update

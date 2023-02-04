@@ -50,6 +50,11 @@ class CarData():
     apps2RawMin            = None                        # APPS-2 Calibration Minimum from Dash
     apps2RawMax            = None                        # APPS-2 Calibration Maximum from Dash
 
+    brake1Min              = None                        # Brake-1 Calibration Minimum from Dash
+    brake1Max              = None                        # Brake-1 Calibration Maximum from Dash
+    brake2RawMin           = None                        # Brake-2 Calibration Minimum from Dash
+    brake2RawMax           = None                        # Brake-2 Calibration Maximum from Dash
+
     accelerating           = None                        # Acceleration State (True => Accelerating)
     braking                = None                        # Braking State (True => Braking)
 

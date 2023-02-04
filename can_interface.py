@@ -87,7 +87,7 @@ def Setup(database):
             import lib_innomaker_linux
             library = lib_innomaker_linux.Main(database, messageHandler=HandleMessage, timingFunction=SetTimeouts, timingPeriod=config.CAN_TIME_PERIOD)
             library.OpenChannel(config.CAN_BITRATE, 0)
-            # library.OpenChannel(config.CAN_BITRATE, 1)
+            library.OpenChannel(config.CAN_BITRATE, 1)
             return library
 
 # Message Handling ------------------------------------------------------------------------------------------------------------
@@ -420,7 +420,7 @@ def SendMessage(transmitter, id, data, channel=0):
     transmitter.Transmit(id, data, channel)
 
 # Message 0x533
-def SendCommandAppsCalibration(transmitter, apps1MinValue, apps1MaxValue, apps2MinValue, apps2MaxValue):
+def SendCalibrationAppsRange(transmitter, apps1MinValue, apps1MaxValue, apps2MinValue, apps2MaxValue):
     message = [0,0,0,0,0,0,0,0]
 
     message[0] = (apps1MinValue)      & 0xFF
@@ -432,7 +432,22 @@ def SendCommandAppsCalibration(transmitter, apps1MinValue, apps1MaxValue, apps2M
     message[6] = (apps2MaxValue)      & 0xFF
     message[7] = (apps2MaxValue >> 8) & 0xFF
     
-    SendMessage(transmitter, config.CAN_ID_COMMAND_APPS_CALIBRATION, message)
+    SendMessage(transmitter, config.CAN_ID_CALIBRATE_APPS_RANGE, message)
+
+# Message 0x534
+def SendCalibrationBrakeRange(transmitter, brake1MinValue, brake1MaxValue, brake2MinValue, brake2MaxValue):
+    message = [0,0,0,0,0,0,0,0]
+
+    message[0] = (brake1MinValue)      & 0xFF
+    message[1] = (brake1MinValue >> 8) & 0xFF
+    message[2] = (brake1MaxValue)      & 0xFF
+    message[3] = (brake1MaxValue >> 8) & 0xFF
+    message[4] = (brake2MinValue)      & 0xFF
+    message[5] = (brake2MinValue >> 8) & 0xFF
+    message[6] = (brake2MaxValue)      & 0xFF
+    message[7] = (brake2MaxValue >> 8) & 0xFF
+    
+    SendMessage(transmitter, config.CAN_ID_CALIBRATE_BRAKE_RANGE, message)
 
 # Message 0x005
 def SendInputPedals(transmitter, apps1, apps2, brake1, brake2):

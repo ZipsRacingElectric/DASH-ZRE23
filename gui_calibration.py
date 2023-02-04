@@ -21,10 +21,11 @@ import can_interface
 # Enumarables -----------------------------------------------------------------------------------------------------------------
 class CalibrationState(Enum): # State of Calibration
     START                = 0, # - Buffer menu to avoid accidental calibration
-    REQUEST_APPS_MIN     = 1, # - For minimum values, tells the driver to not touch pedals
-    REQUEST_APPS_MAX     = 2, # - For maximum values, tells the driver to press throttle
-    FINISHED             = 3, # - For Valid Calibration Only
-    FAILED               = 4  # - For Invalid Calibration
+    REQUEST_BOTH_MIN     = 1, # - For minimum values, tells the driver to not touch pedals
+    REQUEST_APPS_MAX     = 2, # - For APPS Maximum values, tells the driver to press the throttle
+    REQUEST_BRAKE_MAX    = 3, # - For Brake Maximum values, tells the driver to press the brake 
+    FINISHED             = 4, # - For Valid Calibration Only
+    FAILED               = 5  # - For Invalid Calibration
 
 # Objects ---------------------------------------------------------------------------------------------------------------------
 class View(gui.View):
@@ -59,12 +60,15 @@ class View(gui.View):
         if(self.calibrationState == CalibrationState.START):
             # Start Menu
             self.message['text'] = "Press button 1 to start calibration"
-        elif(self.calibrationState == CalibrationState.REQUEST_APPS_MIN):
+        elif(self.calibrationState == CalibrationState.REQUEST_BOTH_MIN):
             # No Pedals Menu
             self.message['text'] = "Release both pedals, then press button 1"
         elif(self.calibrationState == CalibrationState.REQUEST_APPS_MAX):
             # APPS Pedal Menu
             self.message['text'] = "Press the throttle fully, then press button 1"
+        elif(self.calibrationState == CalibrationState.REQUEST_BRAKE_MAX):
+            # APPS Pedal Menu
+            self.message['text'] = "Press the brake fully, then press button 1"
         elif(self.calibrationState == CalibrationState.FINISHED):
             # Finished Menu
             self.message['text'] = "Calibration Finshed"
@@ -81,16 +85,23 @@ class View(gui.View):
         # Continue Button
         if(input == database.InputTypes.BUTTON_WHEEL_RIGHT):
             if(self.calibrationState == CalibrationState.START):
-                self.calibrationState = CalibrationState.REQUEST_APPS_MIN
+                self.calibrationState = CalibrationState.REQUEST_BOTH_MIN
 
-            elif(self.calibrationState == CalibrationState.REQUEST_APPS_MIN):
+            elif(self.calibrationState == CalibrationState.REQUEST_BOTH_MIN):
                 self.apps1CurrentMin    = self.database.apps1
                 self.apps2RawCurrentMin = self.database.apps2Raw
+                self.brake1CurrentMin   = self.database.brake1
+                self.brake2CurrentMin   = self.database.brake2
                 self.calibrationState = CalibrationState.REQUEST_APPS_MAX
 
             elif(self.calibrationState == CalibrationState.REQUEST_APPS_MAX):
                 self.apps1CurrentMax    = self.database.apps1
                 self.apps2RawCurrentMax = self.database.apps2Raw
+                self.calibrationState = CalibrationState.REQUEST_BRAKE_MAX
+
+            elif(self.calibrationState == CalibrationState.REQUEST_BRAKE_MAX):
+                self.brake1CurrentMax   = self.database.brake1
+                self.brake2CurrentMax   = self.database.brake2
                 self.ValidateCalibration()
                 self.ApplyCalibration()
 
@@ -102,8 +113,14 @@ class View(gui.View):
         if(self.apps1CurrentMax == None):    return
         if(self.apps2RawCurrentMin == None): return
         if(self.apps2RawCurrentMax == None): return
+        if(self.brake1CurrentMin == None):   return
+        if(self.brake1CurrentMax == None):   return
+        if(self.brake2CurrentMin == None):   return
+        if(self.brake2CurrentMax == None):   return
         if(self.apps1CurrentMin    >= self.apps1CurrentMax):    return
         if(self.apps2RawCurrentMin >= self.apps2RawCurrentMax): return
+        if(self.brake1CurrentMin   >= self.brake1CurrentMax):   return
+        if(self.brake2CurrentMin   >= self.brake2CurrentMax):   return
         self.calibrationState = CalibrationState.FINISHED
 
     # Apply Calibration
@@ -114,7 +131,12 @@ class View(gui.View):
         self.database.apps1Max    = self.apps1CurrentMax
         self.database.apps2RawMin = self.apps2RawCurrentMin
         self.database.apps2RawMax = self.apps2RawCurrentMax
-        can_interface.SendCommandAppsCalibration(self.canTransmitter, self.apps1CurrentMin, self.apps1CurrentMax, self.apps2RawCurrentMin, self.apps2RawCurrentMax)
+        self.database.brake1Min   = self.brake1CurrentMin
+        self.database.brake1Max   = self.brake1CurrentMax
+        self.database.brake2Min   = self.brake2CurrentMin
+        self.database.brake2Max   = self.brake2CurrentMax
+        can_interface.SendCalibrateAppsRange(self.canTransmitter, self.apps1CurrentMin, self.apps1CurrentMax, self.apps2RawCurrentMin, self.apps2RawCurrentMax)
+        can_interface.SendCalibrateBrakeRange(self.canTransmitter, self.brake1CurrentMin, self.brake1CurrentMax, self.brake2CurrentMin, self.brake2CurrentMax)
 
     def Close(self):
         self.calibrationState = CalibrationState.START

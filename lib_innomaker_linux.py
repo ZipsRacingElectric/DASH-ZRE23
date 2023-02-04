@@ -27,7 +27,7 @@ class Main(CanInterface):
         self.channels = []
 
     def OpenChannel(self, bitrate, id):
-        if(id < 0 or id >= len(self.channels)): return
+        if(id < 0): return
         self.channels.append(OpenChannel(id, bitrate=bitrate))
 
     def CloseChannel(self, id):

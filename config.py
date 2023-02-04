@@ -15,7 +15,7 @@ GUI_DASH_STYLE                   = "style_Dash.json"
 GUI_DEBUG_STYLE                  = "style_Debug.json"
 
 # CAN Interface ---------------------------------------------------------------------------------------------------------------
-CAN_LIBRARY_TYPE                 = "CANLIB"
+CAN_LIBRARY_TYPE                 = "INNOMAKER"
 
 # CAN Bus ---------------------------------------------------------------------------------------------------------------------
 CAN_BITRATE                      = 1000000                     # CAN Bitrate of 1 Megabit per Second

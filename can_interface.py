@@ -87,7 +87,7 @@ def Setup(database):
             import lib_innomaker_linux
             library = lib_innomaker_linux.Main(database, messageHandler=HandleMessage, timingFunction=SetTimeouts, timingPeriod=config.CAN_TIME_PERIOD)
             library.OpenChannel(config.CAN_BITRATE, 0)
-            library.OpenChannel(config.CAN_BITRATE, 1)
+            # library.OpenChannel(config.CAN_BITRATE, 1)
             return library
 
 # Message Handling ------------------------------------------------------------------------------------------------------------

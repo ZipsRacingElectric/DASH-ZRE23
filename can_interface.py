@@ -420,7 +420,7 @@ def SendMessage(transmitter, id, data, channel=0):
     transmitter.Transmit(id, data, channel)
 
 # Message 0x533
-def SendCalibrationAppsRange(transmitter, apps1MinValue, apps1MaxValue, apps2MinValue, apps2MaxValue):
+def SendCalibrateAppsRange(transmitter, apps1MinValue, apps1MaxValue, apps2MinValue, apps2MaxValue):
     message = [0,0,0,0,0,0,0,0]
 
     message[0] = (apps1MinValue)      & 0xFF
@@ -435,7 +435,7 @@ def SendCalibrationAppsRange(transmitter, apps1MinValue, apps1MaxValue, apps2Min
     SendMessage(transmitter, config.CAN_ID_CALIBRATE_APPS_RANGE, message)
 
 # Message 0x534
-def SendCalibrationBrakeRange(transmitter, brake1MinValue, brake1MaxValue, brake2MinValue, brake2MaxValue):
+def SendCalibrateBrakeRange(transmitter, brake1MinValue, brake1MaxValue, brake2MinValue, brake2MaxValue):
     message = [0,0,0,0,0,0,0,0]
 
     message[0] = (brake1MinValue)      & 0xFF

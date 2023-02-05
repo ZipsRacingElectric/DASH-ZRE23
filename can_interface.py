@@ -117,7 +117,7 @@ def HandleMessage(database, id, data):
         idIndex = config.CAN_ID_PACK_TEMPERATURES_START + index
         if(id == idIndex): HandlePackTemperatures(database, data, idIndex)
 
-# Message 0x005 - Pedal Data from ACAN
+# Message 0x005 - Pedal Data from ECU
 def HandleInputPedals(database, data):
     # Bytes 0 & 1
     database.apps1    = data[0] | (data[1] << 8)
@@ -169,13 +169,13 @@ def HandleDataMotor(database, data):
 # Message 0x701 - Pedal Data from ECU
 def HandleDataPedals(database, data):
     # Byte 0
-    database.apps1Percent  = (data[0] | (data[1] << 8)) * config.APPS_1_PERCENT_SCALE
+    database.apps1Percent  = InterpretSignedNBitInt((data[0] | (data[1] << 8))) * config.APPS_1_PERCENT_SCALE
     # Byte 1
-    database.apps2Percent  = (data[2] | (data[3] << 8)) * config.APPS_2_PERCENT_SCALE
+    database.apps2Percent  = InterpretSignedNBitInt((data[2] | (data[3] << 8))) * config.APPS_2_PERCENT_SCALE
     # Byte 2
-    database.brake1Percent = (data[4] | (data[5] << 8)) * config.BRAKE_1_PERCENT_SCALE
+    database.brake1Percent = InterpretSignedNBitInt((data[4] | (data[5] << 8))) * config.BRAKE_1_PERCENT_SCALE
     # Byte 3
-    database.brake2Percent = (data[6] | (data[7] << 8)) * config.BRAKE_2_PERCENT_SCALE
+    database.brake2Percent = InterpretSignedNBitInt((data[6] | (data[7] << 8))) * config.BRAKE_2_PERCENT_SCALE
     # Timeout
     ClearTimeoutEcu(database)
 

@@ -11,6 +11,7 @@ import tkinter
 import lib_tkinter
 
 import os
+import inspect
 
 # Objects ---------------------------------------------------------------------------------------------------------------------
 class View():
@@ -75,9 +76,14 @@ def Setup(database, can):
     gui.geometry(f'{config.GUI_WIDTH}x{config.GUI_HEIGHT}')
     gui.SetFullscreen(True)
 
+    parentPath = os.path.dirname(__file__)
+
     # Import Styles
-    dashStyle  = lib_tkinter.Style(config.GUI_DASH_STYLE)
-    debugStyle = lib_tkinter.Style(config.GUI_DEBUG_STYLE)
+    dashStylePath  = os.path.join(parentPath, config.GUI_DASH_STYLE)
+    debugStylePath = os.path.join(parentPath, config.GUI_DEBUG_STYLE)
+    
+    dashStyle  = lib_tkinter.Style(dashStylePath)
+    debugStyle = lib_tkinter.Style(debugStylePath)
     
     # Instance Views
     menu = gui_menu.View(gui, id="Menu", style=dashStyle, database=database)
@@ -89,14 +95,23 @@ def Setup(database, can):
     gui.AppendView(gui_calibration.View(gui, id="Calibration", style=dashStyle, databaseObj=database, canTransmitter=can))
     gui.AppendView(gui_database.View   (gui, id="Database",    style=dashStyle, database=database))
 
+
     # Setup Menu
-    iconScaling = 0.33
-    menu.AppendShortcut(id="Speed",       icon=("icons/Speed.png"),       iconSampling=(iconScaling, iconScaling))
-    menu.AppendShortcut(id="Endurance",   icon=("icons/Endurance.png"),   iconSampling=(iconScaling, iconScaling))
-    menu.AppendShortcut(id="Testing",     icon=("icons/Testing.png"),     iconSampling=(iconScaling, iconScaling))
-    menu.AppendShortcut(id="Bms",         icon=("icons/Bms.png"),         iconSampling=(iconScaling, iconScaling))
-    menu.AppendShortcut(id="Calibration", icon=("icons/Calibration.png"), iconSampling=(iconScaling, iconScaling))
-    menu.AppendShortcut(id="Database",    icon=("icons/Database.png"),    iconSampling=(iconScaling, iconScaling))
+    iconSpeedPath       = os.path.join(parentPath, config.ICON_SPEED)
+    iconEndurancePath   = os.path.join(parentPath, config.ICON_ENDURANCE)
+    iconTestingPath     = os.path.join(parentPath, config.ICON_TESTING)
+    iconBmsPath         = os.path.join(parentPath, config.ICON_BMS)
+    iconCalibrationPath = os.path.join(parentPath, config.ICON_CALIBRATION)
+    iconDatabasePath    = os.path.join(parentPath, config.ICON_DATABASE)
+    
+    iconSampling = (config.ICON_SCALING, config.ICON_SCALING)
+    
+    menu.AppendShortcut(id="Speed",       icon=iconSpeedPath,       iconSampling=iconSampling)
+    menu.AppendShortcut(id="Endurance",   icon=iconEndurancePath,   iconSampling=iconSampling)
+    menu.AppendShortcut(id="Testing",     icon=iconTestingPath,     iconSampling=iconSampling)
+    menu.AppendShortcut(id="Bms",         icon=iconBmsPath,         iconSampling=iconSampling)
+    menu.AppendShortcut(id="Calibration", icon=iconCalibrationPath, iconSampling=iconSampling)
+    menu.AppendShortcut(id="Database",    icon=iconDatabasePath,    iconSampling=iconSampling)
     
     # Open Menu
     gui.CloseViews()

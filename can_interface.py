@@ -181,6 +181,8 @@ def HandleDataPedals(database, data):
 
 # Message 0x703 - Status Message from ECU
 def HandleStatusEcu(database, data):
+    # TODO UPDATE WITH NEW ECU MESSAGE
+
     # Byte 0
     driveState = data[0] & 0b00000011
     if(driveState == 0): database.driveState = database.DriveState.INITIALIZING

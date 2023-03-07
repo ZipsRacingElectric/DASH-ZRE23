@@ -183,27 +183,27 @@ def HandleDataPedals(database, data):
 def HandleStatusEcu(database, data):
     # TODO UPDATE WITH NEW ECU MESSAGE
 
-    # Byte 0
-    driveState = data[0] & 0b00000011
-    if(driveState == 0): database.driveState = database.DriveState.INITIALIZING
-    if(driveState == 1): database.driveState = database.DriveState.LV_DRIVEOFF
-    if(driveState == 2): database.driveState = database.DriveState.HV_DRIVEOFF
-    if(driveState == 3): database.driveState = database.DriveState.HV_DRIVEON
-    database.accelerating          = bool((data[0] >> 2) & 0b1)
-    database.braking               = bool((data[0] >> 3) & 0b1)
-    database.drsState              = bool((data[0] >> 4) & 0b1)
-    database.regenState            = bool((data[0] >> 5) & 0b1)
-    # Byte 1
-    database.error25_5Implausible  = bool((data[1] >> 0) & 0b1)
-    database.errorInverterFault    = bool((data[1] >> 1) & 0b1)
-    database.errorAcanImplausible  = bool((data[1] >> 2) & 0b1)
-    database.error100MsImplausible = bool((data[1] >> 3) & 0b1)
-    # Byte 2
-    database.torquePercentageMax   = data[2]
-    # Byte 3
-    database.torquePercentageRegen = data[3]
-    # Bytes 4 & 5
-    database.lvBatteryVoltage = (data[4] | (data[5] << 8)) * config.LV_BATTERY_VOLTAGE_SCALE
+    # # Byte 0
+    # driveState = data[0] & 0b00000011
+    # if(driveState == 0): database.driveState = database.DriveState.INITIALIZING
+    # if(driveState == 1): database.driveState = database.DriveState.LV_DRIVEOFF
+    # if(driveState == 2): database.driveState = database.DriveState.HV_DRIVEOFF
+    # if(driveState == 3): database.driveState = database.DriveState.HV_DRIVEON
+    # database.accelerating          = bool((data[0] >> 2) & 0b1)
+    # database.braking               = bool((data[0] >> 3) & 0b1)
+    # database.drsState              = bool((data[0] >> 4) & 0b1)
+    # database.regenState            = bool((data[0] >> 5) & 0b1)
+    # # Byte 1
+    # database.error25_5Implausible  = bool((data[1] >> 0) & 0b1)
+    # database.errorInverterFault    = bool((data[1] >> 1) & 0b1)
+    # database.errorAcanImplausible  = bool((data[1] >> 2) & 0b1)
+    # database.error100MsImplausible = bool((data[1] >> 3) & 0b1)
+    # # Byte 2
+    # database.torquePercentageMax   = data[2]
+    # # Byte 3
+    # database.torquePercentageRegen = data[3]
+    # # Bytes 4 & 5
+    # database.lvBatteryVoltage = (data[4] | (data[5] << 8)) * config.LV_BATTERY_VOLTAGE_SCALE
     # Timeout
     ClearTimeoutEcu(database)
 

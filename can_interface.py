@@ -430,6 +430,8 @@ def SendCommandTorqueLimit(transmitter, torqueLimit, regenLimit):
     message[2] = (int(regenLimit  * 10))      & 0xFF
     message[3] = (int(regenLimit  * 10) >> 8) & 0xFF
 
+    SendMessage(transmitter, config.CAN_ID_COMMAND_TORQUE_LIMIT, message)
+
 # Message 0x533
 def SendCalibrateAppsRange(transmitter, apps1MinValue, apps1MaxValue, apps2MinValue, apps2MaxValue):
     message = [0,0,0,0,0,0,0,0]

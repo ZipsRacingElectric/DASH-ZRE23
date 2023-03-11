@@ -35,7 +35,7 @@ class View(gui.View):
         dataMotorRoot              = lib_tkinter.GetLabelFrame(self.frame, label="Data Motor: 0x0A7",               style=self.style, sticky="NESW", column=0, row=1)
         commandAppsCalibrationRoot = lib_tkinter.GetLabelFrame(self.frame, label="Command APPS Calibration: 0x533", style=self.style, sticky="NESW", column=0, row=2)
         dataPedalsRoot             = lib_tkinter.GetLabelFrame(self.frame, label="Data Pedals: 0x701",              style=self.style, sticky="NESW", column=0, row=3)
-        commandTorqueLimitRoot     = lib_tkinter.GetLabelFrame(self.frame, label="Command Torque LimitL 0x010",     style=self.style, sticky="NESW", column=0, row=4)
+        commandTorqueLimitRoot     = lib_tkinter.GetLabelFrame(self.frame, label="Command Torque Limit: 0x010",     style=self.style, sticky="NESW", column=0, row=4)
         statusEcuRoot              = lib_tkinter.GetLabelFrame(self.frame, label="Status ECU: 0x703",               style=self.style, sticky="NESW", column=1, row=0, rowspan=4)
         # Initializations
         self.InitializeInputPedals           (inputPedalsRoot,            column0Width)
@@ -199,8 +199,8 @@ class View(gui.View):
         lib_tkinter.GetLabel(commandTorqueLimitRoot, text="Torque Limit", column=0, row=0, sticky="W", style=self.style)
         lib_tkinter.GetLabel(commandTorqueLimitRoot, text="Regen Limit",  column=0, row=1, sticky="W", style=self.style)
         # Inputs
-        self.torqueInput = lib_tkinter.GetEntry(commandTorqueLimitRoot, minWidth=8, value=0, column=1, row=0, sticky="E", style=self.style)
-        self.regenInput  = lib_tkinter.GetEntry(commandTorqueLimitRoot, minWidth=8, value=0, column=1, row=1, sticky="E", style=self.style)
+        self.torqueInput      = lib_tkinter.GetEntry(commandTorqueLimitRoot, minWidth=8, value=0, column=1, row=0, sticky="E", style=self.style)
+        self.regenTorqueInput = lib_tkinter.GetEntry(commandTorqueLimitRoot, minWidth=8, value=0, column=1, row=1, sticky="E", style=self.style)
         
     # Transmitters ------------------------------------------------------------------------------------------------------------
     def SendInputPedals(self):
@@ -232,6 +232,7 @@ class View(gui.View):
         can_interface.SendDataPedals(self.can, apps1Percent, apps2Percent, brake1Percent, brake2Percent)
 
     def SendStatusEcu(self):
+        print("DEBUG - DEPRECATED CODE.")
         driveStateValue    = int(self.driveStateInput.get())
         acceleratingValue  = self.acceleratingInput.get()
         brakingValue       = self.brakingInput.get()
@@ -249,5 +250,5 @@ class View(gui.View):
 
     def SendCommandTorqueLimit(self):
         torqueLimit = float(self.torqueInput.get())
-        regenLimit  = float(self.regenInput.get())
+        regenLimit  = float(self.regenTorqueInput.get())
         can_interface.SendCommandTorqueLimit(self.can, torqueLimit, regenLimit)

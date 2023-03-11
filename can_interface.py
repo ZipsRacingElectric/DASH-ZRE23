@@ -419,6 +419,7 @@ def RpmToMph(rotationsPerMinute):
 
 # Message Transmitting --------------------------------------------------------------------------------------------------------
 def SendMessage(transmitter, id, data, channel=0):
+    print(f"CAN - Sending Message ID: {id} [{hex(data[0])}, {hex(data[1])}, {hex(data[2])}, {hex(data[3])}, {hex(data[4])}, {hex(data[5])}, {hex(data[6])}, {hex(data[7])}")
     transmitter.Transmit(id, data, channel)
 
 # Message 0x010

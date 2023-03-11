@@ -8,39 +8,41 @@
 # Libraries -------------------------------------------------------------------------------------------------------------------
 import tkinter
 import lib_tkinter
+from lib_tkinter import Orientation
 
 # Includes --------------------------------------------------------------------------------------------------------------------
 import gui
 import can_interface
 
 # Objects ---------------------------------------------------------------------------------------------------------------------
-class Window(gui.Window):
+class View(gui.View):
     # Initialization
-    def __init__(self, gui, id, style, can):
-        super().__init__(gui, id, style)
+    def __init__(self, gui, id, style, database, can):
+        super().__init__(gui, id, style, database)
         self.can = can
+        self.root.columnconfigure(0, weight=1)
+        self.root.rowconfigure(   0, weight=1)
+        self.scrollFrame = lib_tkinter.GetScrollFrame(self.root, self.style, Orientation.VERTICAL, sticky="NESW")
+        self.frame = self.scrollFrame.Get()
 
-    # Open
-    def Open(self):
-        super().Open()
-        self.root.title("Dashboard 2023 - Debug Module")
-        self.root.resizable(0, 0)
         # Root Partitioning
         column0Width = 280
         column1Width = 600 - column0Width
-        self.root.columnconfigure(0, minsize=column0Width)
-        self.root.columnconfigure(1, minsize=column1Width)
+        self.frame.columnconfigure(0, minsize=column0Width)
+        self.frame.columnconfigure(1, minsize=column1Width)
         # Panel Instantiations
-        inputPedalsRoot            = lib_tkinter.GetLabelFrame(self.root, label="Input Pedals: 0x005",             style=self.style, sticky="NESW", column=0, row=0)
-        dataMotorRoot              = lib_tkinter.GetLabelFrame(self.root, label="Data Motor: 0x0A7",               style=self.style, sticky="NESW", column=0, row=1)
-        commandAppsCalibrationRoot = lib_tkinter.GetLabelFrame(self.root, label="Command APPS Calibration: 0x533", style=self.style, sticky="NESW", column=0, row=2)
-        dataPedalsRoot             = lib_tkinter.GetLabelFrame(self.root, label="Data Pedals: 0x701",              style=self.style, sticky="NESW", column=0, row=3)
-        statusEcuRoot              = lib_tkinter.GetLabelFrame(self.root, label="Status ECU: 0x703",               style=self.style, sticky="NESW", column=1, row=0, rowspan=4)
+        inputPedalsRoot            = lib_tkinter.GetLabelFrame(self.frame, label="Input Pedals: 0x005",             style=self.style, sticky="NESW", column=0, row=0)
+        dataMotorRoot              = lib_tkinter.GetLabelFrame(self.frame, label="Data Motor: 0x0A7",               style=self.style, sticky="NESW", column=0, row=1)
+        commandAppsCalibrationRoot = lib_tkinter.GetLabelFrame(self.frame, label="Command APPS Calibration: 0x533", style=self.style, sticky="NESW", column=0, row=2)
+        dataPedalsRoot             = lib_tkinter.GetLabelFrame(self.frame, label="Data Pedals: 0x701",              style=self.style, sticky="NESW", column=0, row=3)
+        commandTorqueLimitRoot     = lib_tkinter.GetLabelFrame(self.frame, label="Command Torque LimitL 0x010",     style=self.style, sticky="NESW", column=0, row=4)
+        statusEcuRoot              = lib_tkinter.GetLabelFrame(self.frame, label="Status ECU: 0x703",               style=self.style, sticky="NESW", column=1, row=0, rowspan=4)
         # Initializations
         self.InitializeInputPedals           (inputPedalsRoot,            column0Width)
         self.InitializeDataMotor             (dataMotorRoot,              column0Width)
         self.InitializeCommandAppsCalibration(commandAppsCalibrationRoot, column0Width)
         self.InitializeDataPedals            (dataPedalsRoot,             column0Width)
+        self.InitializeCommandTorqueLimit    (commandTorqueLimitRoot,     column0Width)
         self.InitializeStatusEcu             (statusEcuRoot,              column1Width)
 
     # Breakout Initializers ---------------------------------------------------------------------------------------------------
@@ -183,6 +185,23 @@ class Window(gui.Window):
         self.voltageLvInput     = lib_tkinter.GetEntry(statusEcuRoot, minWidth=16, column=1, row=11, value=0, sticky="E", style=self.style)
         self.resistanceImdInput = lib_tkinter.GetEntry(statusEcuRoot, minWidth=16, column=1, row=12, value=0, sticky="E", style=self.style)
 
+    def InitializeCommandTorqueLimit(self, commandTorqueLimitRoot, width):
+        # Partitioning
+        buttonWidth = 40
+        labelWidth = 180
+        inputWidth = width - buttonWidth - labelWidth
+        commandTorqueLimitRoot.columnconfigure(0, minsize=labelWidth)
+        commandTorqueLimitRoot.columnconfigure(1, minsize=inputWidth)
+        commandTorqueLimitRoot.columnconfigure(2, minsize=buttonWidth)
+        # Send Button
+        lib_tkinter.GetButton(commandTorqueLimitRoot, text="Send", command=self.SendCommandTorqueLimit, column=2, row=0, sticky="E", style=self.style)
+        # Labels
+        lib_tkinter.GetLabel(commandTorqueLimitRoot, text="Torque Limit", column=0, row=0, sticky="W", style=self.style)
+        lib_tkinter.GetLabel(commandTorqueLimitRoot, text="Regen Limit",  column=0, row=1, sticky="W", style=self.style)
+        # Inputs
+        self.torqueInput = lib_tkinter.GetEntry(commandTorqueLimitRoot, minWidth=8, value=0, column=1, row=0, sticky="E", style=self.style)
+        self.regenInput  = lib_tkinter.GetEntry(commandTorqueLimitRoot, minWidth=8, value=0, column=1, row=1, sticky="E", style=self.style)
+        
     # Transmitters ------------------------------------------------------------------------------------------------------------
     def SendInputPedals(self):
         apps1  = int(self.apps1Input.get())
@@ -227,3 +246,8 @@ class Window(gui.Window):
         voltageLvValue     = float(self.voltageLvInput.get())
         resistanceImdValue = float(self.resistanceImdInput.get())
         can_interface.SendStatusEcu(self.can, driveStateValue, acceleratingValue, brakingValue, drsValue, regenValue, is25_5Value, inverterValue, acanValue, is100msValue, torquePercentValue, regenPercentValue, voltageLvValue, resistanceImdValue)
+
+    def SendCommandTorqueLimit(self):
+        torqueLimit = float(self.torqueInput.get())
+        regenLimit  = float(self.regenInput.get())
+        can_interface.SendCommandTorqueLimit(self.can, torqueLimit, regenLimit)

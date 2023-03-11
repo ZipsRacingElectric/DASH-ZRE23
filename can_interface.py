@@ -421,6 +421,15 @@ def RpmToMph(rotationsPerMinute):
 def SendMessage(transmitter, id, data, channel=0):
     transmitter.Transmit(id, data, channel)
 
+# Message 0x010
+def SendCommandTorqueLimit(transmitter, torqueLimit, regenLimit):
+    message = [0,0,0,0,0,0,0,0]
+
+    message[0] = (int(torqueLimit * 10))      & 0xFF
+    message[1] = (int(torqueLimit * 10) >> 8) & 0xFF
+    message[2] = (int(regenLimit  * 10))      & 0xFF
+    message[3] = (int(regenLimit  * 10) >> 8) & 0xFF
+
 # Message 0x533
 def SendCalibrateAppsRange(transmitter, apps1MinValue, apps1MaxValue, apps2MinValue, apps2MaxValue):
     message = [0,0,0,0,0,0,0,0]

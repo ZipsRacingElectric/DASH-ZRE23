@@ -88,13 +88,13 @@ def Setup(database, can):
     # Instance Views
     menu = gui_menu.View(gui, id="Menu", style=dashStyle, database=database)
     gui.AppendView(menu)
-    gui.AppendView(gui_speed.View      (gui, id="Speed",       style=dashStyle, database=database))
-    gui.AppendView(gui_endurance.View  (gui, id="Endurance",   style=dashStyle, database=database))
-    gui.AppendView(gui_testing.View    (gui, id="Testing",     style=dashStyle, database=database))
-    gui.AppendView(gui_bms.View        (gui, id="Bms",         style=dashStyle, database=database))
-    gui.AppendView(gui_calibration.View(gui, id="Calibration", style=dashStyle, databaseObj=database, canTransmitter=can))
-    gui.AppendView(gui_database.View   (gui, id="Database",    style=dashStyle, database=database))
-
+    gui.AppendView(gui_speed.View      (gui, id="Speed",       style=dashStyle,  database=database))
+    gui.AppendView(gui_endurance.View  (gui, id="Endurance",   style=dashStyle,  database=database))
+    gui.AppendView(gui_testing.View    (gui, id="Testing",     style=dashStyle,  database=database))
+    gui.AppendView(gui_bms.View        (gui, id="Bms",         style=dashStyle,  database=database))
+    gui.AppendView(gui_calibration.View(gui, id="Calibration", style=dashStyle,  databaseObj=database, canTransmitter=can))
+    gui.AppendView(gui_database.View   (gui, id="Database",    style=dashStyle,  database=database))
+    gui.AppendView(gui_debug.View      (gui, id="Debug",       style=debugStyle, database=database, can=can))
 
     # Setup Menu
     iconSpeedPath       = os.path.join(parentPath, config.ICON_SPEED)
@@ -115,13 +115,10 @@ def Setup(database, can):
     
     # Open Menu
     gui.CloseViews()
-
-    # Instance Sub-Windows
-    gui.AppendWindow(gui_debug.Window(gui, id="Debug", style=debugStyle, can=can))
     
     # Setup Keybinds
-    gui.AppendKeybind("F2", lambda: gui.ToggleWindow("Debug"))
     gui.AppendKeybind("F1", lambda: gui.ToggleFullscreen())
+    gui.AppendKeybind("F2", lambda: gui.ToggleView("Debug"))
 
     return gui
 
@@ -183,6 +180,32 @@ class Main(tkinter.Tk):
         if(openDefaultView):
             self.views[0].Open()
             self.activeView = self.views[0]
+
+    def ToggleView(self, view):
+        # Toggle by ID
+        if(type(view) == type("")):
+            viewId = view
+            view = None
+            for targetView in self.views:
+                if(targetView.id == viewId):
+                    view = targetView
+                    break
+            if(view == None):
+                print("GUI - Could not find view of ID '" + viewId + "'")
+                return
+        
+        # Open by Reference
+        if(issubclass(type(view), View)):
+            if(view == self.activeView):
+                self.CloseViews()
+            else:
+                self.CloseViews(openDefaultView=False)
+                view.Open()
+                self.activeView = view
+            return
+
+        # Invalid Object
+        print("GUI - Object '" + str(type(view)) + "' must inherit from 'gui.View")
 
     # Windows ---------------------------------------------------------------------------------
     def InitializeWindows(self):

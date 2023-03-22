@@ -29,6 +29,10 @@ CAN_LIBRARY_TYPE                 = "INNOMAKER"
 
 # CAN Bus ---------------------------------------------------------------------------------------------------------------------
 CAN_BITRATE                      = 1000000                     # CAN Bitrate of 1 Megabit per Second
+
+CAN_DATABASE_PATH                = "database/Main_2023.dbc"
+
+CAN_ID_COMMAND_DRIVE_START       = 0x004                       # ID of Command_Drive_Start
 CAN_ID_INPUT_PEDALS              = 0x005                       # ID of Input_Pedals
 CAN_ID_COMMAND_TORQUE_LIMIT      = 0x010                       # ID of Command_Torque_Limit
 CAN_ID_DATA_TEMP_1               = 0x0A0                       # ID of Data_Temperature_1

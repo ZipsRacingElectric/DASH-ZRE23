@@ -88,20 +88,20 @@ class View(gui.View):
                 self.calibrationState = CalibrationState.REQUEST_BOTH_MIN
 
             elif(self.calibrationState == CalibrationState.REQUEST_BOTH_MIN):
-                self.apps1CurrentMin    = self.database.apps1
-                self.apps2RawCurrentMin = self.database.apps2Raw
-                self.brake1CurrentMin   = self.database.brake1
-                self.brake2CurrentMin   = self.database.brake2
+                self.apps1CurrentMin  = self.database.apps1
+                self.apps2CurrentMin  = self.database.apps2
+                self.brake1CurrentMin = self.database.brake1
+                self.brake2CurrentMin = self.database.brake2
                 self.calibrationState = CalibrationState.REQUEST_APPS_MAX
 
             elif(self.calibrationState == CalibrationState.REQUEST_APPS_MAX):
-                self.apps1CurrentMax    = self.database.apps1
-                self.apps2RawCurrentMax = self.database.apps2Raw
+                self.apps1CurrentMax  = self.database.apps1
+                self.apps2CurrentMax  = self.database.apps2
                 self.calibrationState = CalibrationState.REQUEST_BRAKE_MAX
 
             elif(self.calibrationState == CalibrationState.REQUEST_BRAKE_MAX):
-                self.brake1CurrentMax   = self.database.brake1
-                self.brake2CurrentMax   = self.database.brake2
+                self.brake1CurrentMax = self.database.brake1
+                self.brake2CurrentMax = self.database.brake2
                 self.ValidateCalibration()
                 self.ApplyCalibration()
 
@@ -111,31 +111,31 @@ class View(gui.View):
         self.calibrationState = CalibrationState.FAILED
         if(self.apps1CurrentMin == None):    return
         if(self.apps1CurrentMax == None):    return
-        if(self.apps2RawCurrentMin == None): return
-        if(self.apps2RawCurrentMax == None): return
+        if(self.apps2CurrentMin == None): return
+        if(self.apps2CurrentMax == None): return
         if(self.brake1CurrentMin == None):   return
         if(self.brake1CurrentMax == None):   return
         if(self.brake2CurrentMin == None):   return
         if(self.brake2CurrentMax == None):   return
-        if(self.apps1CurrentMin    >= self.apps1CurrentMax):    return
-        if(self.apps2RawCurrentMin >= self.apps2RawCurrentMax): return
-        if(self.brake1CurrentMin   >= self.brake1CurrentMax):   return
-        if(self.brake2CurrentMin   >= self.brake2CurrentMax):   return
+        if(self.apps1CurrentMin  >= self.apps1CurrentMax):  return
+        if(self.apps2CurrentMin  >= self.apps2CurrentMax):  return
+        if(self.brake1CurrentMin >= self.brake1CurrentMax): return
+        if(self.brake2CurrentMin >= self.brake2CurrentMax): return
         self.calibrationState = CalibrationState.FINISHED
 
     # Apply Calibration
     # - Sends new Variables to CAN Bus
     def ApplyCalibration(self):
         if(self.calibrationState != CalibrationState.FINISHED): return
-        self.database.apps1Min    = self.apps1CurrentMin
-        self.database.apps1Max    = self.apps1CurrentMax
-        self.database.apps2RawMin = self.apps2RawCurrentMin
-        self.database.apps2RawMax = self.apps2RawCurrentMax
-        self.database.brake1Min   = self.brake1CurrentMin
-        self.database.brake1Max   = self.brake1CurrentMax
-        self.database.brake2Min   = self.brake2CurrentMin
-        self.database.brake2Max   = self.brake2CurrentMax
-        can_interface.SendCalibrateAppsRange(self.canTransmitter, self.apps1CurrentMin, self.apps1CurrentMax, self.apps2RawCurrentMin, self.apps2RawCurrentMax)
+        self.database.apps1Min  = self.apps1CurrentMin
+        self.database.apps1Max  = self.apps1CurrentMax
+        self.database.apps2Min  = self.apps2CurrentMin
+        self.database.apps2Max  = self.apps2CurrentMax
+        self.database.brake1Min = self.brake1CurrentMin
+        self.database.brake1Max = self.brake1CurrentMax
+        self.database.brake2Min = self.brake2CurrentMin
+        self.database.brake2Max = self.brake2CurrentMax
+        can_interface.SendCalibrateAppsRange(self.canTransmitter, self.apps1CurrentMin, self.apps1CurrentMax, self.apps2CurrentMin, self.apps2CurrentMax)
         can_interface.SendCalibrateBrakeRange(self.canTransmitter, self.brake1CurrentMin, self.brake1CurrentMax, self.brake2CurrentMin, self.brake2CurrentMax)
 
     def Close(self):

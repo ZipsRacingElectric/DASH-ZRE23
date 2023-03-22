@@ -110,8 +110,6 @@ class View(gui.View):
         self.maxDeltaStat     = lib_tkinter.GetLabelStat(self.statPanel, column=5, row=2, sticky="W", precision=2,           style=style)
         self.meanDeltaStat    = lib_tkinter.GetLabelStat(self.statPanel, column=5, row=3, sticky="W", precision=2,           style=style)
 
-        self.Update()
-
     # Set View Type
     # - Sets the View Type of the Individual Cell Stats
     def SetViewType(self, viewType):

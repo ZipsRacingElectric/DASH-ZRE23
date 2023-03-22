@@ -37,13 +37,15 @@ class View(gui.View):
         dataPedalsRoot             = lib_tkinter.GetLabelFrame(self.frame, label="Data Pedals: 0x701",              style=self.style, sticky="NESW", column=0, row=3)
         commandTorqueLimitRoot     = lib_tkinter.GetLabelFrame(self.frame, label="Command Torque Limit: 0x010",     style=self.style, sticky="NESW", column=0, row=4)
         statusEcuRoot              = lib_tkinter.GetLabelFrame(self.frame, label="Status ECU: 0x703",               style=self.style, sticky="NESW", column=1, row=0, rowspan=4)
+        commandDriveStart          = lib_tkinter.GetLabelFrame(self.frame, label="Command Drive Start: 0x004",      style=self.style, sticky="NESW", column=1, row=4)
         # Initializations
-        self.InitializeInputPedals           (inputPedalsRoot,            column0Width)
-        self.InitializeDataMotor             (dataMotorRoot,              column0Width)
-        self.InitializeCommandAppsCalibration(commandAppsCalibrationRoot, column0Width)
-        self.InitializeDataPedals            (dataPedalsRoot,             column0Width)
-        self.InitializeCommandTorqueLimit    (commandTorqueLimitRoot,     column0Width)
-        self.InitializeStatusEcu             (statusEcuRoot,              column1Width)
+        self.InitializeInputPedals              (inputPedalsRoot,            column0Width)
+        self.InitializeDataMotor                (dataMotorRoot,              column0Width)
+        self.InitializeCommandAppsCalibration   (commandAppsCalibrationRoot, column0Width)
+        self.InitializeDataPedals               (dataPedalsRoot,             column0Width)
+        self.InitializeCommandDriveConfiguration(commandTorqueLimitRoot,     column0Width)
+        self.InitializeStatusEcu                (statusEcuRoot,              column1Width)
+        self.InitializeCommandDriveStart        (commandDriveStart,          column1Width)
 
     # Breakout Initializers ---------------------------------------------------------------------------------------------------
     def InitializeInputPedals(self, inputPedalsRoot, width):
@@ -130,6 +132,27 @@ class View(gui.View):
         self.brake1PercentInput = lib_tkinter.GetEntry(dataPedalsRoot, minWidth=8, column=1, row=2, value=0, sticky="E", style=self.style)
         self.brake2PercentInput = lib_tkinter.GetEntry(dataPedalsRoot, minWidth=8, column=1, row=3, value=0, sticky="E", style=self.style)
   
+    def InitializeCommandDriveConfiguration(self, commandTorqueLimitRoot, width):
+        # Partitioning
+        buttonWidth = 40
+        labelWidth = 180
+        inputWidth = width - buttonWidth - labelWidth
+        commandTorqueLimitRoot.columnconfigure(0, minsize=labelWidth)
+        commandTorqueLimitRoot.columnconfigure(1, minsize=inputWidth)
+        commandTorqueLimitRoot.columnconfigure(2, minsize=buttonWidth)
+        # Send Button
+        lib_tkinter.GetButton(commandTorqueLimitRoot, text="Send", command=self.SendCommandDriveConfiguration, column=2, row=0, sticky="E", style=self.style)
+        # Labels
+        lib_tkinter.GetLabel(commandTorqueLimitRoot, text="Torque Limit",  column=0, row=0, sticky="W", style=self.style)
+        lib_tkinter.GetLabel(commandTorqueLimitRoot, text="Regen Limit",   column=0, row=1, sticky="W", style=self.style)
+        lib_tkinter.GetLabel(commandTorqueLimitRoot, text="Regen Enabled", column=0, row=2, sticky="W", style=self.style)
+        # Inputs
+        self.regenEnableInput = tkinter.BooleanVar(value=False)
+
+        self.torqueInput      = lib_tkinter.GetEntry      (commandTorqueLimitRoot, minWidth=8, value=0, column=1, row=0, sticky="E", style=self.style)
+        self.regenTorqueInput = lib_tkinter.GetEntry      (commandTorqueLimitRoot, minWidth=8, value=0, column=1, row=1, sticky="E", style=self.style)
+        self.regenEnableCheck = lib_tkinter.GetCheckbutton(commandTorqueLimitRoot, variable=self.regenEnableInput, column=1, row=2, sticky="W", style=self.style)
+
     def InitializeStatusEcu(self, statusEcuRoot, width):
         # Partitioning
         buttonWidth = 40
@@ -184,23 +207,23 @@ class View(gui.View):
         self.regenPercentInput  = lib_tkinter.GetEntry(statusEcuRoot, minWidth=16, column=1, row=10, value=0, sticky="E", style=self.style)
         self.voltageLvInput     = lib_tkinter.GetEntry(statusEcuRoot, minWidth=16, column=1, row=11, value=0, sticky="E", style=self.style)
         self.resistanceImdInput = lib_tkinter.GetEntry(statusEcuRoot, minWidth=16, column=1, row=12, value=0, sticky="E", style=self.style)
-
-    def InitializeCommandTorqueLimit(self, commandTorqueLimitRoot, width):
+        
+    def InitializeCommandDriveStart(self, commandDriveStartRoot, width):
         # Partitioning
         buttonWidth = 40
-        labelWidth = 180
+        labelWidth = 165
         inputWidth = width - buttonWidth - labelWidth
-        commandTorqueLimitRoot.columnconfigure(0, minsize=labelWidth)
-        commandTorqueLimitRoot.columnconfigure(1, minsize=inputWidth)
-        commandTorqueLimitRoot.columnconfigure(2, minsize=buttonWidth)
+        commandDriveStartRoot.columnconfigure(0, minsize=labelWidth)
+        commandDriveStartRoot.columnconfigure(1, minsize=inputWidth)
+        commandDriveStartRoot.columnconfigure(2, minsize=buttonWidth)
         # Send Button
-        lib_tkinter.GetButton(commandTorqueLimitRoot, text="Send", command=self.SendCommandTorqueLimit, column=2, row=0, sticky="E", style=self.style)
+        lib_tkinter.GetButton(commandDriveStartRoot, text="Send", command=self.SendCommandDriveConfiguration, column=2, row=0, sticky="E", style=self.style)
         # Labels
-        lib_tkinter.GetLabel(commandTorqueLimitRoot, text="Torque Limit", column=0, row=0, sticky="W", style=self.style)
-        lib_tkinter.GetLabel(commandTorqueLimitRoot, text="Regen Limit",  column=0, row=1, sticky="W", style=self.style)
+        lib_tkinter.GetLabel(commandDriveStartRoot, text="Start", column=0, row=0, sticky="W", style=self.style)
         # Inputs
-        self.torqueInput      = lib_tkinter.GetEntry(commandTorqueLimitRoot, minWidth=8, value=0, column=1, row=0, sticky="E", style=self.style)
-        self.regenTorqueInput = lib_tkinter.GetEntry(commandTorqueLimitRoot, minWidth=8, value=0, column=1, row=1, sticky="E", style=self.style)
+        self.commandStartInput = tkinter.BooleanVar(value=True)
+        # Boolean Inputs
+        lib_tkinter.GetCheckbutton(commandDriveStartRoot, variable=self.commandStartInput, column=1, row=0, sticky="W", style=self.style)
         
     # Transmitters ------------------------------------------------------------------------------------------------------------
     def SendInputPedals(self):
@@ -231,6 +254,12 @@ class View(gui.View):
         brake2Percent = int(self.brake2PercentInput.get())
         can_interface.SendDataPedals(self.can, apps1Percent, apps2Percent, brake1Percent, brake2Percent)
 
+    def SendCommandDriveConfiguration(self):
+        torqueLimit  = float(self.torqueInput.get())
+        regenLimit   = float(self.regenTorqueInput.get())
+        regenEnabled = self.regenEnableInput.get()
+        can_interface.SendCommandDriveConfiguration(self.can, torqueLimit, regenLimit, regenEnabled)
+
     def SendStatusEcu(self):
         print("DEBUG - DEPRECATED CODE.")
         driveStateValue    = int(self.driveStateInput.get())
@@ -248,7 +277,6 @@ class View(gui.View):
         resistanceImdValue = float(self.resistanceImdInput.get())
         can_interface.SendStatusEcu(self.can, driveStateValue, acceleratingValue, brakingValue, drsValue, regenValue, is25_5Value, inverterValue, acanValue, is100msValue, torquePercentValue, regenPercentValue, voltageLvValue, resistanceImdValue)
 
-    def SendCommandTorqueLimit(self):
-        torqueLimit = float(self.torqueInput.get())
-        regenLimit  = float(self.regenTorqueInput.get())
-        can_interface.SendCommandTorqueLimit(self.can, torqueLimit, regenLimit)
+    def SendCommandDriveConfiguration(self):
+        start = self.commandStartInput.get()
+        can_interface.SendCommandDriveStart(self.can, start)

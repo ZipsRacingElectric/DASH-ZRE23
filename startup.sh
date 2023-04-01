@@ -1,1 +1,1 @@
-python3 /root/DASH23/app.py > /root/DASH23/stdout.log
+python3 /root/DASH23/app.py

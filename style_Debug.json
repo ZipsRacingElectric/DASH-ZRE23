@@ -1,5 +1,6 @@
 {
     "font"              : {"font" : "consolas", "size" : 10},
+    "fontBold"          : {"font" : "consolas bold", "size" : 10},
     "textColor"         : "#000000",
     "background"        : "#F0F0F0",
     "highlight"         : "#AAAAAA",

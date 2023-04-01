@@ -1,1 +1,1 @@
-echo "bash /root/DASH23/startup.sh > /root/DASH23/stdout.log" > /root/.xsession
+echo "bash /root/DASH23/startup.sh" > /root/.xinitrc

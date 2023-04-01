@@ -13,6 +13,9 @@ from lib_tkinter import Orientation
 import gui
 import config
 
+import log
+from log import print
+
 # Objects ---------------------------------------------------------------------------------------------------------------------
 class View(gui.View):
     def __init__(self, parent, id, style, database):

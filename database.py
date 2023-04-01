@@ -1,13 +1,32 @@
 import cantools
 import os
 
+import enum
+from enum import Enum
+
 import config
+
+import log
+from log import print
+
+import can_interface
+
+# Enumerables -----------------------------------------------------------------------------------------------------------------
+class InputTypes(Enum):                              # Input Type Enumerable
+    BUTTON_WHEEL_LEFT  = 0,                          # - Left Button of Steering Wheel
+    BUTTON_WHEEL_RIGHT = 1,                          # - Right Button of Steering Wheel
+    BUTTON_DASH_LEFT   = 2,                          # - Left Button of Dashboard
+    BUTTON_DASH_RIGHT  = 3                           # - Right Button of Dashboard
 
 def Setup():
     parentPath = os.path.dirname(__file__)
     databasePath = os.path.join(parentPath, config.CAN_DATABASE_PATH)
 
-    return Database(databasePath)
+    db = Database(databasePath)
+
+    can_interface.CalculateInverterStats(db)
+
+    return db
 
 class Database(dict):
     def __init__(self, path):
@@ -25,8 +44,9 @@ class Database(dict):
 
     def decode_message(self, id, data):
         messageData = self.db.decode_message(id, data)
+        
         for signal in messageData:
-            self[signal[0]] = signal[1]
+            self[signal] = messageData[signal]
 
 # # Database --------------------------------------------------------------------------------------------------------------------
 # # Author: Cole Barach
@@ -38,13 +58,6 @@ class Database(dict):
 # # Libraries -------------------------------------------------------------------------------------------------------------------
 # import enum
 # from enum import Enum
-
-# # Enumerables -----------------------------------------------------------------------------------------------------------------
-# class InputTypes(Enum):                              # Input Type Enumerable
-#     BUTTON_WHEEL_LEFT  = 0,                          # - Left Button of Steering Wheel
-#     BUTTON_WHEEL_RIGHT = 1,                          # - Right Button of Steering Wheel
-#     BUTTON_DASH_LEFT   = 2,                          # - Left Button of Dashboard
-#     BUTTON_DASH_RIGHT  = 3                           # - Right Button of Dashboard
 
 # # Functions -------------------------------------------------------------------------------------------------------------------
 # def Setup():

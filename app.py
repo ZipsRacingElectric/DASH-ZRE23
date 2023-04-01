@@ -6,6 +6,9 @@
 #   initializing the CAN and GUI modules.
 
 # Includes --------------------------------------------------------------------------------------------------------------------
+import log
+from log import print
+
 import gui
 import can_interface
 import database
@@ -13,6 +16,8 @@ import database
 # App Execution ---------------------------------------------------------------------------------------------------------------
 if(__name__ == "__main__"):
     # Initialization
+    log.Setup()
+
     print("APP - Initializing...")
     mainDatabase = database.Setup()                            # Setup Database
     mainCan      = can_interface.Setup(mainDatabase)           # Setup CAN Interface
@@ -29,3 +34,5 @@ if(__name__ == "__main__"):
     print("APP - Terminating...")
     mainCan.Kill()
     print("APP - Terminated.")
+    print("APP - Closing Log.")
+    log.Kill()

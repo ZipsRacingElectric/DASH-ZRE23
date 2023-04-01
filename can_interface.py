@@ -14,6 +14,9 @@ from threading import Thread
 # Includes
 import config
 
+import log
+from log import print
+
 # Objects ---------------------------------------------------------------------------------------------------------------------
 # CAN Interface
 # - Interface Object for CAN Libraries
@@ -62,7 +65,7 @@ class CanInterface():
         while(self.online):
             self.timingFunction(self.database)
             time.sleep(self.timingPeriod)
-    
+
 # Functions -------------------------------------------------------------------------------------------------------------------
 # - Call this function to get an initialized CAN Interface Object
 def Setup(database):
@@ -76,20 +79,20 @@ def Setup(database):
         library.OpenChannel(config.CAN_BITRATE, 0)
         library.OpenChannel(config.CAN_BITRATE, 1)
         return library
-        
+    
     if(config.CAN_LIBRARY_TYPE == config.CAN_INNOMAKER):
         if(sys.platform == "win32"):
             import lib_innomaker_win
             library = lib_innomaker_win.Main(database, messageHandler=HandleMessage, timingFunction=None, timingPeriod=config.CAN_TIME_PERIOD)
             library.OpenChannel(config.CAN_BITRATE, 0)
-            # library.OpenChannel(config.CAN_BITRATE, 1)
+            library.OpenChannel(config.CAN_BITRATE, 1)
             return library
 
         if(sys.platform == "linux"):
             import lib_innomaker_linux
             library = lib_innomaker_linux.Main(database, messageHandler=HandleMessage, timingFunction=None, timingPeriod=config.CAN_TIME_PERIOD)
             library.OpenChannel(config.CAN_BITRATE, 0)
-            # library.OpenChannel(config.CAN_BITRATE, 1)
+            library.OpenChannel(config.CAN_BITRATE, 1)
             return library
 
 # Message Handling ------------------------------------------------------------------------------------------------------------
@@ -98,29 +101,57 @@ def Setup(database):
 # - Call to Interpret a CAN Message
 # - Updates car_data with Appropriate Values  
 def HandleMessage(database, id, data):
+    if(id == config.CAN_ID_INPUT_PEDALS):
+        ClearTimeoutEcu(database)
+        database.decode_message(id, data)
 
-    database.decode_message(id, data)
+    if(id == config.CAN_ID_DATA_TEMP_1): 
+        ClearTimeoutInverter(database)
+        database.decode_message(id, data)
 
-    # if(id == config.CAN_ID_INPUT_PEDALS): HandleInputPedals(database, data)
-    # if(id == config.CAN_ID_DATA_TEMP_1):  HandleDataTemperature1(database, data)
-    # if(id == config.CAN_ID_DATA_TEMP_2):  HandleDataTemperature2(database, data)
-    # if(id == config.CAN_ID_DATA_TEMP_3):  HandleDataTemperature3Torque(database, data)
-    # if(id == config.CAN_ID_DATA_MOTOR):   HandleDataMotor(database, data)
-    # if(id == config.CAN_ID_DATA_PEDALS):  HandleDataPedals(database, data)
-    # if(id == config.CAN_ID_STATUS_ECU):   HandleStatusEcu(database, data)
-    # if(id == config.CAN_ID_STATUS_BMS):   HandleStatusBms(database, data)
+    if(id == config.CAN_ID_DATA_TEMP_2):
+        ClearTimeoutInverter(database)
+        database.decode_message(id, data)
+
+    if(id == config.CAN_ID_DATA_TEMP_3):
+        ClearTimeoutInverter(database)
+        database.decode_message(id, data)
+
+    if(id == config.CAN_ID_DATA_MOTOR):
+        ClearTimeoutInverter(database)
+        database.decode_message(id, data)
+
+    if(id == config.CAN_ID_DATA_PEDALS):
+        ClearTimeoutEcu(database)
+        database.decode_message(id, data)
+
+    if(id == config.CAN_ID_STATUS_ECU):
+        ClearTimeoutEcu(database)
+        database.decode_message(id, data)
+
+    if(id == config.CAN_ID_STATUS_BMS):
+        ClearTimeoutBms(database)
+        database.decode_message(id, data)
     
-    # for index in range(config.CAN_ID_CELL_VOLTAGES_END - config.CAN_ID_CELL_VOLTAGES_START + 1):
-    #     idIndex = config.CAN_ID_CELL_VOLTAGES_START + index
-    #     if(id == idIndex): HandleCellVoltages(database, data, idIndex)
+    for index in range(config.CAN_ID_CELL_VOLTAGES_END - config.CAN_ID_CELL_VOLTAGES_START + 1):
+        idIndex = config.CAN_ID_CELL_VOLTAGES_START + index
+        if(id == idIndex):
+            ClearTimeoutBms(database)
+            database.decode_message(id, data)
     
-    # for index in range(config.CAN_ID_CELL_BALANCINGS_END - config.CAN_ID_CELL_BALANCINGS_START + 1):
-    #     idIndex = config.CAN_ID_CELL_BALANCINGS_START + index
-    #     if(id == idIndex): HandleCellBalancings(database, data, idIndex)
+    for index in range(config.CAN_ID_CELL_BALANCINGS_END - config.CAN_ID_CELL_BALANCINGS_START + 1):
+        idIndex = config.CAN_ID_CELL_BALANCINGS_START + index
+        if(id == idIndex):
+            ClearTimeoutBms(database)
+            database.decode_message(id, data)
 
-    # for index in range(config.CAN_ID_PACK_TEMPERATURES_END - config.CAN_ID_PACK_TEMPERATURES_START + 1):
-    #     idIndex = config.CAN_ID_PACK_TEMPERATURES_START + index
-    #     if(id == idIndex): HandlePackTemperatures(database, data, idIndex)
+    for index in range(config.CAN_ID_PACK_TEMPERATURES_END - config.CAN_ID_PACK_TEMPERATURES_START + 1):
+        idIndex = config.CAN_ID_PACK_TEMPERATURES_START + index
+        if(id == idIndex):
+            ClearTimeoutBms(database)
+            database.decode_message(id, data)
+
+# DEPRICATED ------------------------------------------------------------------------------------------------------------------
 
 # # Message 0x005 - Pedal Data from ECU
 # def HandleInputPedals(database, data):
@@ -314,232 +345,232 @@ def HandleMessage(database, id, data):
 #     # Timeout
 #     CalculateBmsStats(database) 
 
-# # Data Extrapolation ----------------------------------------------------------------------------------------------------------
-# def CalculateInverterStats(database):
-#     database.inverterTempMean = None
-#     database.inverterTempMax  = None
+# Data Extrapolation ----------------------------------------------------------------------------------------------------------
+def CalculateInverterStats(database):
+    database["Temperature_Inverter_Mean"] = None
+    database["Temperature_Inverter_Max"]  = None
 
-#     tempCount = 0
-#     for i in range(5):
-#         temp = None
-#         if(i == 0):
-#             temp = database.inverterTempModuleA
-#         elif(i == 1):
-#             temp = database.inverterTempModuleB
-#         elif(i == 2):
-#             temp = database.inverterTempModuleC
-#         elif(i == 3):
-#             temp = database.inverterTempCb
-#         elif(i == 4):
-#             temp = database.inverterTempGdb
+    tempCount = 0
+    for i in range(5):
+        temp = None
+        if(i == 0):
+            temp = database["Temperature_Inverter_Module_A"]
+        elif(i == 1):
+            temp = database["Temperature_Inverter_Module_B"]
+        elif(i == 2):
+            temp = database["Temperature_Inverter_Module_C"]
+        elif(i == 3):
+            temp = database["Temperature_Inverter_CB"]
+        elif(i == 4):
+            temp = database["Temperature_Inverter_GDB"]
 
-#         if(temp == None): continue
-#         if(database.inverterTempMax  == None): database.inverterTempMax  = temp
-#         if(database.inverterTempMean == None): database.inverterTempMean = 0
-#         database.inverterTempMean += temp
-#         tempCount += 1
+        if(temp == None): continue
+        if(database["Temperature_Inverter_Max"]  == None): database["Temperature_Inverter_Max"]  = temp
+        if(database["Temperature_Inverter_Mean"] == None): database["Temperature_Inverter_Mean"] = 0
+        database["Temperature_Inverter_Mean"] += temp
+        tempCount += 1
 
-#     if(tempCount != 0): database.inverterTempMean /= tempCount
+    if(tempCount != 0): database["Temperature_Inverter_Mean"] /= tempCount
 
-# def CalculateBmsStats(database):
-#     # Voltages
-#     database.packVoltage    = None
-#     database.cellVoltageMin = None
-#     database.cellVoltageMax = None
-#     for voltage in database.cellVoltages:
-#         if(voltage == None): continue
-#         if(database.packVoltage == None): database.packVoltage = 0
-#         database.packVoltage += voltage
-#         if(database.cellVoltageMin == None or voltage < database.cellVoltageMin):
-#             database.cellVoltageMin = voltage
-#         if(database.cellVoltageMax == None or voltage > database.cellVoltageMax):
-#             database.cellVoltageMax = voltage
+def CalculateBmsStats(database):
+    # Voltages
+    database.packVoltage    = None
+    database.cellVoltageMin = None
+    database.cellVoltageMax = None
+    for voltage in database.cellVoltages:
+        if(voltage == None): continue
+        if(database.packVoltage == None): database.packVoltage = 0
+        database.packVoltage += voltage
+        if(database.cellVoltageMin == None or voltage < database.cellVoltageMin):
+            database.cellVoltageMin = voltage
+        if(database.cellVoltageMax == None or voltage > database.cellVoltageMax):
+            database.cellVoltageMax = voltage
     
-#     # Deltas
-#     database.cellDeltaMax  = None
-#     database.cellDeltaMean = None
-#     deltaCount = 0
-#     for voltage in database.cellVoltages:
-#         if(voltage == None): continue
-#         delta = voltage - database.cellVoltageMin
-#         if(database.cellDeltaMean == None): database.cellDeltaMean = 0
-#         if(database.cellDeltaMax == None or voltage > database.cellDeltaMax):
-#             database.cellDeltaMax = delta
-#         database.cellDeltaMean += delta
-#         deltaCount += 1
-#     if(deltaCount != 0): database.cellDeltaMean /= deltaCount
+    # Deltas
+    database.cellDeltaMax  = None
+    database.cellDeltaMean = None
+    deltaCount = 0
+    for voltage in database.cellVoltages:
+        if(voltage == None): continue
+        delta = voltage - database.cellVoltageMin
+        if(database.cellDeltaMean == None): database.cellDeltaMean = 0
+        if(database.cellDeltaMax == None or voltage > database.cellDeltaMax):
+            database.cellDeltaMax = delta
+        database.cellDeltaMean += delta
+        deltaCount += 1
+    if(deltaCount != 0): database.cellDeltaMean /= deltaCount
 
-#     # Temperatures
-#     database.packTemperatureMax  = None
-#     database.packTemperatureMean = None
-#     tempCount = 0
-#     for temperature in database.packTemperatures:
-#         if(temperature == None): continue
-#         if(database.packTemperatureMean == None): database.packTemperatureMean = 0
-#         if(database.packTemperatureMax == None or temperature > database.packTemperatureMax):
-#             database.packTemperatureMax = temperature
-#         database.packTemperatureMean += temperature
-#         tempCount += 1
-#     if(tempCount != 0): database.packTemperatureMean /= tempCount
+    # Temperatures
+    database.packTemperatureMax  = None
+    database.packTemperatureMean = None
+    tempCount = 0
+    for temperature in database.packTemperatures:
+        if(temperature == None): continue
+        if(database.packTemperatureMean == None): database.packTemperatureMean = 0
+        if(database.packTemperatureMax == None or temperature > database.packTemperatureMax):
+            database.packTemperatureMax = temperature
+        database.packTemperatureMean += temperature
+        tempCount += 1
+    if(tempCount != 0): database.packTemperatureMean /= tempCount
 
-# # Message Timeouts ------------------------------------------------------------------------------------------------------------
-# def SetTimeouts(database):
-#     database.time = time.time()
-#     if(database.ecuCanTimeout      == None or database.time > database.ecuCanTimeout      + config.CAN_MESSAGE_TIMEOUT): database.ecuCanActive      = False
-#     if(database.acanCanTimeout     == None or database.time > database.acanCanTimeout     + config.CAN_MESSAGE_TIMEOUT): database.acanCanActive     = False
-#     if(database.inverterCanTimeout == None or database.time > database.inverterCanTimeout + config.CAN_MESSAGE_TIMEOUT): database.inverterCanActive = False
-#     if(database.bmsCanTimeout      == None or database.time > database.bmsCanTimeout      + config.CAN_MESSAGE_TIMEOUT): database.bmsCanActive      = False
+# Message Timeouts ------------------------------------------------------------------------------------------------------------
+def SetTimeouts(database):
+    database.time = time.time()
+    if(database.ecuCanTimeout      == None or database.time > database.ecuCanTimeout      + config.CAN_MESSAGE_TIMEOUT): database.ecuCanActive      = False
+    if(database.acanCanTimeout     == None or database.time > database.acanCanTimeout     + config.CAN_MESSAGE_TIMEOUT): database.acanCanActive     = False
+    if(database.inverterCanTimeout == None or database.time > database.inverterCanTimeout + config.CAN_MESSAGE_TIMEOUT): database.inverterCanActive = False
+    if(database.bmsCanTimeout      == None or database.time > database.bmsCanTimeout      + config.CAN_MESSAGE_TIMEOUT): database.bmsCanActive      = False
 
-# def ClearTimeoutEcu(database):
-#     database.ecuCanTimeout = time.time()
-#     database.ecuCanActive = True
+def ClearTimeoutEcu(database):
+    database.ecuCanTimeout = time.time()
+    database.ecuCanActive = True
 
-# def ClearTimeoutAcan(database):
-#     database.acanCanTimeout = time.time()
-#     database.acanCanActive = True
+def ClearTimeoutAcan(database):
+    database.acanCanTimeout = time.time()
+    database.acanCanActive = True
 
-# def ClearTimeoutInverter(database):
-#     database.inverterCanTimeout = time.time()
-#     database.inverterCanActive = True
+def ClearTimeoutInverter(database):
+    database.inverterCanTimeout = time.time()
+    database.inverterCanActive = True
 
-# def ClearTimeoutBms(database):
-#     database.bmsCanTimeout = time.time()
-#     database.bmsCanActive = True
+def ClearTimeoutBms(database):
+    database.bmsCanTimeout = time.time()
+    database.bmsCanActive = True
 
-# # Data Interpretation ---------------------------------------------------------------------------------------------------------
-# def InterpretSignedNBitInt(value, bitCount=16):
-#     if(value > 2 ** (bitCount-1)): value -= 2 ** bitCount
-#     return value
+# Data Interpretation ---------------------------------------------------------------------------------------------------------
+def InterpretSignedNBitInt(value, bitCount=16):
+    if(value > 2 ** (bitCount-1)): value -= 2 ** bitCount
+    return value
 
-# def RpmToMph(rotationsPerMinute):
-#     radiansPerMinute = rotationsPerMinute * config.RADIANS_PER_ROTATION * config.MOTOR_TEETH_COUNT / config.SPROCKET_TEETH_COUNT
-#     speedMph = radiansPerMinute * config.TIRE_RADIUS_INCHES * config.MINUTES_PER_HOUR / (config.INCHES_PER_FOOT * config.FEET_PER_MILE)
-#     return speedMph
+def RpmToMph(rotationsPerMinute):
+    radiansPerMinute = rotationsPerMinute * config.RADIANS_PER_ROTATION * config.MOTOR_TEETH_COUNT / config.SPROCKET_TEETH_COUNT
+    speedMph = radiansPerMinute * config.TIRE_RADIUS_INCHES * config.MINUTES_PER_HOUR / (config.INCHES_PER_FOOT * config.FEET_PER_MILE)
+    return speedMph
 
-# # Message Transmitting --------------------------------------------------------------------------------------------------------
-# def SendMessage(transmitter, id, data, channel=0):
-#     print(f"CAN - Sending Message ID: {id} [{hex(data[0])}, {hex(data[1])}, {hex(data[2])}, {hex(data[3])}, {hex(data[4])}, {hex(data[5])}, {hex(data[6])}, {hex(data[7])}")
-#     transmitter.Transmit(id, data, channel)
+# Message Transmitting --------------------------------------------------------------------------------------------------------
+def SendMessage(transmitter, id, data, channel=0):
+    print(f"CAN - Sending Message ID: {id} [{hex(data[0])}, {hex(data[1])}, {hex(data[2])}, {hex(data[3])}, {hex(data[4])}, {hex(data[5])}, {hex(data[6])}, {hex(data[7])}")
+    transmitter.Transmit(id, data, channel)
 
-# # Message 0x004
-# def SendCommandDriveStart(transmitter, commandEnterDrive):
-#     message = [0,0,0,0,0,0,0,0]
+# Message 0x004
+def SendCommandDriveStart(transmitter, commandEnterDrive):
+    message = [0,0,0,0,0,0,0,0]
     
-#     message[0] = commandEnterDrive & 0b1
+    message[0] = commandEnterDrive & 0b1
     
-#     SendMessage(transmitter, config.CAN_ID_COMMAND_DRIVE_START, message)
+    SendMessage(transmitter, config.CAN_ID_COMMAND_DRIVE_START, message)
 
-# # Message 0x010
-# def SendCommandDriveConfiguration(transmitter, torqueLimit, regenLimit, regenEnabled):
-#     message = [0,0,0,0,0,0,0,0]
+# Message 0x010
+def SendCommandDriveConfiguration(transmitter, torqueLimit, regenLimit, regenEnabled):
+    message = [0,0,0,0,0,0,0,0]
 
-#     message[0] = (int(torqueLimit * 10))      & 0xFF
-#     message[1] = (int(torqueLimit * 10) >> 8) & 0xFF
-#     message[2] = (int(regenLimit  * 10))      & 0xFF
-#     message[3] = (int(regenLimit  * 10) >> 8) & 0xFF
-#     message[4] = regenEnabled & 0b1
+    message[0] = (int(torqueLimit * 10))      & 0xFF
+    message[1] = (int(torqueLimit * 10) >> 8) & 0xFF
+    message[2] = (int(regenLimit  * 10))      & 0xFF
+    message[3] = (int(regenLimit  * 10) >> 8) & 0xFF
+    message[4] = regenEnabled & 0b1
 
-#     SendMessage(transmitter, config.CAN_ID_COMMAND_TORQUE_LIMIT, message)
+    SendMessage(transmitter, config.CAN_ID_COMMAND_TORQUE_LIMIT, message)
 
-# # Message 0x533
-# def SendCalibrateAppsRange(transmitter, apps1MinValue, apps1MaxValue, apps2MinValue, apps2MaxValue):
-#     message = [0,0,0,0,0,0,0,0]
+# Message 0x533
+def SendCalibrateAppsRange(transmitter, apps1MinValue, apps1MaxValue, apps2MinValue, apps2MaxValue):
+    message = [0,0,0,0,0,0,0,0]
 
-#     message[0] = (apps1MinValue)      & 0xFF
-#     message[1] = (apps1MinValue >> 8) & 0xFF
-#     message[2] = (apps1MaxValue)      & 0xFF
-#     message[3] = (apps1MaxValue >> 8) & 0xFF
-#     message[4] = (apps2MinValue)      & 0xFF
-#     message[5] = (apps2MinValue >> 8) & 0xFF
-#     message[6] = (apps2MaxValue)      & 0xFF
-#     message[7] = (apps2MaxValue >> 8) & 0xFF
+    message[0] = (apps1MinValue)      & 0xFF
+    message[1] = (apps1MinValue >> 8) & 0xFF
+    message[2] = (apps1MaxValue)      & 0xFF
+    message[3] = (apps1MaxValue >> 8) & 0xFF
+    message[4] = (apps2MinValue)      & 0xFF
+    message[5] = (apps2MinValue >> 8) & 0xFF
+    message[6] = (apps2MaxValue)      & 0xFF
+    message[7] = (apps2MaxValue >> 8) & 0xFF
     
-#     SendMessage(transmitter, config.CAN_ID_CALIBRATE_APPS_RANGE, message)
+    SendMessage(transmitter, config.CAN_ID_CALIBRATE_APPS_RANGE, message)
 
-# # Message 0x534
-# def SendCalibrateBrakeRange(transmitter, brake1MinValue, brake1MaxValue, brake2MinValue, brake2MaxValue):
-#     message = [0,0,0,0,0,0,0,0]
+# Message 0x534
+def SendCalibrateBrakeRange(transmitter, brake1MinValue, brake1MaxValue, brake2MinValue, brake2MaxValue):
+    message = [0,0,0,0,0,0,0,0]
 
-#     message[0] = (brake1MinValue)      & 0xFF
-#     message[1] = (brake1MinValue >> 8) & 0xFF
-#     message[2] = (brake1MaxValue)      & 0xFF
-#     message[3] = (brake1MaxValue >> 8) & 0xFF
-#     message[4] = (brake2MinValue)      & 0xFF
-#     message[5] = (brake2MinValue >> 8) & 0xFF
-#     message[6] = (brake2MaxValue)      & 0xFF
-#     message[7] = (brake2MaxValue >> 8) & 0xFF
+    message[0] = (brake1MinValue)      & 0xFF
+    message[1] = (brake1MinValue >> 8) & 0xFF
+    message[2] = (brake1MaxValue)      & 0xFF
+    message[3] = (brake1MaxValue >> 8) & 0xFF
+    message[4] = (brake2MinValue)      & 0xFF
+    message[5] = (brake2MinValue >> 8) & 0xFF
+    message[6] = (brake2MaxValue)      & 0xFF
+    message[7] = (brake2MaxValue >> 8) & 0xFF
     
-#     SendMessage(transmitter, config.CAN_ID_CALIBRATE_BRAKE_RANGE, message)
+    SendMessage(transmitter, config.CAN_ID_CALIBRATE_BRAKE_RANGE, message)
 
-# # Message 0x005
-# def SendInputPedals(transmitter, apps1, apps2, brake1, brake2):
-#     message = [0,0,0,0,0,0,0,0]
+# Message 0x005
+def SendInputPedals(transmitter, apps1, apps2, brake1, brake2):
+    message = [0,0,0,0,0,0,0,0]
     
-#     message[0] = (apps1)       & 0xFF
-#     message[1] = (apps1 >> 8)  & 0xFF
-#     message[2] = (apps2)       & 0xFF
-#     message[3] = (apps2 >> 8)  & 0xFF
-#     message[4] = (brake1)      & 0xFF
-#     message[5] = (brake1 >> 8) & 0xFF
-#     message[6] = (brake2)      & 0xFF
-#     message[7] = (brake2 >> 8) & 0xFF
+    message[0] = (apps1)       & 0xFF
+    message[1] = (apps1 >> 8)  & 0xFF
+    message[2] = (apps2)       & 0xFF
+    message[3] = (apps2 >> 8)  & 0xFF
+    message[4] = (brake1)      & 0xFF
+    message[5] = (brake1 >> 8) & 0xFF
+    message[6] = (brake2)      & 0xFF
+    message[7] = (brake2 >> 8) & 0xFF
     
-#     SendMessage(transmitter, config.CAN_ID_INPUT_PEDALS, message)
+    SendMessage(transmitter, config.CAN_ID_INPUT_PEDALS, message)
 
-# # Message 0x0A5
-# def SendDataMotor(transmitter, motorAngle, motorRpm, motorFrequency, motorDeltaResolver):
-#     message = [0,0,0,0,0,0,0,0]
+# Message 0x0A5
+def SendDataMotor(transmitter, motorAngle, motorRpm, motorFrequency, motorDeltaResolver):
+    message = [0,0,0,0,0,0,0,0]
     
-#     message[0] =  (motorAngle * 10)           & 0xFF
-#     message[1] = ((motorAngle * 10) >> 8)     & 0xFF
-#     message[2] =  (motorRpm)                  & 0xFF
-#     message[3] =  (motorRpm >> 8)             & 0xFF
-#     message[4] =  (motorFrequency * 10)       & 0xFF
-#     message[5] = ((motorFrequency * 10) >> 8) & 0xFF
-#     message[6] =  (motorDeltaResolver)        & 0xFF
-#     message[7] =  (motorDeltaResolver >> 8)   & 0xFF
+    message[0] =  (motorAngle * 10)           & 0xFF
+    message[1] = ((motorAngle * 10) >> 8)     & 0xFF
+    message[2] =  (motorRpm)                  & 0xFF
+    message[3] =  (motorRpm >> 8)             & 0xFF
+    message[4] =  (motorFrequency * 10)       & 0xFF
+    message[5] = ((motorFrequency * 10) >> 8) & 0xFF
+    message[6] =  (motorDeltaResolver)        & 0xFF
+    message[7] =  (motorDeltaResolver >> 8)   & 0xFF
     
-#     SendMessage(transmitter, config.CAN_ID_DATA_MOTOR, message)
+    SendMessage(transmitter, config.CAN_ID_DATA_MOTOR, message)
 
-# # Message 0x701
-# def SendDataPedals(transmitter, apps1Percent, apps2Percent, brake1Percent, brake2Percent):
-#     message = [0,0,0,0,0,0,0,0]
+# Message 0x701
+def SendDataPedals(transmitter, apps1Percent, apps2Percent, brake1Percent, brake2Percent):
+    message = [0,0,0,0,0,0,0,0]
     
-#     message[0] = int(apps1Percent / config.APPS_1_PERCENT_SCALE)        & 0xFF
-#     message[1] = int(apps1Percent / config.APPS_1_PERCENT_SCALE) >> 8   & 0xFF
-#     message[2] = int(apps2Percent / config.APPS_2_PERCENT_SCALE)        & 0xFF
-#     message[3] = int(apps2Percent / config.APPS_2_PERCENT_SCALE) >> 8   & 0xFF
-#     message[4] = int(brake1Percent / config.BRAKE_1_PERCENT_SCALE)      & 0xFF
-#     message[5] = int(brake1Percent / config.BRAKE_1_PERCENT_SCALE) >> 8 & 0xFF
-#     message[6] = int(brake2Percent / config.BRAKE_2_PERCENT_SCALE)      & 0xFF
-#     message[7] = int(brake2Percent / config.BRAKE_2_PERCENT_SCALE) >> 8 & 0xFF
+    message[0] = int(apps1Percent / config.APPS_1_PERCENT_SCALE)        & 0xFF
+    message[1] = int(apps1Percent / config.APPS_1_PERCENT_SCALE) >> 8   & 0xFF
+    message[2] = int(apps2Percent / config.APPS_2_PERCENT_SCALE)        & 0xFF
+    message[3] = int(apps2Percent / config.APPS_2_PERCENT_SCALE) >> 8   & 0xFF
+    message[4] = int(brake1Percent / config.BRAKE_1_PERCENT_SCALE)      & 0xFF
+    message[5] = int(brake1Percent / config.BRAKE_1_PERCENT_SCALE) >> 8 & 0xFF
+    message[6] = int(brake2Percent / config.BRAKE_2_PERCENT_SCALE)      & 0xFF
+    message[7] = int(brake2Percent / config.BRAKE_2_PERCENT_SCALE) >> 8 & 0xFF
     
-#     SendMessage(transmitter, config.CAN_ID_DATA_PEDALS, message)
+    SendMessage(transmitter, config.CAN_ID_DATA_PEDALS, message)
 
-# # Message 0x703
-# def SendStatusEcu(transmitter, driveStateInput, acceleratingInput, brakingInput, drsInput, regenInput, is25_5Input, inverterInput,
-#                   acanInput, is100msInput, torquePercentInput, regenPercentInput, voltageLvInput, resistanceImdInput):
-#     message = [0,0,0,0,0,0,0,0]
+# Message 0x703
+def SendStatusEcu(transmitter, driveStateInput, acceleratingInput, brakingInput, drsInput, regenInput, is25_5Input, inverterInput,
+                  acanInput, is100msInput, torquePercentInput, regenPercentInput, voltageLvInput, resistanceImdInput):
+    message = [0,0,0,0,0,0,0,0]
     
-#     # Byte 0
-#     message[0] |= (driveStateInput)        & 0b00000011
-#     message[0] |= (acceleratingInput << 2) & 0b00000100
-#     message[0] |= (brakingInput      << 3) & 0b00001000
-#     message[0] |= (drsInput          << 4) & 0b00010000
-#     message[0] |= (regenInput        << 5) & 0b00100000
-#     # Byte 1
-#     message[1] |= (is25_5Input)            & 0b00000001
-#     message[1] |= (inverterInput     << 1) & 0b00000010
-#     message[1] |= (acanInput         << 2) & 0b00000100
-#     message[1] |= (is100msInput      << 3) & 0b00001000
-#     # Bytes 2 & 3
-#     message[2] = int(torquePercentInput) & 0xFF
-#     message[3] = int(regenPercentInput)  & 0xFF
-#     # Bytes 4 & 5
-#     message[4] = (int(voltageLvInput / config.LV_BATTERY_VOLTAGE_SCALE))      & 0xFF
-#     message[5] = (int(voltageLvInput / config.LV_BATTERY_VOLTAGE_SCALE) >> 8) & 0xFF
-#     # Bytes 6 & 7
-#     message[6] = (int(resistanceImdInput))      & 0xFF
-#     message[7] = (int(resistanceImdInput) >> 8) & 0xFF
+    # Byte 0
+    message[0] |= (driveStateInput)        & 0b00000011
+    message[0] |= (acceleratingInput << 2) & 0b00000100
+    message[0] |= (brakingInput      << 3) & 0b00001000
+    message[0] |= (drsInput          << 4) & 0b00010000
+    message[0] |= (regenInput        << 5) & 0b00100000
+    # Byte 1
+    message[1] |= (is25_5Input)            & 0b00000001
+    message[1] |= (inverterInput     << 1) & 0b00000010
+    message[1] |= (acanInput         << 2) & 0b00000100
+    message[1] |= (is100msInput      << 3) & 0b00001000
+    # Bytes 2 & 3
+    message[2] = int(torquePercentInput) & 0xFF
+    message[3] = int(regenPercentInput)  & 0xFF
+    # Bytes 4 & 5
+    message[4] = (int(voltageLvInput / config.LV_BATTERY_VOLTAGE_SCALE))      & 0xFF
+    message[5] = (int(voltageLvInput / config.LV_BATTERY_VOLTAGE_SCALE) >> 8) & 0xFF
+    # Bytes 6 & 7
+    message[6] = (int(resistanceImdInput))      & 0xFF
+    message[7] = (int(resistanceImdInput) >> 8) & 0xFF
     
-#     SendMessage(transmitter, config.CAN_ID_STATUS_ECU, message)
+    SendMessage(transmitter, config.CAN_ID_STATUS_ECU, message)

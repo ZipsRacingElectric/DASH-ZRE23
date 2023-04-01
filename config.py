@@ -32,7 +32,7 @@ CAN_CANLIB                       = "CANLIB"
 CAN_INNOMAKER                    = "INNOMAKER"
 CAN_EMULATE                      = "EMULATER"
 
-CAN_LIBRARY_TYPE                 = CAN_INNOMAKER
+CAN_LIBRARY_TYPE                 = CAN_EMULATE
 
 # CAN Bus ---------------------------------------------------------------------------------------------------------------------
 CAN_BITRATE                      = 1000000                     # CAN Bitrate of 1 Megabit per Second
@@ -78,6 +78,9 @@ PACK_TEMPERATURE_SCALE           = -0.0021933                  # Pack Temperatur
 PACK_TEMPERATURE_OFFSET          = 81.297                      # Pack Temperature Offset Factor
 STATE_OF_CHARGE_SCALE            = 0.1                         # State of Charge Scale Factor
 PACK_CURRENT_LO_SCALE            = 0.01                        # Pack Current Lo Byte Scale Factor
+
+# Logging ---------------------------------------------------------------------------------------------------------------------
+LOG_FILE                         = "stdout.log"
 
 # Mechanical Data - 2022 ------------------------------------------------------------------------------------------------------
 RADIANS_PER_ROTATION             = 6.283185307                 # Number of Radians per Rotation (2 * PI)

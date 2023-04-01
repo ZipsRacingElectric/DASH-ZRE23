@@ -18,6 +18,9 @@ from threading import Thread
 import can_interface
 from can_interface import CanInterface
 
+import log
+from log import print
+
 # Enumarables -----------------------------------------------------------------------------------------------------------------
 CanlibBitrate = {
     10000   : canlib.canBITRATE_10K,

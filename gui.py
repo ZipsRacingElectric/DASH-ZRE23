@@ -14,6 +14,9 @@ import os
 import sys
 import inspect
 
+import log
+from log import print
+
 # Objects ---------------------------------------------------------------------------------------------------------------------
 class View():
     def __init__(self, parent, id, style, database):

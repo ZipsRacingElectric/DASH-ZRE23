@@ -200,8 +200,8 @@ def GetRadiobutton(parent, style, value="", variable="", text="", grid=True, col
 # Get Entry
 # - Call to Get and Grid an Entry Object
 # - Use Variable for Functionality
-def GetEntry(parent, style, minWidth, value="", grid=True, column=0, row=0, columnspan=1, rowspan=1, sticky=""):
-    entry = tkinter.Entry(parent, width=minWidth, font=style["font"], foreground=style["textColor"], bg=style["background"])
+def GetEntry(parent, style, minWidth, variable=None, value="", grid=True, column=0, row=0, columnspan=1, rowspan=1, sticky=""):
+    entry = tkinter.Entry(parent, textvariable=variable, width=minWidth, font=style["font"], foreground=style["textColor"], bg=style["background"])
     entry.insert(0,str(value))
     if(grid): entry.grid(column=column, row=row, columnspan=columnspan, rowspan=rowspan, sticky=sticky)
     return entry

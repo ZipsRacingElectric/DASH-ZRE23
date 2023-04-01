@@ -23,6 +23,9 @@ from threading import Thread
 import can_interface
 from can_interface import CanInterface
 
+import log
+from log import print
+
 # Objects ---------------------------------------------------------------------------------------------------------------------
 class Main(CanInterface):
     def __init__(self, database, messageHandler=None, timingFunction=None, timingPeriod=None):

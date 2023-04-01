@@ -64,15 +64,14 @@ class View(gui.View):
             signals = message.signals
             for signal in signals:
                 lib_tkinter.GetLabel(self.display, style=style, text=f"  {signal.name}: ", column=0, row=row, sticky="W", styleOverrides=fontOverride)
-                
+
                 if(signal.unit == "Boolean"):
                     self.stats.append(lib_tkinter.GetCheckStat(self.display, style=style, column=1, row=row, sticky="W", styleOverrides=fontOverride))
                 else:
                     self.stats.append(lib_tkinter.GetLabelStat(self.display, style=style, column=1, row=row, sticky="W", precision=4, styleOverrides=fontOverride))
 
                 lib_tkinter.GetLabel(self.display, style=style, text=f"Unit: {signal.unit}", column=2, row=row, sticky="W", styleOverrides=fontOverride)
-                # lib_tkinter.GetLabel(self.display, style=style, text=f"  {signal.comment}  ", column=3, row=row, sticky="W", styleOverrides=fontOverride)
-
+                
                 row += 1
 
     def Update(self):

@@ -11,6 +11,7 @@ import tkinter
 import lib_tkinter
 
 import os
+import sys
 import inspect
 
 # Objects ---------------------------------------------------------------------------------------------------------------------
@@ -119,8 +120,12 @@ def Setup(database, can):
     # Setup Keybinds
     gui.AppendKeybind("F1", lambda: gui.ToggleFullscreen())
     gui.AppendKeybind("F2", lambda: gui.ToggleView("Debug"))
+    if(sys.platform == "linux"): gui.AppendKeybind("F3", lambda: OpenTerminal())
 
     return gui
+
+def OpenTerminal():
+    os.system(f'{config.TERMINAL_ID}')
 
 # GUI Object ------------------------------------------------------------------------------------------------------------------
 class Main(tkinter.Tk):

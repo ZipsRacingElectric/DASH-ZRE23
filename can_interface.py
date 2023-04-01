@@ -66,18 +66,18 @@ class CanInterface():
 # Functions -------------------------------------------------------------------------------------------------------------------
 # - Call this function to get an initialized CAN Interface Object
 def Setup(database):
-    if(config.CAN_LIBRARY_TYPE == "EMULATE"):
+    if(config.CAN_LIBRARY_TYPE == config.CAN_EMULATE):
         print("CAN - Using CAN Emulation.")
         return CanInterface(database, messageHandler=HandleMessage, timingFunction=None, timingPeriod=config.CAN_TIME_PERIOD)
     
-    if(config.CAN_LIBRARY_TYPE == "CANLIB"):
+    if(config.CAN_LIBRARY_TYPE == config.CAN_CANLIB):
         import lib_canlib
         library = lib_canlib.Main(database, messageHandler=HandleMessage, timingFunction=None, timingPeriod=config.CAN_TIME_PERIOD)
         library.OpenChannel(config.CAN_BITRATE, 0)
         library.OpenChannel(config.CAN_BITRATE, 1)
         return library
         
-    if(config.CAN_LIBRARY_TYPE == "INNOMAKER"):
+    if(config.CAN_LIBRARY_TYPE == config.CAN_INNOMAKER):
         if(sys.platform == "win32"):
             import lib_innomaker_win
             library = lib_innomaker_win.Main(database, messageHandler=HandleMessage, timingFunction=None, timingPeriod=config.CAN_TIME_PERIOD)

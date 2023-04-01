@@ -24,8 +24,15 @@ ICON_DATABASE                    = "icons/Database.png"
 
 ICON_SCALING                     = 0.33
 
+# System ----------------------------------------------------------------------------------------------------------------------
+TERMINAL_ID                      = "LXTerminal"
+
 # CAN Interface ---------------------------------------------------------------------------------------------------------------
-CAN_LIBRARY_TYPE                 = "INNOMAKER"
+CAN_CANLIB                       = "CANLIB"
+CAN_INNOMAKER                    = "INNOMAKER"
+CAN_EMULATE                      = "EMULATER"
+
+CAN_LIBRARY_TYPE                 = CAN_INNOMAKER
 
 # CAN Bus ---------------------------------------------------------------------------------------------------------------------
 CAN_BITRATE                      = 1000000                     # CAN Bitrate of 1 Megabit per Second

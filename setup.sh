@@ -1,0 +1,1 @@
+echo "bash /root/DASH23/setup.sh" > /root/.xsession

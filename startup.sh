@@ -1,0 +1,1 @@
+python3 /root/DASH23/app.py >> DASH23/stdout.log

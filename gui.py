@@ -124,6 +124,7 @@ def Setup(database, can):
     gui.AppendKeybind("F1", lambda: gui.ToggleFullscreen())
     gui.AppendKeybind("F2", lambda: gui.ToggleView("Debug"))
     if(sys.platform == "linux"): gui.AppendKeybind("F3", lambda: OpenTerminal())
+    gui.AppendKeybind("F4", gui.Kill)
 
     return gui
 
@@ -284,5 +285,8 @@ class Main(tkinter.Tk):
         print("GUI - Loop Terminated.")
 
     def Kill(self):
-        if(self.state != 'normal'): return
+        print("GUI - Terminating...")
+        print("GUI - State: " + self.state())
+        if(self.state() != 'normal'): return
         self.destroy()
+        print("GUI - Terminated.")

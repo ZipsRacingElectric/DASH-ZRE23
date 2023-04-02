@@ -52,10 +52,12 @@ class View(gui.View):
         fontOverride     = [("font", "fontBare")]
         fontBoldOverride = [("font", "fontBareBold")]
 
-        self.stats = []
+        self.stats = dict()
         messages = database.db.messages
 
         # Pack Widgets
+        renderedKeys = []
+        
         row = 0
         for message in messages:
             lib_tkinter.GetLabel(self.display, style=style, text=f"{message.name} ({hex(message.frame_id)}): ", column=0, row=row, sticky="W", styleOverrides=fontBoldOverride)
@@ -66,20 +68,33 @@ class View(gui.View):
                 lib_tkinter.GetLabel(self.display, style=style, text=f"  {signal.name}: ", column=0, row=row, sticky="W", styleOverrides=fontOverride)
 
                 if(signal.unit == "Boolean"):
-                    self.stats.append(lib_tkinter.GetCheckStat(self.display, style=style, column=1, row=row, sticky="W", styleOverrides=fontOverride))
+                    self.stats[signal.name] = lib_tkinter.GetCheckStat(self.display, style=style, column=1, row=row, sticky="W", styleOverrides=fontOverride)
                 else:
-                    self.stats.append(lib_tkinter.GetLabelStat(self.display, style=style, column=1, row=row, sticky="W", precision=4, styleOverrides=fontOverride))
+                    self.stats[signal.name] = lib_tkinter.GetLabelStat(self.display, style=style, column=1, row=row, sticky="W", precision=4, styleOverrides=fontOverride)
 
                 lib_tkinter.GetLabel(self.display, style=style, text=f"Unit: {signal.unit}", column=2, row=row, sticky="W", styleOverrides=fontOverride)
-                
+
+                row += 1
+                renderedKeys.append(signal.name)
+
+        lib_tkinter.GetLabel(self.display, style=style, text=f"Extrapolated: ", column=0, row=row, sticky="W", styleOverrides=fontBoldOverride)
+        row += 1
+
+        for key, value in self.database.items():
+            if(key == "db" or key == "overrides"): continue
+
+            keyIsRendered = False
+            for renderedKey in renderedKeys:
+                if(key == renderedKey): keyIsRendered = True
+
+            if(not keyIsRendered):
+                lib_tkinter.GetLabel(self.display, style=style, text=f"  {key}: ", column=0, row=row, sticky="W", styleOverrides=fontOverride)
+                self.stats[key] = lib_tkinter.GetLabelStat(self.display, style=style, column=1, row=row, sticky="W", precision=4, styleOverrides=fontOverride)
                 row += 1
 
     def Update(self):
         index = 0
 
         messages = self.database.db.messages
-        for message in messages:
-            signals = message.signals
-            for signal in signals:
-                self.stats[index].Set(self.database[signal.name])
-                index += 1
+        for key, value in self.stats.items():
+            self.stats[key].Set(self.database[key])

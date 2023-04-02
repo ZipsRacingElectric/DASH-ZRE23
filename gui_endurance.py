@@ -56,11 +56,11 @@ class View(gui.View):
         self.display.rowconfigure   (3, weight=0) # Torque Panel
 
         # Widgets
-        rpmPanel       = lib_tkinter.GetFrame       (self.display, column=0, row=0, style=style, sticky="EW", columnspan=5)
-        statPanel      = lib_tkinter.GetFrame       (self.display, column=0, row=1, style=style, sticky="W")
-        speedPanel     = lib_tkinter.GetFrame       (self.display, column=2, row=1, style=style, sticky="NESW")
-        regenPanel     = lib_tkinter.GetFrame       (self.display, column=0, row=2, style=style, sticky="EW", columnspan=5)
-        torquePanel    = lib_tkinter.GetFrame       (self.display, column=0, row=3, style=style, sticky="EW", columnspan=5)
+        rpmPanel       = lib_tkinter.GetFrame(self.display, column=0, row=0, style=style, sticky="EW", columnspan=5)
+        statPanel      = lib_tkinter.GetFrame(self.display, column=0, row=1, style=style, sticky="W")
+        speedPanel     = lib_tkinter.GetFrame(self.display, column=2, row=1, style=style, sticky="NESW")
+        regenPanel     = lib_tkinter.GetFrame(self.display, column=0, row=2, style=style, sticky="EW", columnspan=5)
+        torquePanel    = lib_tkinter.GetFrame(self.display, column=0, row=3, style=style, sticky="EW", columnspan=5)
 
         # Charge Panel ------------------------------------------------------------------------------------------------------------------------------------------------
         # Partitioning
@@ -115,13 +115,13 @@ class View(gui.View):
         temp4Label        = lib_tkinter.GetLabel    (statPanel, style=style, column=0, row=4, sticky="W", text="Inv. Avg:")
         temp5Label        = lib_tkinter.GetLabel    (statPanel, style=style, column=0, row=5, sticky="W", text="Mtr. Avg:")
         statDividerBottom = lib_tkinter.GetDivider  (statPanel, style=style, column=0, row=6, sticky="EW", orientation=Orientation.HORIZONTAL, columnspan=2)
-
+    
     def Update(self):
         self.brakeBar.Set  (self.database["Brake_1_Percent"])
         self.appsBar.Set   (self.database["APPS_1_Percent"])
         self.rpmBar.Set    (self.database["Motor_Speed"])
-        # self.torqueBar.Set (self.database.torquePercentageMax)
-        # self.regenBar.Set  (self.database.torquePercentageRegen)
+        self.torqueBar.Set (self.database["Torque_Limit"])
+        self.regenBar.Set  (self.database["Torque_Limit_Regen"])
         self.chargeStat.Set(self.database["State_of_Charge"])
         # self.temp1Stat.Set (self.database.packTemperatureMax)
         # self.temp2Stat.Set (self.database.packTemperatureMean)

@@ -69,13 +69,24 @@ class CanInterface():
 # Functions -------------------------------------------------------------------------------------------------------------------
 # - Call this function to get an initialized CAN Interface Object
 def Setup(database):
+    database["Time"] = None
+    database["ECU_CAN_Timeout"]      = None
+    database["ACAN_CAN_Timeout"]     = None
+    database["Inverter_CAN_Timeout"] = None
+    database["BMS_CAN_Timeout"]      = None
+    database["ECU_CAN_Active"]       = None
+    database["ACAN_CAN_Active"]      = None
+    database["Inverter_CAN_Active"]  = None
+    database["BMS_CAN_Active"]       = None
+    SetTimeouts(database)
+
     if(config.CAN_LIBRARY_TYPE == config.CAN_EMULATE):
         print("CAN - Using CAN Emulation.")
         return CanInterface(database, messageHandler=HandleMessage, timingFunction=None, timingPeriod=config.CAN_TIME_PERIOD)
     
     if(config.CAN_LIBRARY_TYPE == config.CAN_CANLIB):
         import lib_canlib
-        library = lib_canlib.Main(database, messageHandler=HandleMessage, timingFunction=None, timingPeriod=config.CAN_TIME_PERIOD)
+        library = lib_canlib.Main(database, messageHandler=HandleMessage, timingFunction=SetTimeouts, timingPeriod=config.CAN_TIME_PERIOD)
         library.OpenChannel(config.CAN_BITRATE, 0)
         library.OpenChannel(config.CAN_BITRATE, 1)
         return library
@@ -83,14 +94,14 @@ def Setup(database):
     if(config.CAN_LIBRARY_TYPE == config.CAN_INNOMAKER):
         if(sys.platform == "win32"):
             import lib_innomaker_win
-            library = lib_innomaker_win.Main(database, messageHandler=HandleMessage, timingFunction=None, timingPeriod=config.CAN_TIME_PERIOD)
+            library = lib_innomaker_win.Main(database, messageHandler=HandleMessage, timingFunction=SetTimeouts, timingPeriod=config.CAN_TIME_PERIOD)
             library.OpenChannel(config.CAN_BITRATE, 0)
             library.OpenChannel(config.CAN_BITRATE, 1)
             return library
 
         if(sys.platform == "linux"):
             import lib_innomaker_linux
-            library = lib_innomaker_linux.Main(database, messageHandler=HandleMessage, timingFunction=None, timingPeriod=config.CAN_TIME_PERIOD)
+            library = lib_innomaker_linux.Main(database, messageHandler=HandleMessage, timingFunction=SetTimeouts, timingPeriod=config.CAN_TIME_PERIOD)
             library.OpenChannel(config.CAN_BITRATE, 0)
             library.OpenChannel(config.CAN_BITRATE, 1)
             return library
@@ -119,6 +130,7 @@ def HandleMessage(database, id, data):
 
     if(id == config.CAN_ID_DATA_MOTOR):
         ClearTimeoutInverter(database)
+        CalculateMotorStats(database)
         database.decode_message(id, data)
 
     if(id == config.CAN_ID_DATA_PEDALS):
@@ -372,6 +384,9 @@ def CalculateInverterStats(database):
 
     if(tempCount != 0): database["Temperature_Inverter_Mean"] /= tempCount
 
+def CalculateMotorStats(database):
+    database["Motor_Speed_MPH"] = int(abs(RpmToMph(database["Motor_Speed"])))
+
 def CalculateBmsStats(database):
     # Voltages
     database.packVoltage    = None
@@ -415,27 +430,27 @@ def CalculateBmsStats(database):
 
 # Message Timeouts ------------------------------------------------------------------------------------------------------------
 def SetTimeouts(database):
-    database.time = time.time()
-    if(database.ecuCanTimeout      == None or database.time > database.ecuCanTimeout      + config.CAN_MESSAGE_TIMEOUT): database.ecuCanActive      = False
-    if(database.acanCanTimeout     == None or database.time > database.acanCanTimeout     + config.CAN_MESSAGE_TIMEOUT): database.acanCanActive     = False
-    if(database.inverterCanTimeout == None or database.time > database.inverterCanTimeout + config.CAN_MESSAGE_TIMEOUT): database.inverterCanActive = False
-    if(database.bmsCanTimeout      == None or database.time > database.bmsCanTimeout      + config.CAN_MESSAGE_TIMEOUT): database.bmsCanActive      = False
+    database["Time"] = time.time()
+    if(database["ECU_CAN_Timeout"]      == None or database["Time"] > database["ECU_CAN_Timeout"]      + config.CAN_MESSAGE_TIMEOUT): database["ECU_CAN_Active"]      = False
+    if(database["ACAN_CAN_Timeout"]     == None or database["Time"] > database["ACAN_CAN_Timeout"]     + config.CAN_MESSAGE_TIMEOUT): database["ACAN_CAN_Active"]     = False
+    if(database["Inverter_CAN_Timeout"] == None or database["Time"] > database["Inverter_CAN_Timeout"] + config.CAN_MESSAGE_TIMEOUT): database["Inverter_CAN_Active"] = False
+    if(database["BMS_CAN_Timeout"]      == None or database["Time"] > database["BMS_CAN_Timeout"]      + config.CAN_MESSAGE_TIMEOUT): database["BMS_CAN_Active"]      = False
 
 def ClearTimeoutEcu(database):
-    database.ecuCanTimeout = time.time()
-    database.ecuCanActive = True
+    database["ECU_CAN_Timeout"] = time.time()
+    database["ECU_CAN_Active"] = True
 
 def ClearTimeoutAcan(database):
-    database.acanCanTimeout = time.time()
-    database.acanCanActive = True
+    database["ACAN_CAN_Timeout"] = time.time()
+    database["ACAN_CAN_Active"] = True
 
 def ClearTimeoutInverter(database):
-    database.inverterCanTimeout = time.time()
-    database.inverterCanActive = True
+    database["Inverter_CAN_Timeout"] = time.time()
+    database["Inverter_CAN_Active"] = True
 
 def ClearTimeoutBms(database):
-    database.bmsCanTimeout = time.time()
-    database.bmsCanActive = True
+    database["BMS_CAN_Timeout"] = time.time()
+    database["BMS_CAN_Active"] = True
 
 # Data Interpretation ---------------------------------------------------------------------------------------------------------
 def InterpretSignedNBitInt(value, bitCount=16):

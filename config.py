@@ -32,7 +32,7 @@ CAN_CANLIB                       = "CANLIB"
 CAN_INNOMAKER                    = "INNOMAKER"
 CAN_EMULATE                      = "EMULATER"
 
-CAN_LIBRARY_TYPE                 = CAN_INNOMAKER
+CAN_LIBRARY_TYPE                 = CAN_CANLIB
 
 # CAN Bus ---------------------------------------------------------------------------------------------------------------------
 CAN_BITRATE                      = 1000000                     # CAN Bitrate of 1 Megabit per Second

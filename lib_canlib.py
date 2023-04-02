@@ -37,7 +37,7 @@ CanlibBitrate = {
 class Main(CanInterface):
     def __init__(self, database, messageHandler=None, timingFunction=None, timingPeriod=None):
         print("CAN - Using Kvaser Canlib Library")
-        print("CAN - Canlib Version:", canlib.dllversion())
+        print("CAN - Canlib Version:" + str(canlib.dllversion()))
         super().__init__(database, messageHandler, timingFunction, timingPeriod)
 
     def OpenChannel(self, bitrate, id):
@@ -75,13 +75,13 @@ class Main(CanInterface):
 # Functions -------------------------------------------------------------------------------------------------------------------
 def OpenChannel(channelId, openFlags=canlib.canOPEN_ACCEPT_VIRTUAL, bitrate=canlib.canBITRATE_500K, bitrateFlags=canlib.canDRIVER_NORMAL):
     channel = canlib.openChannel(channelId, openFlags)
-    print("CAN - Device:", ChannelData(channelId).channel_name, "- ID:", ChannelData(channelId).card_upc_no)
+    print("CAN - Device: " + ChannelData(channelId).channel_name + " - ID:" + str(ChannelData(channelId).card_upc_no))
     channel.setBusOutputControl(bitrateFlags)
     channel.setBusParams(bitrate)
     channel.busOn()
     return channel
 
 def CloseChannel(channel):
-    print("CAN - Device Closed:", ChannelData(channel.index).channel_name)
+    print("CAN - Device Closed:" + ChannelData(channel.index).channel_name)
     channel.busOff()
     channel.close()

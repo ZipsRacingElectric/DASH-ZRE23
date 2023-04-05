@@ -7,6 +7,7 @@
 
 # Libraries -------------------------------------------------------------------------------------------------------------------
 import logging
+import os
 
 # Includes --------------------------------------------------------------------------------------------------------------------
 import config
@@ -18,7 +19,8 @@ import database
 # App Execution ---------------------------------------------------------------------------------------------------------------
 if(__name__ == "__main__"):
     # Initialization
-    logging.basicConfig(filename=config.LOG_FILE,
+    logPath = os.path.join(os.path.dirname(__file__), config.LOG_FILE)
+    logging.basicConfig(filename=logPath,
                         filemode='w',
                         format="%(asctime)s [%(levelname)s] %(message)s",
                         datefmt='%H:%M:%S',

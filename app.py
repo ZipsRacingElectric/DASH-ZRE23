@@ -42,4 +42,5 @@ if(__name__ == "__main__"):
         logging.debug("APP - Terminated.")
     except:
         logging.error("App Failure. Terminating...")
-        exit()
+        logging.shutdown()
+        exit(1)

@@ -43,6 +43,7 @@ if(__name__ == "__main__"):
         # Exit
         logging.debug("APP - Terminating...")
         mainCan.Kill()
+        mainGpio.Kill()
         logging.debug("APP - Terminated.")
         logging.shutdown()
         exit()

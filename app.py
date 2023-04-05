@@ -12,6 +12,7 @@ import logging
 import config
 import gui
 import can_interface
+import gpio_interface
 import database
 
 # App Execution ---------------------------------------------------------------------------------------------------------------
@@ -27,6 +28,7 @@ if(__name__ == "__main__"):
         logging.debug("APP - Initializing...")
         mainDatabase = database.Setup()                            # Setup Database
         mainCan      = can_interface.Setup(mainDatabase)           # Setup CAN Interface
+        mainGpio     = gpio_interface.Setup(mainDatabase, mainCan) # Setup GPIO Interface
         mainGui      = gui.Setup(mainDatabase, mainCan)            # Setup GUI
         
         # Begin

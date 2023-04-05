@@ -121,19 +121,23 @@ class View(gui.View):
 
         # Display (Startup) -------------------------------------------------------------------------------------------------------------------------------------------
         self.displayStartup = lib_tkinter.GetFrame(self.display, grid=False, style=style)
+        
+        self.displayStartup.columnconfigure(0, weight=1)
+        self.displayStartup.rowconfigure   (0, weight=1)
+        self.displayStartup.rowconfigure   (1, weight=1)
 
         # Partitioning
-        self.startupText         = lib_tkinter.GetLabel(self.displayStartup, style=style, column=0, row=0, sticky="EW")
-        self.startupInstructions = lib_tkinter.GetLabel(self.displayStartup, style=style, column=0, row=1, sticky="EW")
+        self.startupText         = lib_tkinter.GetLabel(self.displayStartup, style=style, column=0, row=0, sticky="EW", styleOverrides=[("font", "fontLarge")])
+        self.startupInstructions = lib_tkinter.GetLabel(self.displayStartup, style=style, column=0, row=1, sticky="NEW", styleOverrides=[("font", "fontLarge")])
 
         self.SetDisplayState("Normal")
 
     def Update(self):
-        if(self.database["State_Ready_to_Drive"] == True):
+        if(self.database["State_Ready_to_Drive"] == True): # and self.database["ECU_CAN_Active"]):
             self.SetDisplayState("Normal")
-        elif(self.database["State_High_Voltage"] == True):
+        elif(self.database["State_High_Voltage"] == True): # and self.database["ECU_CAN_Active"]):
             self.SetDisplayState("Startup_HV")
-        elif(self.database["State_High_Voltage"] == False):
+        elif(self.database["State_High_Voltage"] == False): # and self.database["ECU_CAN_Active"]):
             self.SetDisplayState("Startup_LV")
         else:
             self.SetDisplayState("Startup_Invalid")
@@ -151,26 +155,26 @@ class View(gui.View):
 
     def SetDisplayState(self, state):
         if(state == "Normal"):
-            self.displayStartup.forget()
-            self.displayNormal.pack()
+            self.displayStartup.grid_forget()
+            self.displayNormal.grid(column=0, row=0, sticky="NESW")
 
         elif(state == "Startup_LV"):
-            self.displayNormal.forget()
-            self.displayStartup.pack()
+            self.displayNormal.grid_forget()
+            self.displayStartup.grid(column=0, row=0, sticky="NESW")
             
             self.startupText["text"] = "Low Voltage Enabled"
-            self.startupInstructions["text"] = "Have an ESO enable tractive systems."
+            self.startupInstructions["text"] = "When ready, an ESO will\nenable tractive systems."
         
         elif(state == "Startup_HV"):
-            self.displayNormal.forget()
-            self.displayStartup.pack()
+            self.displayNormal.grid_forget()
+            self.displayStartup.grid(column=0, row=0, sticky="NESW")
 
-            self.startupText["text"] = "High Voltage Enabled"
-            self.startupInstructions["text"] = "Press the Brake\nthen the Start Button"
+            self.startupText["text"] = "Tractive Systems Enabled"
+            self.startupInstructions["text"] = "To enter drive mode,\npress and hold the brake\nthen press the start button."
 
         elif(state == "Startup_Invalid"):
-            self.displayNormal.forget()
-            self.displayStartup.pack()
+            self.displayNormal.grid_forget()
+            self.displayStartup.grid(column=0, row=0, sticky="NESW")
 
             self.startupText["text"] = "ECU Communications Failed"
-            self.startupInstructions["text"] = ""
+            self.startupInstructions["text"] = "If the ECU is online, the\nECU Status Message (0x703)\nhas not been recieved."

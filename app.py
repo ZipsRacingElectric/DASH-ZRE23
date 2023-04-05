@@ -40,7 +40,10 @@ if(__name__ == "__main__"):
         logging.debug("APP - Terminating...")
         mainCan.Kill()
         logging.debug("APP - Terminated.")
+        logging.shutdown()
+        exit()
     except:
+        # Exit as Failure
         logging.error("App Failure. Terminating...")
         logging.shutdown()
         exit(1)

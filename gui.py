@@ -267,8 +267,12 @@ class Main(tkinter.Tk):
 
     # Behavior --------------------------------------------------------------------------------
     def Update(self):
-        if(self.activeView != None):
-            self.activeView.Update()
+        try:
+            if(self.activeView != None):
+                self.activeView.Update()
+        except:
+            logging.error("GUI Update Loop Error.")
+            raise
 
     def Loop(self):
         if(self.framerate == 0 or self.framerate == None): return

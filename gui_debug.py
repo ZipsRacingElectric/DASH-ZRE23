@@ -14,73 +14,84 @@ from lib_tkinter import Orientation
 import gui
 import can_interface
 
-import log
-from log import print
+import logging
 
 # Objects ---------------------------------------------------------------------------------------------------------------------
 class View(gui.View):
     # Initialization
     def __init__(self, gui, id, style, database, can):
-        super().__init__(gui, id, style, database)
-        self.can = can
-        self.root.columnconfigure(0, weight=1)
-        self.root.rowconfigure(   0, weight=1)
-        self.scrollFrame = lib_tkinter.GetScrollFrame(self.root, self.style, Orientation.VERTICAL, sticky="NESW")
-        self.frame = self.scrollFrame.Get()
+        try:
+            super().__init__(gui, id, style, database)
+            self.can = can
+            self.root.columnconfigure(0, weight=1)
+            self.root.rowconfigure(   0, weight=1)
+            self.scrollFrame = lib_tkinter.GetScrollFrame(self.root, self.style, Orientation.VERTICAL, sticky="NESW")
+            self.frame = self.scrollFrame.Get()
 
-        self.database = database
+            self.database = database
 
-        # Root Partitioning
-        self.frame.columnconfigure(0, weight=1)
-        self.frame.columnconfigure(1, weight=1)
+            # Root Partitioning
+            self.frame.columnconfigure(0, weight=1)
+            self.frame.columnconfigure(1, weight=1)
 
-        labelWidth = 180 # Label Column
-        statWidth  = 180 # Stat Column Width
+            labelWidth = 180 # Label Column
+            statWidth  = 180 # Stat Column Width
 
-        fontBoldOverride = [("font", "fontBold")]
+            fontBoldOverride = [("font", "fontBold")]
 
-        rowIndex = 0
+            rowIndex = 0
 
-        self.commands = []
-        self.widgets = []
-        self.inputs = []
+            self.commands = []
+            self.widgets = []
+            self.inputs = []
 
-        for message in database.db.messages:
-            messageFrame = lib_tkinter.GetFrame(self.frame, style=style, border=True, column=0, row=rowIndex, sticky="NESW")
+            for message in database.db.messages:
+                messageFrame = lib_tkinter.GetFrame(self.frame, style=style, border=True, column=0, row=rowIndex, sticky="NESW")
 
-            self.commands.append(lambda id = message.frame_id: self.SendMessage(id))
+                self.commands.append(lambda id = message.frame_id: self.SendMessage(id))
 
-            label  = lib_tkinter.GetLabel(messageFrame,  style=style, column=0, row=0, columnspan=2, text=f"{message.name} ({hex(message.frame_id)})", sticky="NW", styleOverrides=fontBoldOverride)
-            button = lib_tkinter.GetButton(messageFrame, style=style, column=2, row=0, text="Send", sticky="NE", command=self.commands[len(self.commands)-1])
-            
-            self.widgets.append((label, button))
-            
-            rowIndex += 1
+                label  = lib_tkinter.GetLabel(messageFrame,  style=style, column=0, row=0, columnspan=2, text=f"{message.name} ({hex(message.frame_id)})", sticky="NW", styleOverrides=fontBoldOverride)
+                button = lib_tkinter.GetButton(messageFrame, style=style, column=2, row=0, text="Send", sticky="NE", command=self.commands[len(self.commands)-1])
+                
+                self.widgets.append((label, button))
+                
+                rowIndex += 1
 
-            messageFrame.columnconfigure(0, minsize=labelWidth)
-            messageFrame.columnconfigure(1, weight=1)
-            messageFrame.columnconfigure(2, minsize=statWidth)
-            
-            subIndex = 1
-            
-            for signal in message.signals:
-                lib_tkinter.GetLabel(messageFrame, style=style, column=0, row=subIndex, text=f"  {signal.name}", sticky="NW")
+                messageFrame.columnconfigure(0, minsize=labelWidth)
+                messageFrame.columnconfigure(1, weight=1)
+                messageFrame.columnconfigure(2, minsize=statWidth)
+                
+                subIndex = 1
+                
+                for signal in message.signals:
+                    lib_tkinter.GetLabel(messageFrame, style=style, column=0, row=subIndex, text=f"  {signal.name}", sticky="NW")
 
-                if(signal.unit == "Boolean"):
-                    variable = tkinter.BooleanVar(self.frame)
-                    entry = lib_tkinter.GetCheckbutton(messageFrame, variable=variable, style=style, column=2, row=subIndex, sticky="NE")
+                    if(signal.unit == "Boolean"):
+                        variable = tkinter.BooleanVar(self.frame)
+                        entry = lib_tkinter.GetCheckbutton(messageFrame, variable=variable, style=style, column=2, row=subIndex, sticky="NE")
 
-                    self.inputs.append((message.frame_id, signal.name, variable, entry, "bool"))
-                else:
-                    variable = tkinter.StringVar(self.frame)
-                    entry = lib_tkinter.GetEntry(messageFrame, variable=variable, minWidth=4, style=style, column=2, row=subIndex, sticky="NEW")
+                        self.inputs.append((message.frame_id, signal.name, variable, entry, "bool"))
+                    else:
+                        variable = tkinter.StringVar(self.frame)
+                        entry = lib_tkinter.GetEntry(messageFrame, variable=variable, minWidth=4, style=style, column=2, row=subIndex, sticky="NEW")
 
-                    self.inputs.append((message.frame_id, signal.name, variable, entry, "int"))
+                        self.inputs.append((message.frame_id, signal.name, variable, entry, "int"))
 
-                subIndex += 1
+                    subIndex += 1
+        except:
+            logging.error("GUI Debug Initialization Error.")
 
     def Open(self):
-        super().Open()
+        try:
+            super().Open()
+
+            for message in self.database.db.messages:
+                for signal in message.signals:
+                    for input in self.inputs:
+                        if(input[1] == signal.name):
+                            if(self.database[input[1]] != None): input[2].set(self.database[input[1]])
+        except:
+            logging.error("GUI Debug Open Error")
 
     def SendMessage(self, id):
         messageDatabase = dict()

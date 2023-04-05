@@ -12,6 +12,8 @@ from lib_tkinter import Orientation
 import enum
 from enum import Enum
 
+import logging
+
 # Includes --------------------------------------------------------------------------------------------------------------------
 import gui
 import config
@@ -57,24 +59,27 @@ class View(gui.View):
 
     # Update
     def Update(self):
-        if(self.calibrationState == CalibrationState.START):
-            # Start Menu
-            self.message['text'] = "Press button 1 to start calibration"
-        elif(self.calibrationState == CalibrationState.REQUEST_BOTH_MIN):
-            # No Pedals Menu
-            self.message['text'] = "Release both pedals, then press button 1"
-        elif(self.calibrationState == CalibrationState.REQUEST_APPS_MAX):
-            # APPS Pedal Menu
-            self.message['text'] = "Press the throttle fully, then press button 1"
-        elif(self.calibrationState == CalibrationState.REQUEST_BRAKE_MAX):
-            # APPS Pedal Menu
-            self.message['text'] = "Press the brake fully, then press button 1"
-        elif(self.calibrationState == CalibrationState.FINISHED):
-            # Finished Menu
-            self.message['text'] = "Calibration Finshed"
-        elif(self.calibrationState == CalibrationState.FAILED):
-            # Failed Menu
-            self.message['text'] = "Calibration Failed"
+        try:
+            if(self.calibrationState == CalibrationState.START):
+                # Start Menu
+                self.message['text'] = "Press button 1 to start calibration"
+            elif(self.calibrationState == CalibrationState.REQUEST_BOTH_MIN):
+                # No Pedals Menu
+                self.message['text'] = "Release both pedals, then press button 1"
+            elif(self.calibrationState == CalibrationState.REQUEST_APPS_MAX):
+                # APPS Pedal Menu
+                self.message['text'] = "Press the throttle fully, then press button 1"
+            elif(self.calibrationState == CalibrationState.REQUEST_BRAKE_MAX):
+                # APPS Pedal Menu
+                self.message['text'] = "Press the brake fully, then press button 1"
+            elif(self.calibrationState == CalibrationState.FINISHED):
+                # Finished Menu
+                self.message['text'] = "Calibration Finshed"
+            elif(self.calibrationState == CalibrationState.FAILED):
+                # Failed Menu
+                self.message['text'] = "Calibration Failed"
+        except:
+            logging.error("GUI Calibration Update Error.")
 
     # Input Interrupt
     def InputInterrupt(self, input):

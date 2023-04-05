@@ -10,6 +10,8 @@ import tkinter
 import lib_tkinter
 from lib_tkinter import Orientation
 
+import logging
+
 # Includes --------------------------------------------------------------------------------------------------------------------
 import gui
 
@@ -118,27 +120,31 @@ class View(gui.View):
 
     # Update
     def Update(self):
-        for index in range(CELL_WIDTH_COUNT*CELL_HEIGHT_COUNT):
-            self.cellStats[index].Set(self.database.cellVoltages[index],
-                                      self.database.cellBalancings[index],
-                                      self.database.packTemperatures[int(index/2)],
-                                      self.database.cellVoltageMin)
-        self.canStatusStat.Set  (self.database.bmsCanActive)
-        self.selfTestStat.Set   (self.database.errorBmsSelfTestFault)
-        self.voltageTestStat.Set(self.database.errorBmsVoltageFault)
-        self.tempTestStat.Set   (self.database.errorBmsTempFault)
-        self.senseTestStat.Set  (self.database.errorBmsSenseLineFault)
+        try:
+            for index in range(CELL_WIDTH_COUNT*CELL_HEIGHT_COUNT):
+                self.cellStats[index].Set(self.database.cellVoltages[index],
+                                        self.database.cellBalancings[index],
+                                        self.database.packTemperatures[int(index/2)],
+                                        self.database.cellVoltageMin)
+            self.canStatusStat.Set  (self.database.bmsCanActive)
+            self.selfTestStat.Set   (self.database.errorBmsSelfTestFault)
+            self.voltageTestStat.Set(self.database.errorBmsVoltageFault)
+            self.tempTestStat.Set   (self.database.errorBmsTempFault)
+            self.senseTestStat.Set  (self.database.errorBmsSenseLineFault)
 
-        self.chargeStat.Set     (self.database.stateOfCharge)
-        self.packVoltStat.Set   (self.database.packVoltage)
-        self.maxVoltStat.Set    (self.database.cellVoltageMax)
-        self.minVoltStat.Set    (self.database.cellVoltageMin)
-        self.currentStat.Set    (self.database.packCurrent)
+            self.chargeStat.Set     (self.database.stateOfCharge)
+            self.packVoltStat.Set   (self.database.packVoltage)
+            self.maxVoltStat.Set    (self.database.cellVoltageMax)
+            self.minVoltStat.Set    (self.database.cellVoltageMin)
+            self.currentStat.Set    (self.database.packCurrent)
 
-        self.maxTempStat.Set    (self.database.packTemperatureMax)
-        self.meanTempStat.Set   (self.database.packTemperatureMean)
-        self.maxDeltaStat.Set   (self.database.cellDeltaMax)
-        self.meanDeltaStat.Set  (self.database.cellDeltaMean)
+            self.maxTempStat.Set    (self.database.packTemperatureMax)
+            self.meanTempStat.Set   (self.database.packTemperatureMean)
+            self.maxDeltaStat.Set   (self.database.cellDeltaMax)
+            self.meanDeltaStat.Set  (self.database.cellDeltaMean)
+        except:
+            logging.error("BMS GUI Update Loop Error.")
+            raise
 
 # Getters ---------------------------------------------------------------------------------------------------------------------
 def GetCellStat(parent, style, minWidth=20, minHeight=20, grid=True, column=0, row=0, columnspan=1, rowspan=1, sticky="", styleOverrides=[]):

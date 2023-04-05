@@ -20,13 +20,17 @@ import can_interface
 
 # Functions -------------------------------------------------------------------------------------------------------------------
 def Setup(database, can_transceiver):
-    if(sys.platform == "win32"): return None
+    try:
+        if(sys.platform == "win32"): return None
 
-    interface = Main()
+        interface = Main()
 
-    interface.InsertInterrupt(config.GPIO_START_BUTTON, lambda: StartButtonPress(can_transceiver))
-    
-    return interface
+        interface.InsertInterrupt(config.GPIO_START_BUTTON, lambda: StartButtonPress(can_transceiver))
+        
+        return interface
+    except:
+        logging.error("GPIO Setup failure.")
+        raise
 
 def StartButtonPress(can_transceiver):
     can_interface.SendCommandDriveStart(can_transceiver, True)
@@ -49,20 +53,28 @@ class Main():
             logging.error("GPIO Initialization failed.")
 
     def InsertInterrupt(self, pin, handler):
-        self.interrupts[pin] = handler
+        try:
+            self.interrupts[pin] = handler
 
-        self.inputs[pin] = gpiozero.Button(pin)
-        
-        self.threads.append(threading.Thread(target=lambda: self.ScanInterrupt(pin)))
+            self.inputs[pin] = gpiozero.Button(pin)
+            
+            self.threads.append(threading.Thread(target=lambda: self.ScanInterrupt(pin)))
+        except:
+            logging.error("GPIO interrupt insertion failure.")
+            pass
         
     def ScanInterrupt(self, pin):
-        while(self.online):
-            if(self.inputs[pin].is_pressed and not self.inputStates[pin]):
-                self.interrupts[pin]
+        try:
+            while(self.online):
+                if(self.inputs[pin].is_pressed and not self.inputStates[pin]):
+                    self.interrupts[pin]
 
-            self.inputStates[pin] = self.inputs[pin].is_pressed
+                self.inputStates[pin] = self.inputs[pin].is_pressed
 
-            time.sleep(config.GPIO_TIME_PERIOD)
+                time.sleep(config.GPIO_TIME_PERIOD)
+        except:
+            logging.error("Interrupt scan error.")
+            pass
 
     def Kill(self):
         self.online = False

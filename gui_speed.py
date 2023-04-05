@@ -13,8 +13,7 @@ from lib_tkinter import Orientation
 import gui
 import config
 
-import log
-from log import print
+import logging
 
 # Objects ---------------------------------------------------------------------------------------------------------------------
 class View(gui.View):
@@ -45,25 +44,30 @@ class View(gui.View):
         self.display    = lib_tkinter.GetFrame      (self.root, column=1, row=0, sticky="NESW", style=style, border=True)
         buttonBar       = lib_tkinter.GetButtonBar  (self.root, column=1, row=1, minHeight=style["buttonBarHeight"], sticky="EW", style=style, orientation=Orientation.HORIZONTAL, commands=buttonCommands, labels=buttonLabels)
 
-        # Display -----------------------------------------------------------------------------------------------------------------------------------------------------
-        # Partitioning
-        self.display.columnconfigure(0, weight=0, minsize=style["statPanelWidth"]) # Stat Panel
-        self.display.columnconfigure(1, weight=1)              # Padding
-        self.display.columnconfigure(2, weight=0)              # Speed Stat
-        self.display.columnconfigure(3, weight=1)              # Padding
-        self.display.columnconfigure(4, weight=0, minsize=style["speedStatWidth"]) # Speed Label
+        self.display.columnconfigure(0, weight=1)
+        self.display.rowconfigure   (0, weight=1)
 
-        self.display.rowconfigure   (0, weight=0) # RPM Panel
-        self.display.rowconfigure   (1, weight=1) # Speed Stat
-        self.display.rowconfigure   (2, weight=0) # Regen Panel 
-        self.display.rowconfigure   (3, weight=0) # Torque Panel
+        # Display (Normal) --------------------------------------------------------------------------------------------------------------------------------------------
+        self.displayNormal = lib_tkinter.GetFrame(self.display, grid=False, style=style)
+        
+        # Partitioning
+        self.displayNormal.columnconfigure(0, weight=0, minsize=style["statPanelWidth"]) # Stat Panel
+        self.displayNormal.columnconfigure(1, weight=1)              # Padding
+        self.displayNormal.columnconfigure(2, weight=0)              # Speed Stat
+        self.displayNormal.columnconfigure(3, weight=1)              # Padding
+        self.displayNormal.columnconfigure(4, weight=0, minsize=style["speedStatWidth"]) # Speed Label
+
+        self.displayNormal.rowconfigure   (0, weight=0) # RPM Panel
+        self.displayNormal.rowconfigure   (1, weight=1) # Speed Stat
+        self.displayNormal.rowconfigure   (2, weight=0) # Regen Panel 
+        self.displayNormal.rowconfigure   (3, weight=0) # Torque Panel
 
         # Widgets
-        rpmPanel       = lib_tkinter.GetFrame       (self.display, column=0, row=0, style=style, sticky="EW", columnspan=5)
-        statPanel      = lib_tkinter.GetFrame       (self.display, column=0, row=1, style=style, sticky="W")
-        speedPanel     = lib_tkinter.GetFrame       (self.display, column=2, row=1, style=style, sticky="NESW")
-        regenPanel     = lib_tkinter.GetFrame       (self.display, column=0, row=2, style=style, sticky="EW", columnspan=5)
-        torquePanel    = lib_tkinter.GetFrame       (self.display, column=0, row=3, style=style, sticky="EW", columnspan=5)
+        rpmPanel       = lib_tkinter.GetFrame       (self.displayNormal, column=0, row=0, style=style, sticky="EW", columnspan=5)
+        statPanel      = lib_tkinter.GetFrame       (self.displayNormal, column=0, row=1, style=style, sticky="W")
+        speedPanel     = lib_tkinter.GetFrame       (self.displayNormal, column=2, row=1, style=style, sticky="NESW")
+        regenPanel     = lib_tkinter.GetFrame       (self.displayNormal, column=0, row=2, style=style, sticky="EW", columnspan=5)
+        torquePanel    = lib_tkinter.GetFrame       (self.displayNormal, column=0, row=3, style=style, sticky="EW", columnspan=5)
 
         # Speed Panel -------------------------------------------------------------------------------------------------------------------------------------------------
         # Partitioning
@@ -115,7 +119,25 @@ class View(gui.View):
         temp3Label        = lib_tkinter.GetLabel    (statPanel, style=style, column=0, row=4, sticky="W", text="Mtr. Max:")
         statDividerBottom = lib_tkinter.GetDivider  (statPanel, style=style, column=0, row=5, sticky="EW", orientation=Orientation.HORIZONTAL, columnspan=2)
 
+        # Display (Startup) -------------------------------------------------------------------------------------------------------------------------------------------
+        self.displayStartup = lib_tkinter.GetFrame(self.display, grid=False, style=style)
+
+        # Partitioning
+        self.startupText         = lib_tkinter.GetLabel(self.displayStartup, style=style, column=0, row=0, sticky="EW")
+        self.startupInstructions = lib_tkinter.GetLabel(self.displayStartup, style=style, column=0, row=1, sticky="EW")
+
+        self.SetDisplayState("Normal")
+
     def Update(self):
+        if(self.database["State_Ready_to_Drive"] == True):
+            self.SetDisplayState("Normal")
+        elif(self.database["State_High_Voltage"] == True):
+            self.SetDisplayState("Startup_HV")
+        elif(self.database["State_High_Voltage"] == False):
+            self.SetDisplayState("Startup_LV")
+        else:
+            self.SetDisplayState("Startup_Invalid")
+
         self.brakeBar.Set  (self.database["Brake_1_Percent"])
         self.appsBar.Set   (self.database["APPS_1_Percent"])
         self.rpmBar.Set    (self.database["Motor_Speed"])
@@ -126,3 +148,29 @@ class View(gui.View):
         # self.temp1Stat.Set (self.database[""])
         # self.temp2Stat.Set (self.database[""])
         # self.temp3Stat.Set (self.database[""])
+
+    def SetDisplayState(self, state):
+        if(state == "Normal"):
+            self.displayStartup.forget()
+            self.displayNormal.pack()
+
+        elif(state == "Startup_LV"):
+            self.displayNormal.forget()
+            self.displayStartup.pack()
+            
+            self.startupText["text"] = "Low Voltage Enabled"
+            self.startupInstructions["text"] = "Have an ESO enable tractive systems."
+        
+        elif(state == "Startup_HV"):
+            self.displayNormal.forget()
+            self.displayStartup.pack()
+
+            self.startupText["text"] = "High Voltage Enabled"
+            self.startupInstructions["text"] = "Press the Brake\nthen the Start Button"
+
+        elif(state == "Startup_Invalid"):
+            self.displayNormal.forget()
+            self.displayStartup.pack()
+
+            self.startupText["text"] = "ECU Communications Failed"
+            self.startupInstructions["text"] = ""

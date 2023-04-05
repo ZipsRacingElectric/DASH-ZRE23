@@ -57,8 +57,8 @@ class Main(CanInterface):
                 channelThread = Thread(target= lambda: self.Scan(index))
                 channelThread.start()
                 print(f"CAN - Channel {index} Thread Started.")
-        except:
-            logging.error("Could not begin CAN process.")
+        except Exception as e:
+            logging.error("Could not begin CAN process: " + str(e))
             raise
 
 # Functions -------------------------------------------------------------------------------------------------------------------

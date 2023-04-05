@@ -78,8 +78,8 @@ class View(gui.View):
                         self.inputs.append((message.frame_id, signal.name, variable, entry, "int"))
 
                     subIndex += 1
-        except:
-            logging.error("GUI Debug Initialization Error.")
+        except Exception as e:
+            logging.error("GUI Debug Initialization Error: " + str(e))
 
     def Open(self):
         try:
@@ -90,8 +90,8 @@ class View(gui.View):
                     for input in self.inputs:
                         if(input[1] == signal.name):
                             if(self.database[input[1]] != None): input[2].set(self.database[input[1]])
-        except:
-            logging.error("GUI Debug Open Error")
+        except Exception as e:
+            logging.error("GUI Debug Open Error: " + str(e))
 
     def SendMessage(self, id):
         messageDatabase = dict()

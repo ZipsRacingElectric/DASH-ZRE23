@@ -270,8 +270,8 @@ class Main(tkinter.Tk):
         try:
             if(self.activeView != None):
                 self.activeView.Update()
-        except:
-            logging.error("GUI Update Loop Error.")
+        except Exception as e:
+            logging.error("GUI Update Loop Error: " + str(e))
             raise
 
     def Loop(self):
@@ -287,8 +287,8 @@ class Main(tkinter.Tk):
             self.Loop()
             self.mainloop()
             logging.debug("GUI - Loop Terminated.")
-        except:
-            logging.error("Could not begin GUI process.")
+        except Exception as e:
+            logging.error("Could not begin GUI process: " + str(e))
             raise
 
     def Kill(self):

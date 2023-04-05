@@ -43,8 +43,8 @@ class Main(CanInterface):
         try:
             logging.debug(f"CAN - Opening Channel {id}...")
             self.channels.append(OpenChannel(id, bitrate=CanlibBitrate[bitrate]))
-        except:
-            logging.error("Failed to Open Channel.")
+        except Exception as e:
+            logging.error("Failed to Open Channel: " + str(e))
             pass
 
     def CloseChannel(self, channel):

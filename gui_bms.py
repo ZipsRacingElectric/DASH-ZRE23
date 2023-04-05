@@ -142,8 +142,8 @@ class View(gui.View):
             self.meanTempStat.Set   (self.database.packTemperatureMean)
             self.maxDeltaStat.Set   (self.database.cellDeltaMax)
             self.meanDeltaStat.Set  (self.database.cellDeltaMean)
-        except:
-            logging.error("BMS GUI Update Loop Error.")
+        except Exception as e:
+            logging.error("BMS GUI Update Loop Error: " + str(e))
             raise
 
 # Getters ---------------------------------------------------------------------------------------------------------------------

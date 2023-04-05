@@ -78,8 +78,8 @@ class View(gui.View):
             elif(self.calibrationState == CalibrationState.FAILED):
                 # Failed Menu
                 self.message['text'] = "Calibration Failed"
-        except:
-            logging.error("GUI Calibration Update Error.")
+        except Exception as e:
+            logging.error("GUI Calibration Update Error: " + str(e))
 
     # Input Interrupt
     def InputInterrupt(self, input):

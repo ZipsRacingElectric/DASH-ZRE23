@@ -104,8 +104,8 @@ def GetFrame(parent, style, grid=True, column=0, row=0, columnspan=1, rowspan=1,
             frame.grid(column=column, row=row, columnspan=columnspan, rowspan=rowspan, sticky=sticky, padx=padding, pady=padding)
         style.RemoveOverrides(styleOverrides)
         return frame
-    except:
-        logging.error("lib_tkinter.GetFrame() call failed.")
+    except Exception as e:
+        logging.error("lib_tkinter.GetFrame() call failed: " + str(e))
         raise
 
 # Get Label Frame
@@ -121,8 +121,8 @@ def GetLabelFrame(parent, style, grid=True, column=0, row=0, columnspan=1, rowsp
             frame.grid(column=column, row=row, columnspan=columnspan, rowspan=rowspan, sticky=sticky)
         style.RemoveOverrides(styleOverrides)
         return frame
-    except:
-        logging.error("lib_tkinter.GetLabelFrame() call failed.")
+    except Exception as e:
+        logging.error("lib_tkinter.GetLabelFrame() call failed: " + str(e))
         raise
 
 # Get Canvas
@@ -139,8 +139,8 @@ def GetCanvas(parent, style, width, height, grid=True, column=0, row=0, columnsp
             canvas.grid(column=column, row=row, columnspan=columnspan, rowspan=rowspan, sticky=sticky)
         style.RemoveOverrides(styleOverrides)
         return canvas
-    except:
-        logging.error("lib_tkinter.GetCanvas() call failed.")
+    except Exception as e:
+        logging.error("lib_tkinter.GetCanvas() call failed: " + str(e))
         raise
 
 # Get Divider
@@ -160,8 +160,8 @@ def GetDivider(parent, style, orientation, grid=True, column=0, row=0, columnspa
             frame.grid(column=column, row=row, columnspan=columnspan, rowspan=rowspan, sticky=sticky)
         style.RemoveOverrides(styleOverrides)
         return frame
-    except:
-        logging.error("lib_tkinter.GetDivider() call failed.")
+    except Exception as e:
+        logging.error("lib_tkinter.GetDivider() call failed: " + str(e))
         raise
 
 # Get Label
@@ -174,8 +174,8 @@ def GetLabel(parent, style, text="", grid=True, column=0, row=0, columnspan=1, r
             label.grid(column=column, row=row, columnspan=columnspan, rowspan=rowspan, sticky=sticky)
         style.RemoveOverrides(styleOverrides)
         return label
-    except:
-        logging.error("lib_tkinter.GetLabel() call failed.")
+    except Exception as e:
+        logging.error("lib_tkinter.GetLabel() call failed: " + str(e))
         raise
 
 # Get Button
@@ -188,8 +188,8 @@ def GetButton(parent, style, command="", text="", grid=True, column=0, row=0, co
         if(grid): button.grid(column=column, row=row, columnspan=columnspan, rowspan=rowspan, sticky=sticky)
         style.RemoveOverrides(styleOverrides)
         return button
-    except:
-        logging.error("lib_tkinter.GetButton() call failed.")
+    except Exception as e:
+        logging.error("lib_tkinter.GetButton() call failed: " + str(e))
         raise
 
 # Get Image Button
@@ -215,8 +215,8 @@ def GetImageButton(parent, style, command="", image="", imageSampling=(1,1), gri
         if(grid): button.grid(column=column, row=row, columnspan=columnspan, rowspan=rowspan, sticky=sticky)
         style.RemoveOverrides(styleOverrides)
         return (button, tkinterImage)
-    except:
-        logging.error("lib_tkinter.GetImageButton() call failed.")
+    except Exception as e:
+        logging.error("lib_tkinter.GetImageButton() call failed: " + str(e))
         raise
 
 # Get Radio Button
@@ -227,8 +227,8 @@ def GetRadiobutton(parent, style, value="", variable="", text="", grid=True, col
         button = tkinter.Radiobutton(parent, variable=variable, value=value, text=text, font=style["font"], foreground=style["textColor"], background=style["background"])
         if(grid): button.grid(column=column, row=row, columnspan=columnspan, rowspan=rowspan, sticky=sticky)
         return button
-    except:
-        logging.error("lib_tkinter.GetRadioButton() call failed.")
+    except Exception as e:
+        logging.error("lib_tkinter.GetRadioButton() call failed: " + str(e))
         raise
 
 # Get Entry
@@ -240,8 +240,8 @@ def GetEntry(parent, style, minWidth, variable=None, value="", grid=True, column
         entry.insert(0,str(value))
         if(grid): entry.grid(column=column, row=row, columnspan=columnspan, rowspan=rowspan, sticky=sticky)
         return entry
-    except:
-        logging.error("lib_tkinter.GetEntry() call failed.")
+    except Exception as e:
+        logging.error("lib_tkinter.GetEntry() call failed: " + str(e))
         raise
 
 # Get Check Button
@@ -252,8 +252,8 @@ def GetCheckbutton(parent, style, variable, text="", grid=True, column=0, row=0,
         button = tkinter.Checkbutton(parent, variable=variable, text=text, font=style["font"], foreground=style["textColor"], background=style["background"])
         if(grid): button.grid(column=column, row=row, columnspan=columnspan, rowspan=rowspan, sticky=sticky)
         return button
-    except:
-        logging.error("lib_tkinter.GetCheckButton() call failed.")
+    except Exception as e:
+        logging.error("lib_tkinter.GetCheckButton() call failed: " + str(e))
         raise
 
 # Get Progress Bar
@@ -270,8 +270,8 @@ def GetProgressBar(parent, style, orientation, grid=True, column=0, row=0, colum
             bar.grid(column=column, row=row, columnspan=columnspan, rowspan=rowspan, sticky=sticky, padx=gridPadding, pady=gridPadding)
         style.RemoveOverrides(styleOverrides)
         return bar
-    except:
-        logging.error("lib_tkinter.GetProgressBar() call failed.")
+    except Exception as e:
+        logging.error("lib_tkinter.GetProgressBar() call failed: " + str(e))
         raise
 
 # Get Stratafied Bar
@@ -293,8 +293,8 @@ def GetStrataBar(parent, style, orientation, grid=True, column=0, row=0, columns
             bar.grid(column=column, row=row, columnspan=columnspan, rowspan=rowspan, sticky=sticky)
         style.RemoveOverrides(styleOverrides)
         return bar
-    except:
-        logging.error("lib_tkinter.GetStrataBar() call failed.")
+    except Exception as e:
+        logging.error("lib_tkinter.GetStrataBar() call failed: " + str(e))
         raise
 
 # Get Button Bar
@@ -313,8 +313,8 @@ def GetButtonBar(parent, style, orientation, commands, labels=[], grid=True, col
             bar.grid(column=column, row=row, columnspan=columnspan, rowspan=rowspan, sticky=sticky)
         style.RemoveOverrides(styleOverrides)
         return bar
-    except:
-        logging.error("lib_tkinter.GetButtonBar() call failed.")
+    except Exception as e:
+        logging.error("lib_tkinter.GetButtonBar() call failed: " + str(e))
         raise
 
 # Get Label Stat
@@ -332,8 +332,8 @@ def GetLabelStat(parent, style, grid=True, column=0, row=0, columnspan=1, rowspa
             label.grid(column=column, row=row, columnspan=columnspan, rowspan=rowspan, sticky=sticky)
         style.RemoveOverrides(styleOverrides)
         return label
-    except:
-        logging.error("lib_tkinter.GetLabelStat() call failed.")
+    except Exception as e:
+        logging.error("lib_tkinter.GetLabelStat() call failed: " + str(e))
         raise
 
 # Get Check Stat
@@ -348,8 +348,8 @@ def GetCheckStat(parent, style, grid=True, column=0, row=0, columnspan=1, rowspa
             stat.grid(column=column, row=row, columnspan=columnspan, rowspan=rowspan, sticky=sticky)
         style.RemoveOverrides(styleOverrides)
         return stat
-    except:
-        logging.error("lib_tkinter.GetCheckStat() call failed.")
+    except Exception as e:
+        logging.error("lib_tkinter.GetCheckStat() call failed: " + str(e))
         raise
 
 # Get Scroll Frame
@@ -364,8 +364,8 @@ def GetScrollFrame(parent, style, orientation, grid=True, column=0, row=0, colum
             frame.grid(column=column, row=row, columnspan=columnspan, rowspan=rowspan, sticky=sticky)
         style.RemoveOverrides(styleOverrides)
         return frame
-    except:
-        logging.error("lib_tkinter.GetScrollFrame() call failed.")
+    except Exception as e:
+        logging.error("lib_tkinter.GetScrollFrame() call failed: " + str(e))
         raise
 
 # Widgets ---------------------------------------------------------------------------------------------------------------------------

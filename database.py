@@ -27,8 +27,8 @@ def Setup():
         can_interface.CalculateInverterStats(db)
 
         return db
-    except:
-        logging.error("Database Setup Failure.")
+    except Exception as e:
+        logging.error("Database Setup Failure: " + str(e))
         raise
 
 class Database(dict):

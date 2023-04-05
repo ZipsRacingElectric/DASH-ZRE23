@@ -25,11 +25,11 @@ def Setup(database, can_transceiver):
 
         interface = Main()
 
-        interface.InsertInterrupt(config.GPIO_START_BUTTON, lambda: StartButtonPress(can_transceiver))
+        interface.InsertInterrupt(config.GPIO_BUTTON_START, lambda: StartButtonPress(can_transceiver))
         
         return interface
-    except:
-        logging.error("GPIO Setup failure.")
+    except Exception as e:
+        logging.error("GPIO Setup failure: " + str(e))
         raise
 
 def StartButtonPress(can_transceiver):
@@ -37,7 +37,7 @@ def StartButtonPress(can_transceiver):
 
 # GUI Object ------------------------------------------------------------------------------------------------------------------
 class Main():
-    def __init__(self, title, database, framerate=0):
+    def __init__(self):
         try:
             logging.debug("GPIO - Initializing...")
         
@@ -49,8 +49,8 @@ class Main():
             self.online = True
 
             logging.debug("GPIO - Initialized.")
-        except:
-            logging.error("GPIO Initialization failed.")
+        except Exception as e:
+            logging.error("GPIO Initialization failed: " + str(e))
 
     def InsertInterrupt(self, pin, handler):
         try:
@@ -59,8 +59,8 @@ class Main():
             self.inputs[pin] = gpiozero.Button(pin)
             
             self.threads.append(threading.Thread(target=lambda: self.ScanInterrupt(pin)))
-        except:
-            logging.error("GPIO interrupt insertion failure.")
+        except Exception as e:
+            logging.error("GPIO interrupt insertion failure:  " + str(e))
             pass
         
     def ScanInterrupt(self, pin):
@@ -72,8 +72,8 @@ class Main():
                 self.inputStates[pin] = self.inputs[pin].is_pressed
 
                 time.sleep(config.GPIO_TIME_PERIOD)
-        except:
-            logging.error("Interrupt scan error.")
+        except Exception as e:
+            logging.error("Interrupt scan error: " + str(e))
             pass
 
     def Kill(self):

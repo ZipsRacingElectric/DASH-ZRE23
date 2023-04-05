@@ -45,8 +45,8 @@ class Main(CanInterface):
         try:
             if(id < 0 or id >= len(self.channels)): return
             OpenChannel(bitrate, self.channels[id])
-        except:
-            logging.error(f"Could not open CAN Channel {id}")
+        except Exception as e:
+            logging.error(f"Could not open CAN Channel {id}: " + str(e))
             pass
 
     def CloseChannel(self, id):
@@ -76,8 +76,8 @@ class Main(CanInterface):
                 channelThread = Thread(target= lambda i = index: self.Scan(i))
                 channelThread.start()
                 logging.debug(f"CAN - Channel {index} Thread Started.")
-        except:
-            logging.error("Could not begin CAN process.")
+        except Exception as e:
+            logging.error("Could not begin CAN process: " + str(e))
             raise
 
 # Functions -------------------------------------------------------------------------------------------------------------------

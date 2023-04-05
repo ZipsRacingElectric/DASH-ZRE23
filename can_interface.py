@@ -84,8 +84,8 @@ def Setup(database):
             try:
                 logging.debug("CAN - Using CAN Emulation.")
                 return CanInterface(database, messageHandler=HandleMessage, timingFunction=None, timingPeriod=config.CAN_TIME_PERIOD)
-            except:
-                logging.error("Failed to Initialize Emulated CAN.")
+            except Exception as e:
+                logging.error("Failed to Initialize Emulated CAN: " + str(e))
 
         if(config.CAN_LIBRARY_TYPE == config.CAN_CANLIB):
             try:
@@ -94,8 +94,8 @@ def Setup(database):
                 library.OpenChannel(config.CAN_BITRATE, 0)
                 library.OpenChannel(config.CAN_BITRATE, 1)
                 return library
-            except:
-                logging.error("Failed to Initialize CANLIB Library.")
+            except Exception as e:
+                logging.error("Failed to Initialize CANLIB Library: " + str(e))
         
         if(config.CAN_LIBRARY_TYPE == config.CAN_INNOMAKER):
             try:
@@ -112,13 +112,13 @@ def Setup(database):
                     library.OpenChannel(config.CAN_BITRATE, 0)
                     library.OpenChannel(config.CAN_BITRATE, 1)
                     return library
-            except:
-                logging.error("Failed to Initialize INNOMAKER Library.")
+            except Exception as e:
+                logging.error("Failed to Initialize INNOMAKER Library: " + str(e))
         
         logging.error("Exception: No CAN Library Type configured.")
         raise
-    except:
-        logging.error("Failed to Setup CAN Interface.")
+    except Exception as e:
+        logging.error("Failed to Setup CAN Interface: " + str(e))
         raise
 
 # Message Handling ------------------------------------------------------------------------------------------------------------

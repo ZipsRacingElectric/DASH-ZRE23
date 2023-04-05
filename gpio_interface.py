@@ -54,11 +54,15 @@ class Main():
 
     def InsertInterrupt(self, pin, handler):
         try:
+            logging.debug(f"GPIO - Inserting Interrupt for Pin: {pin}...")
             self.interrupts[pin] = handler
 
             self.inputs[pin] = gpiozero.Button(pin)
             
-            self.threads.append(threading.Thread(target=lambda: self.ScanInterrupt(pin)))
+            logging.debug(f"GPIO - Beginning Interrupt Thread...")
+            newThread = threading.Thread(target=lambda: self.ScanInterrupt(pin))
+            newThread.start()
+            self.threads.append(newThread)
         except Exception as e:
             logging.error("GPIO interrupt insertion failure:  " + str(e))
             pass

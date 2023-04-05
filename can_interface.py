@@ -5,6 +5,8 @@
 #   This module acts as the manager for anything relating to the CAN communications protocol.
 
 # Libraries
+import logging
+
 import time
 import sys
 
@@ -14,16 +16,13 @@ from threading import Thread
 # Includes
 import config
 
-import log
-from log import print
-
 # Objects ---------------------------------------------------------------------------------------------------------------------
 # CAN Interface
 # - Interface Object for CAN Libraries
 # - Objects inheriting from this may be used a CAN interface by the application
 class CanInterface():
     def __init__(self, database, messageHandler=None, timingFunction=None, timingPeriod=None):
-        print("CAN - Initializing...")
+        logging.debug("CAN - Initializing...")
         self.database = database
         self.channels = []
         self.messageHandler = messageHandler
@@ -33,12 +32,12 @@ class CanInterface():
     
     # Main Loop
     def Begin(self):
-        print("CAN - Beginning...")
+        logging.debug("CAN - Beginning...")
         self.online = True
         self.BeginTimeThread()
 
     def Kill(self):
-        print("CAN - Terminating...")
+        logging.debug("CAN - Terminating...")
         self.online = False
 
     # Messages
@@ -69,42 +68,58 @@ class CanInterface():
 # Functions -------------------------------------------------------------------------------------------------------------------
 # - Call this function to get an initialized CAN Interface Object
 def Setup(database):
-    database["Time"] = None
-    database["ECU_CAN_Timeout"]      = None
-    database["ACAN_CAN_Timeout"]     = None
-    database["Inverter_CAN_Timeout"] = None
-    database["BMS_CAN_Timeout"]      = None
-    database["ECU_CAN_Active"]       = None
-    database["ACAN_CAN_Active"]      = None
-    database["Inverter_CAN_Active"]  = None
-    database["BMS_CAN_Active"]       = None
-    SetTimeouts(database)
+    try:
+        database["Time"] = None
+        database["ECU_CAN_Timeout"]      = None
+        database["ACAN_CAN_Timeout"]     = None
+        database["Inverter_CAN_Timeout"] = None
+        database["BMS_CAN_Timeout"]      = None
+        database["ECU_CAN_Active"]       = None
+        database["ACAN_CAN_Active"]      = None
+        database["Inverter_CAN_Active"]  = None
+        database["BMS_CAN_Active"]       = None
+        SetTimeouts(database)
 
-    if(config.CAN_LIBRARY_TYPE == config.CAN_EMULATE):
-        print("CAN - Using CAN Emulation.")
-        return CanInterface(database, messageHandler=HandleMessage, timingFunction=None, timingPeriod=config.CAN_TIME_PERIOD)
-    
-    if(config.CAN_LIBRARY_TYPE == config.CAN_CANLIB):
-        import lib_canlib
-        library = lib_canlib.Main(database, messageHandler=HandleMessage, timingFunction=SetTimeouts, timingPeriod=config.CAN_TIME_PERIOD)
-        library.OpenChannel(config.CAN_BITRATE, 0)
-        library.OpenChannel(config.CAN_BITRATE, 1)
-        return library
-    
-    if(config.CAN_LIBRARY_TYPE == config.CAN_INNOMAKER):
-        if(sys.platform == "win32"):
-            import lib_innomaker_win
-            library = lib_innomaker_win.Main(database, messageHandler=HandleMessage, timingFunction=SetTimeouts, timingPeriod=config.CAN_TIME_PERIOD)
-            library.OpenChannel(config.CAN_BITRATE, 0)
-            library.OpenChannel(config.CAN_BITRATE, 1)
-            return library
+        if(config.CAN_LIBRARY_TYPE == config.CAN_EMULATE):
+            try:
+                logging.debug("CAN - Using CAN Emulation.")
+                return CanInterface(database, messageHandler=HandleMessage, timingFunction=None, timingPeriod=config.CAN_TIME_PERIOD)
+            except:
+                logging.error("Failed to Initialize Emulated CAN.")
 
-        if(sys.platform == "linux"):
-            import lib_innomaker_linux
-            library = lib_innomaker_linux.Main(database, messageHandler=HandleMessage, timingFunction=SetTimeouts, timingPeriod=config.CAN_TIME_PERIOD)
-            library.OpenChannel(config.CAN_BITRATE, 0)
-            library.OpenChannel(config.CAN_BITRATE, 1)
-            return library
+        if(config.CAN_LIBRARY_TYPE == config.CAN_CANLIB):
+            try:
+                import lib_canlib
+                library = lib_canlib.Main(database, messageHandler=HandleMessage, timingFunction=SetTimeouts, timingPeriod=config.CAN_TIME_PERIOD)
+                library.OpenChannel(config.CAN_BITRATE, 0)
+                library.OpenChannel(config.CAN_BITRATE, 1)
+                return library
+            except:
+                logging.error("Failed to Initialize CANLIB Library.")
+        
+        if(config.CAN_LIBRARY_TYPE == config.CAN_INNOMAKER):
+            try:
+                if(sys.platform == "win32"):
+                    import lib_innomaker_win
+                    library = lib_innomaker_win.Main(database, messageHandler=HandleMessage, timingFunction=SetTimeouts, timingPeriod=config.CAN_TIME_PERIOD)
+                    library.OpenChannel(config.CAN_BITRATE, 0)
+                    library.OpenChannel(config.CAN_BITRATE, 1)
+                    return library
+
+                if(sys.platform == "linux"):
+                    import lib_innomaker_linux
+                    library = lib_innomaker_linux.Main(database, messageHandler=HandleMessage, timingFunction=SetTimeouts, timingPeriod=config.CAN_TIME_PERIOD)
+                    library.OpenChannel(config.CAN_BITRATE, 0)
+                    library.OpenChannel(config.CAN_BITRATE, 1)
+                    return library
+            except:
+                logging.error("Failed to Initialize INNOMAKER Library.")
+        
+        logging.error("Exception: No CAN Library Type configured.")
+        raise
+    except:
+        logging.error("Failed to Setup CAN Interface.")
+        raise
 
 # Message Handling ------------------------------------------------------------------------------------------------------------
 

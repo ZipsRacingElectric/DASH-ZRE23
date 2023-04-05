@@ -5,10 +5,11 @@
 #   The main file for the application, execute this file to instance the app. This file is responsible for instancing and
 #   initializing the CAN and GUI modules.
 
-# Includes --------------------------------------------------------------------------------------------------------------------
-import log
-from log import print
+# Libraries -------------------------------------------------------------------------------------------------------------------
+import logging
 
+# Includes --------------------------------------------------------------------------------------------------------------------
+import config
 import gui
 import can_interface
 import database
@@ -16,23 +17,29 @@ import database
 # App Execution ---------------------------------------------------------------------------------------------------------------
 if(__name__ == "__main__"):
     # Initialization
-    log.Setup()
+    logging.basicConfig(filename=config.LOG_FILE,
+                        filemode='w',
+                        format="%(asctime)s [%(levelname)s] %(message)s",
+                        datefmt='%H:%M:%S',
+                        level=logging.DEBUG)
 
-    print("APP - Initializing...")
-    mainDatabase = database.Setup()                            # Setup Database
-    mainCan      = can_interface.Setup(mainDatabase)           # Setup CAN Interface
-    mainGui      = gui.Setup(mainDatabase, mainCan)            # Setup GUI
-    
-    # Begin
-    print("APP - Begining...")
-    mainCan.Begin()                                            # Begin CAN
-    mainGui.Begin()                                            # Begin GUI
+    try:
+        logging.debug("APP - Initializing...")
+        mainDatabase = database.Setup()                            # Setup Database
+        mainCan      = can_interface.Setup(mainDatabase)           # Setup CAN Interface
+        mainGui      = gui.Setup(mainDatabase, mainCan)            # Setup GUI
+        
+        # Begin
+        logging.debug("APP - Begining...")
+        mainCan.Begin()                                            # Begin CAN
+        mainGui.Begin()                                            # Begin GUI
 
-    # GUI Begin function will not return until app is closed.
-    
-    # Exit
-    print("APP - Terminating...")
-    mainCan.Kill()
-    print("APP - Terminated.")
-    print("APP - Closing Log.")
-    log.Kill()
+        # GUI Begin function will not return until app is closed.
+        
+        # Exit
+        logging.debug("APP - Terminating...")
+        mainCan.Kill()
+        logging.debug("APP - Terminated.")
+    except:
+        logging.error("App Failure. Terminating...")
+        exit()

@@ -13,12 +13,11 @@ import os
 import threading
 from threading import Thread
 
+import logging
+
 # Imports ---------------------------------------------------------------------------------------------------------------------
 import can_interface
 from can_interface import CanInterface
-
-import log
-from log import print
 
 # Objects ---------------------------------------------------------------------------------------------------------------------
 class Main(CanInterface):
@@ -50,13 +49,17 @@ class Main(CanInterface):
         self.Receive(id, data)
 
     def Begin(self):
-        super().Begin()
-        
-        for index in range(len(self.channels)):
-            print(f"CAN - Channel {index} Thread Starting...")
-            channelThread = Thread(target= lambda: self.Scan(index))
-            channelThread.start()
-            print(f"CAN - Channel {index} Thread Started.")
+        try:
+            super().Begin()
+            
+            for index in range(len(self.channels)):
+                print(f"CAN - Channel {index} Thread Starting...")
+                channelThread = Thread(target= lambda: self.Scan(index))
+                channelThread.start()
+                print(f"CAN - Channel {index} Thread Started.")
+        except:
+            logging.error("Could not begin CAN process.")
+            raise
 
 # Functions -------------------------------------------------------------------------------------------------------------------
 def OpenChannel(id, bitrate):

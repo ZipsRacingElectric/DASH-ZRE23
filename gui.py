@@ -14,8 +14,7 @@ import os
 import sys
 import inspect
 
-import log
-from log import print
+import logging
 
 # Objects ---------------------------------------------------------------------------------------------------------------------
 class View():
@@ -134,7 +133,7 @@ def OpenTerminal():
 # GUI Object ------------------------------------------------------------------------------------------------------------------
 class Main(tkinter.Tk):
     def __init__(self, title, database, framerate=0):
-        print("GUI - Initializing...")
+        logging.debug("GUI - Initializing...")
         super().__init__()
 
         self.SetFullscreen(False)
@@ -149,7 +148,7 @@ class Main(tkinter.Tk):
 
         self.framerate = framerate
 
-        print("GUI - Initialized.")
+        logging.debug("GUI - Initialized.")
 
     # Views -----------------------------------------------------------------------------------
     def InitializeViews(self):
@@ -169,7 +168,7 @@ class Main(tkinter.Tk):
                     view = targetView
                     break
             if(view == None):
-                print("GUI - Could not find view of ID '" + viewId + "'")
+                logging.error("Error: GUI Could not find view of ID '" + viewId + "'")
                 return
         
         # Open by Reference
@@ -180,7 +179,7 @@ class Main(tkinter.Tk):
             return
 
         # Invalid Object
-        print("GUI - Object '" + str(type(view)) + "' must inherit from 'gui.View")
+        logging.error("Error: GUI Object '" + str(type(view)) + "' must inherit from 'gui.View")
 
     def CloseViews(self, openDefaultView=True):
         self.activeView = None
@@ -200,7 +199,7 @@ class Main(tkinter.Tk):
                     view = targetView
                     break
             if(view == None):
-                print("GUI - Could not find view of ID '" + viewId + "'")
+                logging.error("Exception: GUI Could not find view of ID '" + viewId + "'")
                 return
         
         # Open by Reference
@@ -214,7 +213,7 @@ class Main(tkinter.Tk):
             return
 
         # Invalid Object
-        print("GUI - Object '" + str(type(view)) + "' must inherit from 'gui.View")
+        logging.debug("Exception: GUI Object '" + str(type(view)) + "' must inherit from 'gui.View")
 
     # Windows ---------------------------------------------------------------------------------
     def InitializeWindows(self):
@@ -233,7 +232,7 @@ class Main(tkinter.Tk):
                     window = targetWindow
                     break
             if(window == None):
-                print("GUI - Could not find window of ID '" + windowId + "'")
+                logging.error("Exception: GUI Could not find window of ID '" + windowId + "'")
                 return
         
         # Open by Reference
@@ -242,7 +241,7 @@ class Main(tkinter.Tk):
             return
 
         # Invalid Object
-        print("GUI - Object '" + str(type(window)) + "' must inherit from 'gui.View")
+        logging.error("Exception: GUI Object '" + str(type(window)) + "' must inherit from 'gui.View")
 
     # Keybinds --------------------------------------------------------------------------------
     def InitializeKeybinds(self):
@@ -279,14 +278,18 @@ class Main(tkinter.Tk):
         self.after(delayMilliseconds, self.Loop)
 
     def Begin(self):
-        print("GUI - Loop Starting...")
-        self.Loop()
-        self.mainloop()
-        print("GUI - Loop Terminated.")
+        try:
+            logging.debug("GUI - Loop Starting...")
+            self.Loop()
+            self.mainloop()
+            logging.debug("GUI - Loop Terminated.")
+        except:
+            logging.error("Could not begin GUI process.")
+            raise
 
     def Kill(self):
-        print("GUI - Terminating...")
-        print("GUI - State: " + self.state())
+        logging.debug("GUI - Terminating...")
+        logging.debug("GUI - State: " + self.state())
         if(self.state() != 'normal'): return
         self.destroy()
-        print("GUI - Terminated.")
+        logging.debug("GUI - Terminated.")

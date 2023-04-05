@@ -19,32 +19,35 @@ from gs_usb.gs_usb import GS_CAN_MODE_ONE_SHOT
 import threading
 from threading import Thread
 
+import logging
+
 # Imports ---------------------------------------------------------------------------------------------------------------------
 import can_interface
 from can_interface import CanInterface
-
-import log
-from log import print
 
 # Objects ---------------------------------------------------------------------------------------------------------------------
 class Main(CanInterface):
     def __init__(self, database, messageHandler=None, timingFunction=None, timingPeriod=None):
         super().__init__(database, messageHandler, timingFunction, timingPeriod)
 
-        print("CAN - Using Innomaker USB-CAN Library")
-        print("CAN - Platform: Windows")
+        logging.debug("CAN - Using Innomaker USB-CAN Library")
+        logging.debug("CAN - Platform: Windows")
 
         self.channels = GsUsb.scan()
 
         if len(self.channels) == 0:
-            print("CAN - No GS-USB Devices Found.")
+            logging.debug("CAN - No GS-USB Devices Found.")
             return
 
         self.channels[0].stop()
 
     def OpenChannel(self, bitrate, id):
-        if(id < 0 or id >= len(self.channels)): return
-        OpenChannel(bitrate, self.channels[id])
+        try:
+            if(id < 0 or id >= len(self.channels)): return
+            OpenChannel(bitrate, self.channels[id])
+        except:
+            logging.error(f"Could not open CAN Channel {id}")
+            pass
 
     def CloseChannel(self, id):
         CloseChannel(self.channels[id])
@@ -65,27 +68,31 @@ class Main(CanInterface):
         self.Receive(id, data)
 
     def Begin(self):
-        super().Begin()
-        
-        for index in range(len(self.channels)):
-            print(f"CAN - Channel {index} Thread Starting...")
-            channelThread = Thread(target= lambda: self.Scan(index))
-            channelThread.start()
-            print(f"CAN - Channel {index} Thread Started.")
+        try:
+            super().Begin()
+            
+            for index in range(len(self.channels)):
+                logging.debug(f"CAN - Channel {index} Thread Starting...")
+                channelThread = Thread(target= lambda i = index: self.Scan(i))
+                channelThread.start()
+                logging.debug(f"CAN - Channel {index} Thread Started.")
+        except:
+            logging.error("Could not begin CAN process.")
+            raise
 
 # Functions -------------------------------------------------------------------------------------------------------------------
 def OpenChannel(bitrate, channel):
-    print(f"CAN - Channel {channel.address} Opening...")
+    logging.debug(f"CAN - Channel {channel.address} Opening...")
 
     success = channel.set_bitrate(bitrate)
 
     if(not success):
-        print(f"CAN - Failed to Open Channel {channel.address} at Bitrate {bitrate}.")
+        logging.debug(f"CAN - Failed to Open Channel {channel.address} at Bitrate {bitrate}.")
         return
 
     channel.start(GS_CAN_MODE_LOOP_BACK)
 
 def CloseChannel(channel):
-    print(f"CAN - Closing Channel {channel.address}")
+    logging.debug(f"CAN - Closing Channel {channel.address}")
 
     channel.stop()

@@ -1,13 +1,12 @@
 import cantools
 import os
 
+import logging
+
 import enum
 from enum import Enum
 
 import config
-
-import log
-from log import print
 
 import can_interface
 
@@ -19,14 +18,18 @@ class InputTypes(Enum):                              # Input Type Enumerable
     BUTTON_DASH_RIGHT  = 3                           # - Right Button of Dashboard
 
 def Setup():
-    parentPath = os.path.dirname(__file__)
-    databasePath = os.path.join(parentPath, config.CAN_DATABASE_PATH)
+    try:
+        parentPath = os.path.dirname(__file__)
+        databasePath = os.path.join(parentPath, config.CAN_DATABASE_PATH)
 
-    db = Database(databasePath)
+        db = Database(databasePath)
 
-    can_interface.CalculateInverterStats(db)
+        can_interface.CalculateInverterStats(db)
 
-    return db
+        return db
+    except:
+        logging.error("Database Setup Failure.")
+        raise
 
 class Database(dict):
     def __init__(self, path):

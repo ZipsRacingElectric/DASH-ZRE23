@@ -14,12 +14,11 @@ from canlib.canlib import ChannelData
 import threading
 from threading import Thread
 
+import logging
+
 # Imports ---------------------------------------------------------------------------------------------------------------------
 import can_interface
 from can_interface import CanInterface
-
-import log
-from log import print
 
 # Enumarables -----------------------------------------------------------------------------------------------------------------
 CanlibBitrate = {
@@ -36,14 +35,20 @@ CanlibBitrate = {
 # Objects ---------------------------------------------------------------------------------------------------------------------
 class Main(CanInterface):
     def __init__(self, database, messageHandler=None, timingFunction=None, timingPeriod=None):
-        print("CAN - Using Kvaser Canlib Library")
-        print("CAN - Canlib Version:" + str(canlib.dllversion()))
+        logging.debug("CAN - Using Kvaser Canlib Library")
+        logging.debug("CAN - Canlib Version:" + str(canlib.dllversion()))
         super().__init__(database, messageHandler, timingFunction, timingPeriod)
 
     def OpenChannel(self, bitrate, id):
-        self.channels.append(OpenChannel(id, bitrate=CanlibBitrate[bitrate]))
+        try:
+            logging.debug(f"CAN - Opening Channel {id}...")
+            self.channels.append(OpenChannel(id, bitrate=CanlibBitrate[bitrate]))
+        except:
+            logging.error("Failed to Open Channel.")
+            pass
 
     def CloseChannel(self, channel):
+        logging.debug(f"CAN - Closing Channel {channel.id}...")
         CloseChannel(channel)
 
     def Transmit(self, id, data, channelId):

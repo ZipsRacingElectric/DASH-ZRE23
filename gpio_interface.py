@@ -70,6 +70,8 @@ class Main():
     def ScanInterrupt(self, pin):
         try:
             while(self.online):
+                logging.debug(f"GPIO - Pin {pin} Reading: " + str(self.inputs[pin].is_pressed))
+                
                 if(self.inputs[pin].is_pressed and not self.inputStates[pin]):
                     self.interrupts[pin]
 

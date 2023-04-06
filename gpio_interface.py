@@ -69,7 +69,7 @@ class Main():
             while(self.online):
                 logging.debug("GPIO Scan Loop.")
                 for pin, input in self.inputs.items():
-                    logging.debug(f"GPIO - Pin {str(pin)} Reading: ")
+                    logging.debug(f"GPIO - Pin {str(pin)} Reading: " + input.is_pressed)
                     
                     if(input.is_pressed and not self.inputStates[pin]): self.interrupts[pin]()
 

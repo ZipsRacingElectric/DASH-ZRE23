@@ -44,7 +44,6 @@ class Main():
             self.inputs      = dict()
             self.interrupts  = dict()
             self.inputStates = dict()
-            self.threads     = []
 
             self.online = True
 
@@ -52,32 +51,31 @@ class Main():
         except Exception as e:
             logging.error("GPIO Initialization failed: " + str(e))
 
+    def Begin(self):
+        self.scanningThread = threading.Thread(target=self.ScanInterrupts)
+        self.scanningThread.start()
+
     def InsertInterrupt(self, pin, handler):
         try:
             logging.debug(f"GPIO - Inserting Interrupt for Pin: {pin}...")
             self.interrupts[pin] = handler
 
             self.inputs[pin] = gpiozero.Button(pin)
-            
-            logging.debug(f"GPIO - Beginning Interrupt Thread...")
-            newThread = threading.Thread(target=lambda: self.ScanInterrupt(pin))
-            newThread.start()
-            self.threads.append(newThread)
         except Exception as e:
             logging.error("GPIO interrupt insertion failure:  " + str(e))
             pass
         
-    def ScanInterrupt(self, pin):
+    def ScanInterrupts(self):
         try:
             while(self.online):
-                logging.debug(f"GPIO - Pin {pin} Reading: " + str(self.inputs[pin].is_pressed))
-                
-                if(self.inputs[pin].is_pressed and not self.inputStates[pin]):
-                    self.interrupts[pin]
+                for pin, input in self.inputs:
+                    logging.debug(f"GPIO - Pin {pin} Reading: " + str(input.is_pressed))
+                    
+                    if(input.is_pressed and not self.inputStates[pin]): self.interrupts[pin]()
 
-                self.inputStates[pin] = self.inputs[pin].is_pressed
+                    self.inputStates[pin] = input.is_pressed
 
-                time.sleep(config.GPIO_TIME_PERIOD)
+                    time.sleep(config.GPIO_TIME_PERIOD)
         except Exception as e:
             logging.error("Interrupt scan error: " + str(e))
             pass

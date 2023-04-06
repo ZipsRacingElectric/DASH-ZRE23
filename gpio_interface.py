@@ -59,7 +59,6 @@ class Main():
         try:
             logging.debug(f"GPIO - Inserting Interrupt for Pin: {pin}...")
             self.interrupts[pin] = handler
-
             self.inputs[pin] = gpiozero.Button(pin)
         except Exception as e:
             logging.error("GPIO interrupt insertion failure:  " + str(e))
@@ -68,14 +67,15 @@ class Main():
     def ScanInterrupts(self):
         try:
             while(self.online):
-                for pin, input in self.inputs:
-                    logging.debug(f"GPIO - Pin {pin} Reading: " + str(input.is_pressed))
+                logging.debug("GPIO Scan Loop.")
+                for pin, input in self.inputs.items():
+                    logging.debug(f"GPIO - Pin {str(pin)} Reading: ")
                     
                     if(input.is_pressed and not self.inputStates[pin]): self.interrupts[pin]()
 
                     self.inputStates[pin] = input.is_pressed
 
-                    time.sleep(config.GPIO_TIME_PERIOD)
+                time.sleep(config.GPIO_TIME_PERIOD)
         except Exception as e:
             logging.error("Interrupt scan error: " + str(e))
             pass

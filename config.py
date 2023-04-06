@@ -28,7 +28,7 @@ ICON_SCALING                     = 0.33
 TERMINAL_ID                      = "lxterminal"
 
 # GPIO ------------------------------------------------------------------------------------------------------------------------
-GPIO_TIME_PERIOD                 = 0.01
+GPIO_TIME_PERIOD                 = 0.1
 
 GPIO_BUTTON_START                = 4
 

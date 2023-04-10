@@ -19,14 +19,24 @@ import config
 import can_interface
 
 # Functions -------------------------------------------------------------------------------------------------------------------
-def Setup(database, can_transceiver):
+def Setup(db, canT):
     try:
+        global database
+        global can_transmitter
+        database = db
+        can_transmitter = canT
+
         if(sys.platform == "win32"): return None
 
         interface = Main()
 
-        interface.InsertInterrupt(config.GPIO_BUTTON_START, lambda: StartButtonPress(can_transceiver))
+        interface.InsertDigital(config.GPIO_BUTTON_START, lambda: StartButtonPress(can_transmitter))
         
+        interface.InsertRotary(config.GPIO_ROT_TORQUE_PIN_A, config.GPIO_ROT_TORQUE_PIN_B, TorqueEncoderInterrupt)
+        interface.InsertRotary(config.GPIO_ROT_REGEN_PIN_A,  config.GPIO_ROT_REGEN_PIN_B,  TorqueEncoderInterrupt)
+
+        interface.InsertService(CanSendService)
+
         return interface
     except Exception as e:
         logging.error("GPIO Setup failure: " + str(e))
@@ -35,15 +45,31 @@ def Setup(database, can_transceiver):
 def StartButtonPress(can_transceiver):
     can_interface.SendCommandDriveStart(can_transceiver, True)
 
+def TorqueEncoderInterrupt(direction):
+    global database
+    database["Torque_Limit"] += direction * config.GPIO_ROT_TORQUE_SENSITIVITY
+
+def RegenEncoderInterrupt(direction):
+    global database
+    database["Torque_Limit_Regen"] += direction * config.GPIO_ROT_REGEN_SENSITIVITY
+
+def CanSendService():
+    global can_transmitter
+    can_interface.SendCommandDriveConfiguration(can_transmitter)
+
 # GUI Object ------------------------------------------------------------------------------------------------------------------
 class Main():
     def __init__(self):
         try:
             logging.debug("GPIO - Initializing...")
         
-            self.inputs      = dict()
-            self.interrupts  = dict()
-            self.inputStates = dict()
+            self.digitalInputs     = dict()
+            self.rotaryInputs      = dict()
+            self.digitalStates     = dict()
+            self.rotaryStates      = dict()
+            self.digitalInterrupts = dict()
+            self.rotaryInterrupts  = dict()
+            self.services          = []
 
             self.online = True
 
@@ -55,26 +81,54 @@ class Main():
         self.scanningThread = threading.Thread(target=self.ScanInterrupts)
         self.scanningThread.start()
 
-    def InsertInterrupt(self, pin, handler):
+    def InsertDigital(self, pin, handler):
         try:
-            logging.debug(f"GPIO - Inserting Interrupt for Pin: {pin}...")
-            self.interrupts[pin] = handler
-            self.inputs[pin] = gpiozero.Button(pin)
-            self.inputStates[pin] = False
+            logging.debug(f"GPIO - Inserting Digital Interrupt for Pin: {pin}...")
+            self.digitalInputs[pin]     = gpiozero.Button(pin)
+            self.digitalStates[pin]     = False
+            self.digitalInterrupts[pin] = handler
         except Exception as e:
-            logging.error("GPIO interrupt insertion failure:  " + str(e))
+            logging.error("GPIO Digital Interrupt Insertion Failed: " + str(e))
             pass
+
+    def InsertRotary(self, pinA, pinB, handler):
+        try:
+            logging.debug(f"GPIO - Inserting Rotary Interrupt for Pins: {pinA}, {pinB}...")
+            self.rotaryInputs[pinA]     = (gpiozero.Button(pinA), gpiozero.Button(pinB))
+            self.rotaryStates[pinA]     = False
+            self.rotaryInterrupts[pinA] = handler
+        except Exception as e:
+            logging.error("GPIO Rotary Interrupt Insertion Failed: " + str(e))
+            pass
+
+    def InsertService(self, service):
+        self.services.append(service)
         
     def ScanInterrupts(self):
         try:
             while(self.online):
-                logging.debug("GPIO Scan Loop.")
-                for pin, input in self.inputs.items():
-                    logging.debug(f"GPIO - Pin {str(pin)} Reading: " + str(input.is_pressed))
-                    
-                    if(input.is_pressed and not self.inputStates[pin]): self.interrupts[pin]()
+                # Digital Inputs
+                for pin, input in self.digitalInputs.items():
+                    if(input.is_pressed and not self.digitalStates[pin]):
+                        logging.debug(f"GPIO - Pin {str(pin)} Interrupt Called.")
+                        self.interrupts[pin]()
 
-                    self.inputStates[pin] = input.is_pressed
+                    self.digitalStates[pin] = input.is_pressed
+
+                # Rotary Inputs
+                for pin, input in self.rotaryInputs.items():
+                    if(not self.rotaryStates[pin] and input[0].is_pressed): # Rising Edge
+                        if(input[1].is_pressed):
+                            # A is Rising and B is High (Forwards)
+                            self.rotaryInterrupts[pin](1)
+                        else:
+                            # A is Rising and B is Low (Backwards)
+                            self.rotaryInterrupts[pin](-1)
+
+                    self.rotaryStates[pin] = input[0].is_pressed
+
+                for service in self.services:
+                    service()
 
                 time.sleep(config.GPIO_TIME_PERIOD)
         except Exception as e:

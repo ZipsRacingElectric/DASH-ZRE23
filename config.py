@@ -31,6 +31,13 @@ TERMINAL_ID                      = "lxterminal"
 GPIO_TIME_PERIOD                 = 0.1
 
 GPIO_BUTTON_START                = 4
+GPIO_ROT_TORQUE_PIN_A            = 0
+GPIO_ROT_TORQUE_PIN_B            = 0
+GPIO_ROT_REGEN_PIN_A             = 0
+GPIO_ROT_REGEN_PIN_B             = 0
+
+GPIO_ROT_TORQUE_SENSITIVITY      = 5
+GPIO_ROT_REGEN_SENSITIVITY       = 2
 
 # CAN Interface ---------------------------------------------------------------------------------------------------------------
 CAN_CANLIB                       = "CANLIB"

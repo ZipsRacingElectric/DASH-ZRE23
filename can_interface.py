@@ -130,53 +130,66 @@ def HandleMessage(database, id, data):
     if(id == config.CAN_ID_INPUT_PEDALS):
         ClearTimeoutEcu(database)
         database.decode_message(id, data)
+        return
 
     if(id == config.CAN_ID_DATA_TEMP_1): 
         ClearTimeoutInverter(database)
         database.decode_message(id, data)
+        return
 
     if(id == config.CAN_ID_DATA_TEMP_2):
         ClearTimeoutInverter(database)
         database.decode_message(id, data)
+        return
 
     if(id == config.CAN_ID_DATA_TEMP_3):
         ClearTimeoutInverter(database)
         database.decode_message(id, data)
+        return
 
     if(id == config.CAN_ID_DATA_MOTOR):
         ClearTimeoutInverter(database)
         CalculateMotorStats(database)
         database.decode_message(id, data)
+        return
 
     if(id == config.CAN_ID_DATA_PEDALS):
         ClearTimeoutEcu(database)
         database.decode_message(id, data)
+        return
 
     if(id == config.CAN_ID_STATUS_ECU):
         ClearTimeoutEcu(database)
         database.decode_message(id, data)
+        return
 
     if(id == config.CAN_ID_STATUS_BMS):
         ClearTimeoutBms(database)
         database.decode_message(id, data)
+        return
     
     for index in range(config.CAN_ID_CELL_VOLTAGES_END - config.CAN_ID_CELL_VOLTAGES_START + 1):
         idIndex = config.CAN_ID_CELL_VOLTAGES_START + index
         if(id == idIndex):
             ClearTimeoutBms(database)
             database.decode_message(id, data)
+            return
     
     for index in range(config.CAN_ID_CELL_BALANCINGS_END - config.CAN_ID_CELL_BALANCINGS_START + 1):
         idIndex = config.CAN_ID_CELL_BALANCINGS_START + index
         if(id == idIndex):
             ClearTimeoutBms(database)
             database.decode_message(id, data)
+            return
 
     for index in range(config.CAN_ID_PACK_TEMPERATURES_END - config.CAN_ID_PACK_TEMPERATURES_START + 1):
         idIndex = config.CAN_ID_PACK_TEMPERATURES_START + index
         if(id == idIndex):
             ClearTimeoutBms(database)
             database.decode_message(id, data)
+            return
+
+    database.decode_message(id, data)
 
 # DEPRICATED ------------------------------------------------------------------------------------------------------------------
 
@@ -491,14 +504,14 @@ def SendCommandDriveStart(transmitter, commandEnterDrive):
     SendMessage(transmitter, config.CAN_ID_COMMAND_DRIVE_START, message)
 
 # Message 0x010
-def SendCommandDriveConfiguration(transmitter, torqueLimit, regenLimit, regenEnabled):
+def SendCommandDriveConfiguration(transmitter, database):
     message = [0,0,0,0,0,0,0,0]
 
-    message[0] = (int(torqueLimit * 10))      & 0xFF
-    message[1] = (int(torqueLimit * 10) >> 8) & 0xFF
-    message[2] = (int(regenLimit  * 10))      & 0xFF
-    message[3] = (int(regenLimit  * 10) >> 8) & 0xFF
-    message[4] = regenEnabled & 0b1
+    message[0] = (int(database["Torque_Limit"]        * 10))      & 0xFF
+    message[1] = (int(database["Torque_Limit"]        * 10) >> 8) & 0xFF
+    message[2] = (int(database["Torque_Limit_Regen"]  * 10))      & 0xFF
+    message[3] = (int(database["Torque_Limit_Regen"]  * 10) >> 8) & 0xFF
+    message[4] = database["State_Regen_Enabled"] & 0b1
 
     SendMessage(transmitter, config.CAN_ID_COMMAND_TORQUE_LIMIT, message)
 

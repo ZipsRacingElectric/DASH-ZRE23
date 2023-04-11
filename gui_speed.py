@@ -12,6 +12,7 @@ from lib_tkinter import Orientation
 # Includes --------------------------------------------------------------------------------------------------------------------
 import gui
 import config
+import gpio_interface
 
 import logging
 
@@ -133,30 +134,62 @@ class View(gui.View):
         self.SetDisplayState("Normal")
 
     def Update(self):
-        if(self.database["State_Ready_to_Drive"] == True): # and self.database["ECU_CAN_Active"]):
+        # Check for Errors
+        if(self.database["Error_BMS_Self_Test_Fault"] == 0):
+            self.SetDisplayState("Error_BMS_Self_Test_Fault")
+            
+        elif(self.database["Error_BMS_Sense_Line_Fault"] == 0):
+            self.SetDisplayState("Error_BMS_Sense_Line_Fault")
+            
+        elif(self.database["Error_BMS_Temperature_Fault"] == 0):
+            self.SetDisplayState("Error_BMS_Temperature_Fault")
+            
+        elif(self.database["Error_BMS_Voltage_Fault"] == 0):
+            self.SetDisplayState("Error_BMS_Voltage_Fault")
+            
+        elif(self.database["Plausibility_APPS_Calibration"] == 0):
+            self.SetDisplayState("Error_APPS_Calibration")
+            
+        elif(self.database["Plausibility_Brakes_Calibration"] == 0):
+            self.SetDisplayState("Error_Brakes_Calibration")
+            
+        elif(self.database["Plausibility_Pedals"] == 0):
+            self.SetDisplayState("Error_Plausibility_Pedals")
+            
+        elif(self.database["Plausibility_APPS_25_5"] == 0):
+            self.SetDisplayState("Error_APPS_25_5")
+        
+        #TODO: INSERT IMD Logic
+
+        # Determine Drive State
+        elif(self.database["State_Ready_to_Drive"] == True and self.database["ECU_CAN_Active"]):
             self.SetDisplayState("Normal")
-        elif(self.database["State_High_Voltage"] == True): # and self.database["ECU_CAN_Active"]):
+
+        elif(self.database["State_High_Voltage"] == True and self.database["ECU_CAN_Active"]):
             self.SetDisplayState("Startup_HV")
-        elif(self.database["State_High_Voltage"] == False): # and self.database["ECU_CAN_Active"]):
+
+        elif(self.database["State_High_Voltage"] == False and self.database["ECU_CAN_Active"]):
             self.SetDisplayState("Startup_LV")
+
         else:
             self.SetDisplayState("Startup_Invalid")
 
         self.brakeBar.Set  (self.database["Brake_1_Percent"])
         self.appsBar.Set   (self.database["APPS_1_Percent"])
         self.rpmBar.Set    (self.database["Motor_Speed"])
-        # self.torqueBar.Set (self.database[""])
-        # self.regenBar.Set  (self.database[""])
-        # self.speedStat.Set (self.database[""])
+        self.torqueBar.Set (self.database["Torque_Limit"])
+        self.regenBar.Set  (self.database["Torque_Limit_Regen"])
+        # self.speedStat.Set (self.database[""]) # TODO
         self.chargeStat.Set(self.database["State_of_Charge"])
-        # self.temp1Stat.Set (self.database[""])
-        # self.temp2Stat.Set (self.database[""])
-        # self.temp3Stat.Set (self.database[""])
+        # self.temp1Stat.Set (self.database[""]) # TODO
+        # self.temp2Stat.Set (self.database[""]) # TODO
+        # self.temp3Stat.Set (self.database[""]) # TODO
 
     def SetDisplayState(self, state):
         if(state == "Normal"):
             self.displayStartup.grid_forget()
             self.displayNormal.grid(column=0, row=0, sticky="NESW")
+            gpio_interface.SetRgb(config.GPIO_RGB_PIN_R, False, False, False, -1)
 
         elif(state == "Startup_LV"):
             self.displayNormal.grid_forget()
@@ -164,6 +197,7 @@ class View(gui.View):
             
             self.startupText["text"] = "Low Voltage Enabled"
             self.startupInstructions["text"] = "When ready, an ESO will\nenable tractive systems."
+            gpio_interface.SetRgb(config.GPIO_RGB_PIN_R, False, True, False, -1)
         
         elif(state == "Startup_HV"):
             self.displayNormal.grid_forget()
@@ -171,6 +205,7 @@ class View(gui.View):
 
             self.startupText["text"] = "Tractive Systems Enabled"
             self.startupInstructions["text"] = "To enter drive mode,\npress and hold the brake\nthen press the start button."
+            gpio_interface.SetRgb(config.GPIO_RGB_PIN_R, True, False, False, -1)
 
         elif(state == "Startup_Invalid"):
             self.displayNormal.grid_forget()
@@ -178,3 +213,68 @@ class View(gui.View):
 
             self.startupText["text"] = "ECU Communications Failed"
             self.startupInstructions["text"] = "If the ECU is online, the\nECU Status Message (0x703)\nhas not been recieved."
+            gpio_interface.SetRgb(config.GPIO_RGB_PIN_R, False, False, True, -1)
+
+        elif(state == "Error_APPS_25_5"):
+            self.displayNormal.grid_forget()
+            self.displayStartup.grid(column=0, row=0, sticky="NESW")
+
+            self.startupText["text"] = "APPS 25/5 Implausibility"
+            self.startupInstructions["text"] = "Release the throttle fully\nand continue driving!"
+            gpio_interface.SetRgb(config.GPIO_RGB_PIN_R, True, True, False, -1)
+
+        elif(state == "Error_Plausibility_Pedals"):
+            self.displayNormal.grid_forget()
+            self.displayStartup.grid(column=0, row=0, sticky="NESW")
+
+            self.startupText["text"] = "Pedal Value Implausibility"
+            self.startupInstructions["text"] = "Release both pedals fully.\nIf the error persists,\nrecalibrate the pedals."
+            gpio_interface.SetRgb(config.GPIO_RGB_PIN_R, True, True, False, -1)
+
+        elif(state == "Error_APPS_Calibration"):
+            self.displayNormal.grid_forget()
+            self.displayStartup.grid(column=0, row=0, sticky="NESW")
+
+            self.startupText["text"] = "APPS Calibration Implausibility"
+            self.startupInstructions["text"] = "Recalibrate the pedals.\nIf the error persists,\nmaintenance is required."
+            gpio_interface.SetRgb(config.GPIO_RGB_PIN_R, False, False, True, -1)
+
+        elif(state == "Error_Brakes_Calibration"):
+            self.displayNormal.grid_forget()
+            self.displayStartup.grid(column=0, row=0, sticky="NESW")
+
+            self.startupText["text"] = "Brake Calibration Implausibility"
+            self.startupInstructions["text"] = "Recalibrate the pedals.\nIf the error persists,\nmaintenance is required."
+            gpio_interface.SetRgb(config.GPIO_RGB_PIN_R, False, False, True, -1)
+
+        elif(state == "Error_BMS_Self_Test_Fault"):
+            self.displayNormal.grid_forget()
+            self.displayStartup.grid(column=0, row=0, sticky="NESW")
+
+            self.startupText["text"] = "WARNING: Accumulator Fault"
+            self.startupInstructions["text"] = "Exit the vehicle immediately."
+            gpio_interface.SetRgb(config.GPIO_RGB_PIN_R, True, False, False, 0.5)
+
+        elif(state == "Error_BMS_Sense_Line_Fault"):
+            self.displayNormal.grid_forget()
+            self.displayStartup.grid(column=0, row=0, sticky="NESW")
+
+            self.startupText["text"] = "WARNING: Accumulator Fault"
+            self.startupInstructions["text"] = "Exit the vehicle immediately."
+            gpio_interface.SetRgb(config.GPIO_RGB_PIN_R, True, False, False, 0.5)
+
+        elif(state == "Error_BMS_Temperature_Fault"):
+            self.displayNormal.grid_forget()
+            self.displayStartup.grid(column=0, row=0, sticky="NESW")
+
+            self.startupText["text"] = "WARNING: Accumulator Fault"
+            self.startupInstructions["text"] = "Exit the vehicle immediately."
+            gpio_interface.SetRgb(config.GPIO_RGB_PIN_R, True, False, False, 0.5)
+
+        elif(state == "Error_BMS_Voltage_Fault"):
+            self.displayNormal.grid_forget()
+            self.displayStartup.grid(column=0, row=0, sticky="NESW")
+
+            self.startupText["text"] = "WARNING: Accumulator Fault"
+            self.startupInstructions["text"] = "Exit the vehicle immediately."
+            gpio_interface.SetRgb(config.GPIO_RGB_PIN_R, True, False, False, 0.5)

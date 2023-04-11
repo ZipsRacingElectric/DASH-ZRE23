@@ -36,6 +36,10 @@ GPIO_ROT_TORQUE_PIN_B            = 0
 GPIO_ROT_REGEN_PIN_A             = 0
 GPIO_ROT_REGEN_PIN_B             = 0
 
+GPIO_RGB_PIN_R                   = 0
+GPIO_RGB_PIN_G                   = 0
+GPIO_RGB_PIN_B                   = 0
+
 GPIO_ROT_TORQUE_SENSITIVITY      = 5
 GPIO_ROT_REGEN_SENSITIVITY       = 2
 

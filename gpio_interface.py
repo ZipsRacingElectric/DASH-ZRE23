@@ -23,8 +23,12 @@ def Setup(db, canT):
     try:
         global database
         global can_transmitter
+        global interface
+
         database = db
         can_transmitter = canT
+
+        interface = None
 
         if(sys.platform == "win32"): return None
 
@@ -34,6 +38,8 @@ def Setup(db, canT):
         
         interface.InsertRotary(config.GPIO_ROT_TORQUE_PIN_A, config.GPIO_ROT_TORQUE_PIN_B, TorqueEncoderInterrupt)
         interface.InsertRotary(config.GPIO_ROT_REGEN_PIN_A,  config.GPIO_ROT_REGEN_PIN_B,  TorqueEncoderInterrupt)
+
+        interface.InsertRgb(config.GPIO_RGB_PIN_R, config.GPIO_RGB_PIN_G, config.GPIO_RGB_PIN_B)
 
         interface.InsertService(CanSendService)
 
@@ -57,6 +63,12 @@ def CanSendService():
     global can_transmitter
     can_interface.SendCommandDriveConfiguration(can_transmitter)
 
+def SetRgb(pinR, colorR, colorG, colorB, period):
+    global interface
+    if(interface == None): return
+
+    interface.SetRgb(pinR, colorR, colorG, colorB, period)
+
 # GUI Object ------------------------------------------------------------------------------------------------------------------
 class Main():
     def __init__(self):
@@ -64,11 +76,16 @@ class Main():
             logging.debug("GPIO - Initializing...")
         
             self.digitalInputs     = dict()
-            self.rotaryInputs      = dict()
             self.digitalStates     = dict()
-            self.rotaryStates      = dict()
             self.digitalInterrupts = dict()
+            self.rotaryInputs      = dict()
+            self.rotaryStates      = dict()
             self.rotaryInterrupts  = dict()
+            self.rgbOutputs        = dict()
+            self.rgbColors         = dict()
+            self.rgbTimers         = dict()
+            self.rgbPeriods        = dict()
+            self.rgbStates         = dict()
             self.services          = []
 
             self.online = True
@@ -101,9 +118,51 @@ class Main():
             logging.error("GPIO Rotary Interrupt Insertion Failed: " + str(e))
             pass
 
+    def InsertRgb(self, pinR, pinG, pinB):
+        try:
+            logging.debug(f"GPIO - Inserting RGB LED with pins {pinR} {pinG} {pinB}...")
+            self.rbgOutputs[pinR] = (gpiozero.LED(pinR), gpiozero.LED(pinG), gpiozero.LED(pinB))
+            self.rgbColors[pinR]  = (False,False,False)
+            self.rgbPeriods[pinR] = (-1, -1, -1)
+            self.rgbTimers[pinR]  = ( 0,  0,  0)
+            self.rgbStates[pinR]  = False
+        except Exception as e:
+            logging.error("GPIO RGB Insertion Failed: " + str(e))
+
     def InsertService(self, service):
         self.services.append(service)
         
+    def SetRgb(self, pin, colorR, colorG, colorB, period):
+        rgb = self.rgbOutputs[pin]
+
+        self.rgbColors[pin] = (colorR, colorG, colorB)
+
+        if(period <= 0):
+            period = -1
+            self.rgbStates[pin] = True
+            for i in range(3):
+                if(self.rgbColors[pin][i] == True):
+                    self.rgbOutputs[pin][i].on()
+                else:
+                    self.rgbOutputs[pin][i].off()
+
+        self.rgbPeriods[pin] = period
+
+    def ToggleRgb(self, pin):
+        if(self.rgbStates[pin] == True):
+            self.rgbStates[pin] = False
+
+            for i in range(3):
+                self.rgbOutputs[pin][i].off()
+        else:
+            self.rgbStates[pin] = True
+
+            for i in range(3):
+                if(self.rgbColors[pin][i] == True):
+                    self.rgbOutputs[pin][i].on()
+                else:
+                    self.rgbOutputs[pin][i].off()
+
     def ScanInterrupts(self):
         try:
             while(self.online):
@@ -126,6 +185,13 @@ class Main():
                             self.rotaryInterrupts[pin](-1)
 
                     self.rotaryStates[pin] = input[0].is_pressed
+
+                for pin, led in self.rgbOutputs.items():
+                    if(self.rgbTimers[pin] > self.rgbPeriods[pin]):
+                        self.ToggleRgb(pin)
+                        self.rgbTimers[pin] = 0
+                    else:
+                        self.rgbTimers[pin] += config.GPIO_TIME_PERIOD
 
                 for service in self.services:
                     service()

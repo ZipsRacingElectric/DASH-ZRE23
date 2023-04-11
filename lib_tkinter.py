@@ -760,7 +760,7 @@ class ScrollFrame(tkinter.Frame):
         if(self.orientation == Orientation.HORIZONTAL):
             offsetCurrent = event.y_root
 
-        sectionStep = 16
+        sectionStep = 4
         if(offsetCurrent > self.offsetPrime):
             event.delta = -sectionStep
         elif(offsetCurrent < self.offsetPrime):

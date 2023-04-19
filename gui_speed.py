@@ -179,11 +179,11 @@ class View(gui.View):
         self.rpmBar.Set    (self.database["Motor_Speed"])
         self.torqueBar.Set (self.database["Torque_Limit"])
         self.regenBar.Set  (self.database["Torque_Limit_Regen"])
-        # self.speedStat.Set (self.database[""]) # TODO
+        self.speedStat.Set (self.database["Motor_Speed_MPH"])
         self.chargeStat.Set(self.database["State_of_Charge"])
-        # self.temp1Stat.Set (self.database[""]) # TODO
-        # self.temp2Stat.Set (self.database[""]) # TODO
-        # self.temp3Stat.Set (self.database[""]) # TODO
+        self.temp1Stat.Set (self.database["Pack_Temperature_Max"])
+        self.temp2Stat.Set (self.database["Temperature_Inverter_Max"])
+        self.temp3Stat.Set (self.database["Temperature_Motor"])
 
     def SetDisplayState(self, state):
         if(state == "Normal"):

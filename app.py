@@ -36,7 +36,7 @@ if(__name__ == "__main__"):
         # Begin
         logging.debug("APP - Begining...")
         mainCan.Begin()                                            # Begin CAN
-        if(mainGpio != None): mainGpio.Begin()                     # Begin GPIO
+        # if(mainGpio != None): mainGpio.Begin()                     # Begin GPIO
         mainGui.Begin()                                            # Begin GUI
 
         # GUI Begin function will not return until app is closed.
@@ -44,7 +44,7 @@ if(__name__ == "__main__"):
         # Exit
         logging.debug("APP - Terminating...")
         mainCan.Kill()
-        if(mainGpio != None): mainGpio.Kill()
+        # if(mainGpio != None): mainGpio.Kill()
         logging.debug("APP - Terminated.")
         logging.shutdown()
         exit()

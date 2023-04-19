@@ -68,7 +68,7 @@ import gui_speed
 # import gui_endurance
 # import gui_testing
 import gui_database
-# import gui_bms
+import gui_bms
 import gui_calibration
 import gui_debug
 
@@ -94,7 +94,7 @@ def Setup(database, can):
     gui.AppendView(gui_speed.View      (gui, id="Speed",       style=dashStyle,  database=database))
     # gui.AppendView(gui_endurance.View  (gui, id="Endurance",   style=dashStyle,  database=database))
     # gui.AppendView(gui_testing.View    (gui, id="Testing",     style=dashStyle,  database=database))
-    # gui.AppendView(gui_bms.View        (gui, id="Bms",         style=dashStyle,  database=database))
+    gui.AppendView(gui_bms.View        (gui, id="Bms",         style=dashStyle,  database=database))
     gui.AppendView(gui_calibration.View(gui, id="Calibration", style=dashStyle,  databaseObj=database, canTransmitter=can))
     gui.AppendView(gui_database.View   (gui, id="Database",    style=dashStyle,  database=database))
     gui.AppendView(gui_debug.View      (gui, id="Debug",       style=debugStyle, database=database, can=can))

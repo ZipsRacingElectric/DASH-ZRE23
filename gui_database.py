@@ -60,6 +60,10 @@ class View(gui.View):
         
         row = 0
         for message in messages:
+            if("Cell_Voltages" in message.name): return
+            if("Cell_Balancings" in message.name): return
+            if("Pack_Temperatures" in message.name): return
+
             lib_tkinter.GetLabel(self.display, style=style, text=f"{message.name} ({hex(message.frame_id)}): ", column=0, row=row, sticky="W", styleOverrides=fontBoldOverride)
             row += 1
 

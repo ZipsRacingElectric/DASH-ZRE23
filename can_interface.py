@@ -387,74 +387,99 @@ def HandleMessage(database, id, data):
 
 # Data Extrapolation ----------------------------------------------------------------------------------------------------------
 def CalculateInverterStats(database):
-    database["Temperature_Inverter_Mean"] = None
-    database["Temperature_Inverter_Max"]  = None
+    try:
+        database["Temperature_Inverter_Mean"] = None
+        database["Temperature_Inverter_Max"]  = None
 
-    tempCount = 0
-    for i in range(5):
-        temp = None
-        if(i == 0):
-            temp = database["Temperature_Inverter_Module_A"]
-        elif(i == 1):
-            temp = database["Temperature_Inverter_Module_B"]
-        elif(i == 2):
-            temp = database["Temperature_Inverter_Module_C"]
-        elif(i == 3):
-            temp = database["Temperature_Inverter_CB"]
-        elif(i == 4):
-            temp = database["Temperature_Inverter_GDB"]
+        tempCount = 0
+        for i in range(5):
+            temp = None
+            if(i == 0):
+                temp = database["Temperature_Inverter_Module_A"]
+            elif(i == 1):
+                temp = database["Temperature_Inverter_Module_B"]
+            elif(i == 2):
+                temp = database["Temperature_Inverter_Module_C"]
+            elif(i == 3):
+                temp = database["Temperature_Inverter_CB"]
+            elif(i == 4):
+                temp = database["Temperature_Inverter_GDB"]
 
-        if(temp == None): continue
-        if(database["Temperature_Inverter_Max"]  == None): database["Temperature_Inverter_Max"]  = temp
-        if(database["Temperature_Inverter_Mean"] == None): database["Temperature_Inverter_Mean"] = 0
-        database["Temperature_Inverter_Mean"] += temp
-        tempCount += 1
+            if(temp == None): continue
+            if(database["Temperature_Inverter_Max"]  == None): database["Temperature_Inverter_Max"]  = temp
+            if(database["Temperature_Inverter_Mean"] == None): database["Temperature_Inverter_Mean"] = 0
+            database["Temperature_Inverter_Mean"] += temp
+            tempCount += 1
 
-    if(tempCount != 0): database["Temperature_Inverter_Mean"] /= tempCount
+        if(tempCount != 0): database["Temperature_Inverter_Mean"] /= tempCount
+    except Exception as e:
+        logging.error("Failed to Calculate Inverter Stats: " + str(e))
 
 def CalculateMotorStats(database):
-    database["Motor_Speed_MPH"] = int(abs(RpmToMph(database["Motor_Speed"])))
+    try:
+        database["Motor_Speed_MPH"] = None
+        if(database["Motor_Speed"] != None): database["Motor_Speed_MPH"] = int(abs(RpmToMph(database["Motor_Speed"])))
+    except Exception as e:
+        logging.error("Failed to Calculate Motor Stats: " + str(e))
 
 def CalculateBmsStats(database):
-    # Voltages
-    database.packVoltage    = None
-    database.cellVoltageMin = None
-    database.cellVoltageMax = None
-    for voltage in database.cellVoltages:
-        if(voltage == None): continue
-        if(database.packVoltage == None): database.packVoltage = 0
-        database.packVoltage += voltage
-        if(database.cellVoltageMin == None or voltage < database.cellVoltageMin):
-            database.cellVoltageMin = voltage
-        if(database.cellVoltageMax == None or voltage > database.cellVoltageMax):
-            database.cellVoltageMax = voltage
-    
-    # Deltas
-    database.cellDeltaMax  = None
-    database.cellDeltaMean = None
-    deltaCount = 0
-    for voltage in database.cellVoltages:
-        if(voltage == None): continue
-        delta = voltage - database.cellVoltageMin
-        if(database.cellDeltaMean == None): database.cellDeltaMean = 0
-        if(database.cellDeltaMax == None or voltage > database.cellDeltaMax):
-            database.cellDeltaMax = delta
-        database.cellDeltaMean += delta
-        deltaCount += 1
-    if(deltaCount != 0): database.cellDeltaMean /= deltaCount
+    try:
+        # Voltages
+        database["Pack_Voltage"]    = None
+        database["Cell_Voltage_Min"] = None
+        database["Cell_Voltage_Max"] = None
 
-    # Temperatures
-    database.packTemperatureMax  = None
-    database.packTemperatureMean = None
-    tempCount = 0
-    for temperature in database.packTemperatures:
-        if(temperature == None): continue
-        if(database.packTemperatureMean == None): database.packTemperatureMean = 0
-        if(database.packTemperatureMax == None or temperature > database.packTemperatureMax):
-            database.packTemperatureMax = temperature
-        database.packTemperatureMean += temperature
-        tempCount += 1
-    if(tempCount != 0): database.packTemperatureMean /= tempCount
+        for index in range(90):
+            strIndex = str(index).zfill(2)
+            voltage = database[f"Voltage_Cell_{strIndex}"]
+
+            if(voltage == None): continue
+
+            if(database["Pack_Voltage"] == None): database["Pack_Voltage"] = 0
+            
+            database["Pack_Voltage"] += voltage
+            
+            if(database["Cell_Voltage_Min"] == None or voltage < database["Cell_Voltage_Min"]):
+                database["Cell_Voltage_Min"] = voltage
+            if(database["Cell_Voltage_Max"] == None or voltage > database["Cell_Voltage_Max"]):
+                database["Cell_Voltage_Max"] = voltage
+        
+        # Deltas
+        database["Cell_Delta_Max"]  = None
+        database["Cell_Delta_Mean"] = None
+        deltaCount = 0
+        for index in range(90):
+            strIndex = str(index).zfill(2)
+            voltage = database[f"Voltage_Cell_{strIndex}"]
+
+            if(voltage == None): continue
+
+            delta = voltage - database["Cell_Voltage_Min"]
+            if(database["Cell_Delta_Mean"] == None): database["Cell_Delta_Mean"] = 0
+            if(database["Cell_Delta_Max"]  == None or voltage > database["Cell_Delta_Max"]):
+                database["Cell_Delta_Max"] = delta
+            database["Cell_Delta_Mean"] += delta
+            deltaCount += 1
+        if(deltaCount != 0): database["Cell_Delta_Mean"] /= deltaCount
+
+        # Temperatures
+        database["Pack_Temperature_Max"]  = None
+        database["Pack_Temperature_Mean"] = None
+        tempCount = 0
+        for index in range(45):
+            strIndex = str(index).zfill(2)
+            temperature = database[f"Temperature_Sensor_{strIndex}"]
+
+            if(temperature == None): continue
+            
+            if(database["Pack_Temperature_Mean"] == None): database["Pack_Temperature_Mean"] = 0
+            if(database["Pack_Temperature_Max"]  == None or temperature > database["Pack_Temperature_Max"]):
+                database["Pack_Temperature_Max"] = temperature
+            database["Pack_Temperature_Mean"] += temperature
+            tempCount += 1
+        if(tempCount != 0): database["Pack_Temperature_Mean"] /= tempCount
+    except Exception as e:
+        logging.error("Failed to Calculate BMS Stats: " + str(e))
 
 # Message Timeouts ------------------------------------------------------------------------------------------------------------
 def SetTimeouts(database):

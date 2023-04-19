@@ -30,15 +30,18 @@ TERMINAL_ID                      = "lxterminal"
 # GPIO ------------------------------------------------------------------------------------------------------------------------
 GPIO_TIME_PERIOD                 = 0.1
 
-GPIO_BUTTON_START                = 4
-GPIO_ROT_TORQUE_PIN_A            = 0
-GPIO_ROT_TORQUE_PIN_B            = 0
-GPIO_ROT_REGEN_PIN_A             = 0
-GPIO_ROT_REGEN_PIN_B             = 0
+GPIO_BUTTON_WHEEL_L              = 3
+GPIO_BUTTON_WHEEL_R              = 2
+GPIO_BUTTON_DASH_L               = 27
 
-GPIO_RGB_PIN_R                   = 0
-GPIO_RGB_PIN_G                   = 0
-GPIO_RGB_PIN_B                   = 0
+GPIO_ROT_TORQUE_PIN_A            = 17
+GPIO_ROT_TORQUE_PIN_B            = 18
+GPIO_ROT_REGEN_PIN_A             = 22
+GPIO_ROT_REGEN_PIN_B             = 23
+
+GPIO_RGB_PIN_R                   = 24
+GPIO_RGB_PIN_G                   = 10
+GPIO_RGB_PIN_B                   = 15
 
 GPIO_ROT_TORQUE_SENSITIVITY      = 5
 GPIO_ROT_REGEN_SENSITIVITY       = 2
@@ -54,6 +57,7 @@ CAN_LIBRARY_TYPE                 = CAN_INNOMAKER
 CAN_BITRATE                      = 1000000                     # CAN Bitrate of 1 Megabit per Second
 
 CAN_DATABASE_PATH                = "database/Main_2023.dbc"
+CAN_BMS_DATABASE_PATH            = "database/BMS_2023.dbc"
 
 CAN_ID_COMMAND_DRIVE_START       = 0x004                       # ID of Command_Drive_Start
 CAN_ID_INPUT_PEDALS              = 0x005                       # ID of Input_Pedals

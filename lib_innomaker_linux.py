@@ -36,11 +36,14 @@ class Main(CanInterface):
         CloseChannel(id)
 
     def Scan(self, index):
-        while(self.online):
-            message = self.channels[index].recv(10.0)
-            if(message != None):
-                self.Receive(message.arbitration_id, message.data)
-        self.CloseChannel(index)
+        try:
+            while(self.online):
+                message = self.channels[index].recv(10.0)
+                if(message != None):
+                    self.Receive(message.arbitration_id, message.data)
+            self.CloseChannel(index)
+        except Exception as e:
+            logging.error("Innomaker CAN Scanning Failure. " + str(e))
 
     def Transmit(self, id, data, channel):
         if(channel < 0 or channel > len(self.channels)-1): return

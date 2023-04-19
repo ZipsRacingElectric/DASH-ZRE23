@@ -30,11 +30,14 @@ def Setup(db, canT):
 
         interface = None
 
+        # TODO TEMPORARY
+        return
+
         if(sys.platform == "win32"): return None
 
         interface = Main()
 
-        interface.InsertDigital(config.GPIO_BUTTON_START, lambda: StartButtonPress(can_transmitter))
+        # interface.InsertDigital(config.GPIO_BUTTON_START, lambda: StartButtonPress(can_transmitter))
         
         interface.InsertRotary(config.GPIO_ROT_TORQUE_PIN_A, config.GPIO_ROT_TORQUE_PIN_B, TorqueEncoderInterrupt)
         interface.InsertRotary(config.GPIO_ROT_REGEN_PIN_A,  config.GPIO_ROT_REGEN_PIN_B,  TorqueEncoderInterrupt)
@@ -67,7 +70,7 @@ def SetRgb(pinR, colorR, colorG, colorB, period):
     global interface
     if(interface == None): return
 
-    interface.SetRgb(pinR, colorR, colorG, colorB, period)
+    # interface.SetRgb(pinR, colorR, colorG, colorB, period)
 
 # GUI Object ------------------------------------------------------------------------------------------------------------------
 class Main():

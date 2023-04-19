@@ -20,11 +20,17 @@ class InputTypes(Enum):                              # Input Type Enumerable
 def Setup():
     try:
         parentPath = os.path.dirname(__file__)
-        databasePath = os.path.join(parentPath, config.CAN_DATABASE_PATH)
+        databasePath    = os.path.join(parentPath, config.CAN_DATABASE_PATH)
+        databaseBmsPath = os.path.join(parentPath, config.CAN_BMS_DATABASE_PATH)
 
         db = Database(databasePath)
+        db.add_dbc_file(databaseBmsPath)
+
+        db.populateDictionary()
 
         can_interface.CalculateInverterStats(db)
+        can_interface.CalculateBmsStats(db)
+        can_interface.CalculateMotorStats(db)
 
         return db
     except Exception as e:
@@ -39,6 +45,7 @@ class Database(dict):
 
         self.db = cantools.db.load_file(path)
 
+    def populateDictionary(self):
         messages = self.db.messages
         for message in messages:
             signals = message.signals
@@ -46,10 +53,19 @@ class Database(dict):
                 self[signal.name] = None
 
     def decode_message(self, id, data):
-        messageData = self.db.decode_message(id, data)
+        try:
+            messageData = self.db.decode_message(id, data)
         
-        for signal in messageData:
-            self[signal] = messageData[signal]
+            for signal in messageData:
+                self[signal] = messageData[signal]
+        except Exception as e:
+            logging.error("Database Message Decoding Error. " + str(e))
+
+    def add_dbc_file(self, filepath):
+        try:
+            self.db.add_dbc_file(filepath)
+        except Exception as e:
+            logging.error("Database Appending Error. " + str(e))
 
 # # Database --------------------------------------------------------------------------------------------------------------------
 # # Author: Cole Barach

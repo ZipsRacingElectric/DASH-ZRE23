@@ -392,7 +392,7 @@ def CalculateInverterStats(database):
         database["Temperature_Inverter_Max"]  = None
 
         tempCount = 0
-        for i in range(5):
+        for i in range(4):
             temp = None
             if(i == 0):
                 temp = database["Temperature_Inverter_Module_A"]
@@ -401,8 +401,6 @@ def CalculateInverterStats(database):
             elif(i == 2):
                 temp = database["Temperature_Inverter_Module_C"]
             elif(i == 3):
-                temp = database["Temperature_Inverter_CB"]
-            elif(i == 4):
                 temp = database["Temperature_Inverter_GDB"]
 
             if(temp == None): continue

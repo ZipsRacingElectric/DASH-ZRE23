@@ -53,7 +53,7 @@
         <INT Name="Width">340</INT>
         <INT Name="Height">650</INT>
         <INT Name="State">0</INT>
-        <INT Name="Visible">1</INT>
+        <INT Name="Visible">0</INT>
         <STR Name="Caption">CAN 1</STR>
         <INT Name="PixelsPerInch">96</INT>
         <INT Name="BitR">1000000</INT>
@@ -171,12 +171,12 @@
       </DIR>
       <DIR Name="2">
         <STR Name="Class">TOutputWindow</STR>
-        <INT Name="Left">378</INT>
-        <INT Name="Top">21</INT>
+        <INT Name="Left">361</INT>
+        <INT Name="Top">15</INT>
         <INT Name="Width">1157</INT>
         <INT Name="Height">823</INT>
         <INT Name="State">0</INT>
-        <INT Name="Visible">1</INT>
+        <INT Name="Visible">0</INT>
         <STR Name="Caption">Output Window</STR>
         <INT Name="PixelsPerInch">96</INT>
         <INT Name="AutoScroll">1</INT>
@@ -237,7 +237,7 @@
         <STR Name="FileName"></STR>
         <INT Name="AutoStart">1</INT>
       </DIR>
-      <STR Name="ReverseZOrder">0,2</STR>
+      <STR Name="ReverseZOrder"></STR>
     </DIR>
     <DIR Name="Connections">
       <STR Name="C0">0,1,0,0</STR>

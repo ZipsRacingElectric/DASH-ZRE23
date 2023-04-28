@@ -54,8 +54,8 @@ BO_ 4 Command_Drive_Start: 8 Dashboard
 
 BO_ 16 Command_Drive_Configuration: 8 Dashboard
  SG_ State_Regen_Enabled : 32|1@1+ (1,0) [0|1] "Boolean"  ECU
- SG_ Torque_Limit_Regen : 16|16@1+ (0.1,0) [0|6553.5] "Newton Meters"  ECU
- SG_ Torque_Limit : 0|16@1+ (0.1,0) [0|6553.5] "Newton Meters"  ECU
+ SG_ Torque_Config_Limit_Regen : 16|16@1+ (0.1,0) [0|6553.5] "Newton Meters"  ECU
+ SG_ Torque_Config_Limit : 0|16@1+ (0.1,0) [0|6553.5] "Newton Meters"  ECU
 
 BO_ 1332 Calibrate_Brake_Range: 8 Dashboard
  SG_ Brake_2_Real_Min : 32|10@1+ (1,0) [0|1023] ""  ECU
@@ -94,6 +94,7 @@ BO_ 171 Error_Inverter_Fault: 8 Inverter
  SG_ Error_Inverter_POST_Fault : 0|32@1+ (1,0) [0|4294967295] "Word"  ECU
 
 BO_ 1795 Status_ECU: 8 ECU
+ SG_ Error_BSPD_Fault : 19|1@1+ (1,0) [0|1] "Boolean" Vector__XXX
  SG_ Resistance_IMD : 32|8@1+ (10000,0) [0|2550000] "Ohms" Vector__XXX
  SG_ Voltage_LV_Battery : 24|8@1+ (0.0625,0) [0|15.9375] "Volts" Vector__XXX
  SG_ Error_IMD_Fault : 18|1@1+ (1,0) [0|1] "Boolean" Vector__XXX

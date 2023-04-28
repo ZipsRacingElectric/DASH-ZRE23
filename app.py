@@ -44,7 +44,7 @@ if(__name__ == "__main__"):
         # Exit
         logging.debug("APP - Terminating...")
         mainCan.Kill()
-        # if(mainGpio != None): mainGpio.Kill()
+        if(mainGpio != None): mainGpio.Kill()
         logging.debug("APP - Terminated.")
         logging.shutdown()
         exit()

@@ -54,7 +54,7 @@ def StartButtonPress(can_transceiver):
 def TorqueEncoderInterrupt(direction):
     global database
     global can_transmitter
-    # logging.debug("GPIO: Torque Rotary Event " + str(direction))
+    logging.debug("GPIO: Torque Rotary Event " + str(direction))
     database["Torque_Config_Limit"] += direction * config.GPIO_ROT_TORQUE_SENSITIVITY
 
 def RegenEncoderInterrupt(direction):
@@ -78,10 +78,7 @@ class Main():
             logging.debug("GPIO - Initializing...")
         
             self.digitalInputs     = dict()
-            self.digitalStates     = dict()
-            self.digitalInterrupts = dict()
             self.rotaryInputs      = dict()
-            self.rotaryStates      = dict()
             self.rotaryInterrupts  = dict()
             self.rgbOutputs        = dict()
             self.rgbColors         = dict()
@@ -103,9 +100,8 @@ class Main():
     def InsertDigital(self, pin, handler):
         try:
             logging.debug(f"GPIO - Inserting Digital Interrupt for Pin: {pin}...")
-            self.digitalInputs[pin]     = gpiozero.Button(pin)
-            self.digitalStates[pin]     = False
-            self.digitalInterrupts[pin] = handler
+            self.digitalInputs[pin] = gpiozero.Button(pin)
+            self.digitalInputs[pin].when_pressed = handler
         except Exception as e:
             logging.error("GPIO Digital Interrupt Insertion Failed: " + str(e))
             pass
@@ -113,8 +109,8 @@ class Main():
     def InsertRotary(self, pinA, pinB, handler):
         try:
             logging.debug(f"GPIO - Inserting Rotary Interrupt for Pins: {pinA}, {pinB}...")
-            self.rotaryInputs[pinA]     = (gpiozero.Button(pinA), gpiozero.Button(pinB))
-            self.rotaryStates[pinA]     = False
+            self.rotaryInputs[pinA] = (gpiozero.Button(pinA), gpiozero.Button(pinB))
+            self.rotaryInputs[pinA][0].when_pressed = lambda x = pinA: self.RotaryInterrupt(x)
             self.rotaryInterrupts[pinA] = handler
         except Exception as e:
             logging.error("GPIO Rotary Interrupt Insertion Failed: " + str(e))
@@ -134,6 +130,14 @@ class Main():
     def InsertService(self, service):
         self.services.append(service)
         
+    def RotaryInterrupt(self, pinA):
+        if(self.rotaryInputs[pinA][0] == True):
+            # A is Rising while B is High (Forwards)
+            self.rotaryInterrupts[pinA](1)
+        if(self.rotaryInputs[pinA][0] == False):
+            # A is Rising while B is Low (Backwards)
+            self.rotaryInterrupts[pinA](-1)
+
     def SetRgb(self, pin, colorR, colorG, colorB, period):
         rgb = self.rgbOutputs[pin]
 
@@ -168,26 +172,7 @@ class Main():
     def ScanInterrupts(self):
         try:
             while(self.online):
-                # Digital Inputs
-                for pin, input in self.digitalInputs.items():
-                    if(input.is_pressed and not self.digitalStates[pin]):
-                        logging.debug(f"GPIO - Pin {str(pin)} Interrupt Called.")
-                        self.interrupts[pin]()
-
-                    self.digitalStates[pin] = input.is_pressed
-
-                # Rotary Inputs
-                for pin, input in self.rotaryInputs.items():
-                    if(not self.rotaryStates[pin] and input[0].is_pressed): # Rising Edge
-                        if(input[1].is_pressed):
-                            # A is Rising and B is High (Forwards)
-                            self.rotaryInterrupts[pin](1)
-                        else:
-                            # A is Rising and B is Low (Backwards)
-                            self.rotaryInterrupts[pin](-1)
-
-                    self.rotaryStates[pin] = input[0].is_pressed
-
+                # LED Outputs
                 for pin, led in self.rgbOutputs.items():
                     if(self.rgbTimers[pin] > self.rgbPeriods[pin]):
                         self.ToggleRgb(pin)

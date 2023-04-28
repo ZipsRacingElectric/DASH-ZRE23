@@ -32,7 +32,7 @@ GPIO_TIME_PERIOD                 = 0.1
 
 GPIO_BUTTON_WHEEL_L              = 3
 GPIO_BUTTON_WHEEL_R              = 2
-GPIO_BUTTON_DASH_L               = 27
+GPIO_BUTTON_REGEN                = 27
 
 GPIO_ROT_TORQUE_PIN_A            = 17
 GPIO_ROT_TORQUE_PIN_B            = 18

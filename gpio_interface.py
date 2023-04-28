@@ -34,11 +34,14 @@ def Setup(db, canT):
 
         interface = Main()
 
-        database["Torque_Config_Limit"] = 0
+        database["Torque_Config_Limit"] = config.TORQUE_LIMIT / 10
         database["Torque_Config_Limit_Regen"] = 0
         database["State_Regen_Config_Enabled"] = False
 
-        # interface.InsertDigital(config.GPIO_BUTTON_START, lambda: StartButtonPress(can_transmitter))
+        # interface.InsertDigital(config.GPIO_BUTTON_START, StartButtonPress)
+        interface.InsertDigital(config.GPIO_BUTTON_REGEN, RegenButtonPress)
+        interface.InsertDigital(config.GPIO_BUTTON_WHEEL_L, LeftButtonPress)
+        interface.InsertDigital(config.GPIO_BUTTON_WHEEL_R, RightButtonPress)
         
         interface.InsertRotary(config.GPIO_ROT_TORQUE_PIN_A, config.GPIO_ROT_TORQUE_PIN_B, TorqueEncoderInterrupt)
         interface.InsertRotary(config.GPIO_ROT_REGEN_PIN_A,  config.GPIO_ROT_REGEN_PIN_B,  RegenEncoderInterrupt)
@@ -52,8 +55,22 @@ def Setup(db, canT):
         logging.error("GPIO Setup failure: " + str(e))
         raise
 
-def StartButtonPress(can_transceiver):
-    can_interface.SendCommandDriveStart(can_transceiver, True)
+def StartButtonPress():
+    global can_transmitter
+    can_interface.SendCommandDriveStart(can_transmitter, True)
+
+def RegenButtonPress():
+    global database
+    database["State_Regen_Config_Enabled"] = not database["State_Regen_Config_Enabled"]
+
+    global can_transmitter
+    can_interface.SendCommandDriveConfiguration(can_transmitter, database)
+
+def LeftButtonPress():
+    pass
+
+def RightButtonPress():
+    pass
 
 def TorqueEncoderInterrupt(direction):
     global database

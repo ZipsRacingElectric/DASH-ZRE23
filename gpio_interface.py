@@ -133,10 +133,10 @@ class Main():
         
     def RotaryInterrupt(self, pinA):
         try:
-            if(self.rotaryInputs[pinA][0].on() == True):
+            if(self.rotaryInputs[pinA][0].value == 1):
                 # A is Rising while B is High (Forwards)
                 self.rotaryInterrupts[pinA](1)
-            if(self.rotaryInputs[pinA][0].on() == False):
+            if(self.rotaryInputs[pinA][0].value == 0):
                 # A is Rising while B is Low (Backwards)
                 self.rotaryInterrupts[pinA](-1)
         except Exception as e:

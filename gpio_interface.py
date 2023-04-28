@@ -36,7 +36,7 @@ def Setup(db, canT):
 
         database["Torque_Config_Limit"] = 0
         database["Torque_Config_Limit_Regen"] = 0
-        database["State_Regen_Enabled"] = False
+        database["State_Regen_Config_Enabled"] = False
 
         # interface.InsertDigital(config.GPIO_BUTTON_START, lambda: StartButtonPress(can_transmitter))
         

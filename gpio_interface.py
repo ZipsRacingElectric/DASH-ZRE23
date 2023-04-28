@@ -34,6 +34,9 @@ def Setup(db, canT):
 
         interface = Main()
 
+        database["Torque_Config_Limit"] = 0
+        database["Torque_Config_Limit_Regen"] = 0
+
         # interface.InsertDigital(config.GPIO_BUTTON_START, lambda: StartButtonPress(can_transmitter))
         
         interface.InsertRotary(config.GPIO_ROT_TORQUE_PIN_A, config.GPIO_ROT_TORQUE_PIN_B, TorqueEncoderInterrupt)
@@ -133,10 +136,10 @@ class Main():
         
     def RotaryInterrupt(self, pinA):
         try:
-            if(self.rotaryInputs[pinA][0].value == 1):
+            if(self.rotaryInputs[pinA][1].value == 1):
                 # A is Rising while B is High (Forwards)
                 self.rotaryInterrupts[pinA](1)
-            if(self.rotaryInputs[pinA][0].value == 0):
+            if(self.rotaryInputs[pinA][1].value == 0):
                 # A is Rising while B is Low (Backwards)
                 self.rotaryInterrupts[pinA](-1)
         except Exception as e:

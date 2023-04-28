@@ -62,8 +62,9 @@ def RegenEncoderInterrupt(direction):
     database["Torque_Config_Limit_Regen"] += direction * config.GPIO_ROT_REGEN_SENSITIVITY
 
 def CanSendService():
+    global database
     global can_transmitter
-    can_interface.SendCommandDriveConfiguration(can_transmitter)
+    can_interface.SendCommandDriveConfiguration(can_transmitter, database)
 
 def SetRgb(pinR, colorR, colorG, colorB, period):
     global interface
@@ -131,12 +132,15 @@ class Main():
         self.services.append(service)
         
     def RotaryInterrupt(self, pinA):
-        if(self.rotaryInputs[pinA][0] == True):
-            # A is Rising while B is High (Forwards)
-            self.rotaryInterrupts[pinA](1)
-        if(self.rotaryInputs[pinA][0] == False):
-            # A is Rising while B is Low (Backwards)
-            self.rotaryInterrupts[pinA](-1)
+        try:
+            if(self.rotaryInputs[pinA][0].on == True):
+                # A is Rising while B is High (Forwards)
+                self.rotaryInterrupts[pinA](1)
+            if(self.rotaryInputs[pinA][0].on == False):
+                # A is Rising while B is Low (Backwards)
+                self.rotaryInterrupts[pinA](-1)
+        except Exception as e:
+            logging.error("Rotary Interrupt Scan Error: " + str(e))
 
     def SetRgb(self, pin, colorR, colorG, colorB, period):
         rgb = self.rgbOutputs[pin]

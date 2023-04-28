@@ -53,7 +53,7 @@ BO_ 4 Command_Drive_Start: 8 Dashboard
  SG_ Command_Enter_Drive : 0|1@1+ (1,0) [0|1] "Boolean"  ECU
 
 BO_ 16 Command_Drive_Configuration: 8 Dashboard
- SG_ State_Regen_Enabled : 32|1@1+ (1,0) [0|1] "Boolean"  ECU
+ SG_ State_Regen_Config_Enabled : 32|1@1+ (1,0) [0|1] "Boolean"  ECU
  SG_ Torque_Config_Limit_Regen : 16|16@1+ (0.1,0) [0|6553.5] "Newton Meters"  ECU
  SG_ Torque_Config_Limit : 0|16@1+ (0.1,0) [0|6553.5] "Newton Meters"  ECU
 
@@ -187,7 +187,7 @@ CM_ BU_ ECU "Vehicle ECU";
 CM_ BO_ 4 "Command to Enter Drive Mode";
 CM_ SG_ 4 Command_Enter_Drive "Drive Mode Enable Bit";
 CM_ BO_ 16 "Dashboard Torque Settings";
-CM_ SG_ 16 State_Regen_Enabled "Regen Enable/Disable Bit";
+CM_ SG_ 16 State_Regen_Config_Enabled "Regen Enable/Disable Bit";
 CM_ BO_ 1332 "Command to Update ECU Brake Ranges";
 CM_ SG_ 1332 Brake_2_Real_Min "Brake-2 Calibration Min";
 CM_ SG_ 1332 Brake_2_Real_Max "Brake-2 Calibration Max";

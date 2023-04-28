@@ -53,8 +53,10 @@ def StartButtonPress(can_transceiver):
 
 def TorqueEncoderInterrupt(direction):
     global database
+    global can_transmitter
     # logging.debug("GPIO: Torque Rotary Event " + str(direction))
     database["Torque_Limit"] += direction * config.GPIO_ROT_TORQUE_SENSITIVITY
+    can_interface.SendCommandDriveConfiguration(can_transmitter)
 
 def RegenEncoderInterrupt(direction):
     global database

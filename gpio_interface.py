@@ -30,9 +30,6 @@ def Setup(db, canT):
 
         interface = None
 
-        # TODO TEMPORARY
-        return
-
         if(sys.platform == "win32"): return None
 
         interface = Main()
@@ -40,11 +37,11 @@ def Setup(db, canT):
         # interface.InsertDigital(config.GPIO_BUTTON_START, lambda: StartButtonPress(can_transmitter))
         
         interface.InsertRotary(config.GPIO_ROT_TORQUE_PIN_A, config.GPIO_ROT_TORQUE_PIN_B, TorqueEncoderInterrupt)
-        interface.InsertRotary(config.GPIO_ROT_REGEN_PIN_A,  config.GPIO_ROT_REGEN_PIN_B,  TorqueEncoderInterrupt)
+        # interface.InsertRotary(config.GPIO_ROT_REGEN_PIN_A,  config.GPIO_ROT_REGEN_PIN_B,  RegenEncoderInterrupt)
 
-        interface.InsertRgb(config.GPIO_RGB_PIN_R, config.GPIO_RGB_PIN_G, config.GPIO_RGB_PIN_B)
+        # interface.InsertRgb(config.GPIO_RGB_PIN_R, config.GPIO_RGB_PIN_G, config.GPIO_RGB_PIN_B)
 
-        interface.InsertService(CanSendService)
+        # interface.InsertService(CanSendService)
 
         return interface
     except Exception as e:
@@ -55,8 +52,9 @@ def StartButtonPress(can_transceiver):
     can_interface.SendCommandDriveStart(can_transceiver, True)
 
 def TorqueEncoderInterrupt(direction):
-    global database
-    database["Torque_Limit"] += direction * config.GPIO_ROT_TORQUE_SENSITIVITY
+    # global database
+    logging.debug("GPIO: Torque Rotary Event " + str(direction))
+    # database["Torque_Limit"] += direction * config.GPIO_ROT_TORQUE_SENSITIVITY
 
 def RegenEncoderInterrupt(direction):
     global database

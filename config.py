@@ -44,7 +44,7 @@ GPIO_RGB_PIN_G                   = 10
 GPIO_RGB_PIN_B                   = 15
 
 GPIO_ROT_TORQUE_SENSITIVITY      = 5
-GPIO_ROT_REGEN_SENSITIVITY       = 2
+GPIO_ROT_REGEN_SENSITIVITY       = 1
 
 # CAN Interface ---------------------------------------------------------------------------------------------------------------
 CAN_CANLIB                       = "CANLIB"
@@ -103,6 +103,9 @@ PACK_CURRENT_LO_SCALE            = 0.01                        # Pack Current Lo
 LOG_FILE                         = "stdout.log"
 
 # Mechanical Data - 2022 ------------------------------------------------------------------------------------------------------
+TORQUE_LIMIT                     = 230
+REGEN_LIMIT                      = 30
+
 RADIANS_PER_ROTATION             = 6.283185307                 # Number of Radians per Rotation (2 * PI)
 TIRE_RADIUS_INCHES               = 9                           # Radius of the Vehicle Rear Tire
 SPROCKET_TEETH_COUNT             = 40                          # Number of Teeth on Axle Sprocket

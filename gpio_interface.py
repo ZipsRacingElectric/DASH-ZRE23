@@ -36,11 +36,12 @@ def Setup(db, canT):
 
         database["Torque_Config_Limit"] = 0
         database["Torque_Config_Limit_Regen"] = 0
+        database["State_Regen_Enabled"] = False
 
         # interface.InsertDigital(config.GPIO_BUTTON_START, lambda: StartButtonPress(can_transmitter))
         
         interface.InsertRotary(config.GPIO_ROT_TORQUE_PIN_A, config.GPIO_ROT_TORQUE_PIN_B, TorqueEncoderInterrupt)
-        # interface.InsertRotary(config.GPIO_ROT_REGEN_PIN_A,  config.GPIO_ROT_REGEN_PIN_B,  RegenEncoderInterrupt)
+        interface.InsertRotary(config.GPIO_ROT_REGEN_PIN_A,  config.GPIO_ROT_REGEN_PIN_B,  RegenEncoderInterrupt)
 
         # interface.InsertRgb(config.GPIO_RGB_PIN_R, config.GPIO_RGB_PIN_G, config.GPIO_RGB_PIN_B)
 
@@ -56,13 +57,17 @@ def StartButtonPress(can_transceiver):
 
 def TorqueEncoderInterrupt(direction):
     global database
-    global can_transmitter
-    logging.debug("GPIO: Torque Rotary Event " + str(direction))
     database["Torque_Config_Limit"] += direction * config.GPIO_ROT_TORQUE_SENSITIVITY
+
+    if(database["Torque_Config_Limit"] > config.TORQUE_LIMIT): database["Torque_Config_Limit"] = config.TORQUE_LIMIT
+    if(database["Torque_Config_Limit"] < 0): database["Torque_Config_Limit"] = 0
 
 def RegenEncoderInterrupt(direction):
     global database
     database["Torque_Config_Limit_Regen"] += direction * config.GPIO_ROT_REGEN_SENSITIVITY
+
+    if(database["Torque_Config_Limit_Regen"] > config.REGEN_LIMIT): database["Torque_Config_Limit_Regen"] = config.REGEN_LIMIT
+    if(database["Torque_Config_Limit_Regen"] < 0): database["Torque_Config_Limit_Regen"] = 0
 
 def CanSendService():
     global database

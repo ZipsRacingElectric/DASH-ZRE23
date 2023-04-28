@@ -530,11 +530,11 @@ def SendCommandDriveStart(transmitter, commandEnterDrive):
 def SendCommandDriveConfiguration(transmitter, database):
     message = [0,0,0,0,0,0,0,0]
 
-    message[0] = (int(database["Torque_Limit"]        * 10))      & 0xFF
-    message[1] = (int(database["Torque_Limit"]        * 10) >> 8) & 0xFF
-    message[2] = (int(database["Torque_Limit_Regen"]  * 10))      & 0xFF
-    message[3] = (int(database["Torque_Limit_Regen"]  * 10) >> 8) & 0xFF
-    message[4] = database["State_Regen_Enabled"] & 0b1
+    message[0] = (int(database["Torque_Config_Limit"]        * 10))      & 0xFF
+    message[1] = (int(database["Torque_Config_Limit"]        * 10) >> 8) & 0xFF
+    message[2] = (int(database["Torque_Config_Limit_Regen"]  * 10))      & 0xFF
+    message[3] = (int(database["Torque_Config_Limit_Regen"]  * 10) >> 8) & 0xFF
+    message[4] = database["State_Regen_Config_Enabled"] & 0b1
 
     SendMessage(transmitter, config.CAN_ID_COMMAND_TORQUE_LIMIT, message)
 

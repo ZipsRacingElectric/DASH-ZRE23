@@ -185,6 +185,11 @@ class View(gui.View):
         self.temp2Stat.Set (self.database["Temperature_Inverter_Max"])
         self.temp3Stat.Set (self.database["Temperature_Motor"])
 
+        if(self.database["State_Regen_Config_Enabled"] == True):
+            self.regenBar.SetColor(self.style["accentGreen"])
+        else:
+            self.regenBar.SetColor(self.style["lowlightGreen"])
+
     def SetDisplayState(self, state):
         if(state == "Normal"):
             self.displayStartup.grid_forget()

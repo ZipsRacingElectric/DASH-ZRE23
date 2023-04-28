@@ -428,6 +428,9 @@ class ProgressBar(tkinter.Canvas):
     def Get(self):
         return self.value
 
+    def SetColor(self, color):
+        self.itemconfigure(self.bar, color=color)
+
 # Statafied Bar
 # - Use this widget as a stylized progress bar
 # - Use Highlight and Lowlight Lists for coloring sections

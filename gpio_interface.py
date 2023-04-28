@@ -45,7 +45,7 @@ def Setup(db, canT):
 
         # interface.InsertRgb(config.GPIO_RGB_PIN_R, config.GPIO_RGB_PIN_G, config.GPIO_RGB_PIN_B)
 
-        interface.InsertService(CanSendService)
+        # interface.InsertService(CanSendService)
 
         return interface
     except Exception as e:
@@ -62,6 +62,9 @@ def TorqueEncoderInterrupt(direction):
     if(database["Torque_Config_Limit"] > config.TORQUE_LIMIT): database["Torque_Config_Limit"] = config.TORQUE_LIMIT
     if(database["Torque_Config_Limit"] < 0): database["Torque_Config_Limit"] = 0
 
+    global can_transmitter
+    can_interface.SendCommandDriveConfiguration(can_transmitter, database)
+
 def RegenEncoderInterrupt(direction):
     global database
     database["Torque_Config_Limit_Regen"] += direction * config.GPIO_ROT_REGEN_SENSITIVITY
@@ -69,8 +72,6 @@ def RegenEncoderInterrupt(direction):
     if(database["Torque_Config_Limit_Regen"] > config.REGEN_LIMIT): database["Torque_Config_Limit_Regen"] = config.REGEN_LIMIT
     if(database["Torque_Config_Limit_Regen"] < 0): database["Torque_Config_Limit_Regen"] = 0
 
-def CanSendService():
-    global database
     global can_transmitter
     can_interface.SendCommandDriveConfiguration(can_transmitter, database)
 

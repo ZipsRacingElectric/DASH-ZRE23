@@ -516,7 +516,8 @@ def RpmToMph(rotationsPerMinute):
 # Message Transmitting --------------------------------------------------------------------------------------------------------
 def SendMessage(transmitter, id, data, channel=0):
     logging.debug(f"CAN - Sending Message ID: {hex(id)} [{hex(data[0])}, {hex(data[1])}, {hex(data[2])}, {hex(data[3])}, {hex(data[4])}, {hex(data[5])}, {hex(data[6])}, {hex(data[7])}]")
-    transmitter.Transmit(id, data, channel)
+    transmitter.Transmit(id, data, 0)
+    transmitter.Transmit(id, data, 1)
 
 # Message 0x004
 def SendCommandDriveStart(transmitter, commandEnterDrive):

@@ -272,7 +272,7 @@ class View(gui.View):
 
                 self.startupText["text"] = "WARNING: IMD Fault"
                 self.startupInstructions["text"] = "Exit the vehicle immediately."
-                gpio_interface.SetRgb(config.GPIO_RGB_PIN_R, True, False, False, 0.25)
+                gpio_interface.SetRgb(config.GPIO_RGB_PIN_R, True, False, False, 0.1)
 
         elif(state == "Error_BMS_Self_Test_Fault"):
             self.displayNormal.grid_forget()
@@ -280,7 +280,7 @@ class View(gui.View):
 
             self.startupText["text"] = "WARNING: Accumulator Fault"
             self.startupInstructions["text"] = "Exit the vehicle immediately."
-            gpio_interface.SetRgb(config.GPIO_RGB_PIN_R, True, False, False, 0.25)
+            gpio_interface.SetRgb(config.GPIO_RGB_PIN_R, True, False, False, 0.1)
 
         elif(state == "Error_BMS_Sense_Line_Fault"):
             self.displayNormal.grid_forget()
@@ -288,7 +288,7 @@ class View(gui.View):
 
             self.startupText["text"] = "WARNING: Accumulator Fault"
             self.startupInstructions["text"] = "Exit the vehicle immediately."
-            gpio_interface.SetRgb(config.GPIO_RGB_PIN_R, True, False, False, 0.25)
+            gpio_interface.SetRgb(config.GPIO_RGB_PIN_R, True, False, False, 0.1)
 
         elif(state == "Error_BMS_Temperature_Fault"):
             self.displayNormal.grid_forget()
@@ -296,7 +296,7 @@ class View(gui.View):
 
             self.startupText["text"] = "WARNING: Accumulator Fault"
             self.startupInstructions["text"] = "Exit the vehicle immediately."
-            gpio_interface.SetRgb(config.GPIO_RGB_PIN_R, True, False, False, 0.25)
+            gpio_interface.SetRgb(config.GPIO_RGB_PIN_R, True, False, False, 0.1)
 
         elif(state == "Error_BMS_Voltage_Fault"):
             self.displayNormal.grid_forget()
@@ -304,4 +304,4 @@ class View(gui.View):
 
             self.startupText["text"] = "WARNING: Accumulator Fault"
             self.startupInstructions["text"] = "Exit the vehicle immediately."
-            gpio_interface.SetRgb(config.GPIO_RGB_PIN_R, True, False, False, 0.25)
+            gpio_interface.SetRgb(config.GPIO_RGB_PIN_R, True, False, False, 0.1)

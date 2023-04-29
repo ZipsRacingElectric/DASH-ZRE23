@@ -203,7 +203,7 @@ class Main():
                 # LED Outputs
                 for pin, led in self.rgbOutputs.items():
                     if(self.rgbPeriods[pin] == -1): continue
-                    if(self.rgbTimers[pin] > self.rgbPeriods[pin]):
+                    if(self.rgbTimers[pin] >= self.rgbPeriods[pin]):
                         self.ToggleRgb(pin)
                         self.rgbTimers[pin] = 0
                     else:

@@ -146,7 +146,7 @@ class Main():
     def InsertRgb(self, pinR, pinG, pinB):
         try:
             logging.debug(f"GPIO - Inserting RGB LED with pins {pinR} {pinG} {pinB}...")
-            self.rbgOutputs[pinR] = (gpiozero.LED(pinR), gpiozero.LED(pinG), gpiozero.LED(pinB))
+            self.rgbOutputs[pinR] = (gpiozero.LED(pinR), gpiozero.LED(pinG), gpiozero.LED(pinB))
             self.rgbColors[pinR]  = (False,False,False)
             self.rgbPeriods[pinR] = (-1, -1, -1)
             self.rgbTimers[pinR]  = ( 0,  0,  0)

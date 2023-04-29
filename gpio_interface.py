@@ -96,7 +96,7 @@ def SetRgb(pinR, colorR, colorG, colorB, period):
     global interface
     if(interface == None): return
 
-    # interface.SetRgb(pinR, colorR, colorG, colorB, period)
+    interface.SetRgb(pinR, colorR, colorG, colorB, period)
 
 # GUI Object ------------------------------------------------------------------------------------------------------------------
 class Main():

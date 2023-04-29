@@ -135,16 +135,19 @@ class View(gui.View):
 
     def Update(self):
         # Check for Errors
-        if(self.database["Error_BMS_Self_Test_Fault"] == 0):
+        if(self.database["Error_IMD_Fault"] == 1):
+            self.SetDisplayState("Error_IMD_Fault")
+
+        elif(self.database["Error_BMS_Self_Test_Fault"] == 1):
             self.SetDisplayState("Error_BMS_Self_Test_Fault")
             
-        elif(self.database["Error_BMS_Sense_Line_Fault"] == 0):
+        elif(self.database["Error_BMS_Sense_Line_Fault"] == 1):
             self.SetDisplayState("Error_BMS_Sense_Line_Fault")
             
-        elif(self.database["Error_BMS_Temperature_Fault"] == 0):
+        elif(self.database["Error_BMS_Temperature_Fault"] == 1):
             self.SetDisplayState("Error_BMS_Temperature_Fault")
             
-        elif(self.database["Error_BMS_Voltage_Fault"] == 0):
+        elif(self.database["Error_BMS_Voltage_Fault"] == 1):
             self.SetDisplayState("Error_BMS_Voltage_Fault")
             
         elif(self.database["Plausibility_APPS_Calibration"] == 0):
@@ -155,6 +158,9 @@ class View(gui.View):
             
         elif(self.database["Plausibility_Pedals"] == 0):
             self.SetDisplayState("Error_Plausibility_Pedals")
+        
+        elif(self.database["Error_BSPD_Fault"] == 1):
+            self.SetDisplayState("Error_BSPD_Fault")
             
         elif(self.database["Plausibility_APPS_25_5"] == 0):
             self.SetDisplayState("Error_APPS_25_5")
@@ -220,6 +226,14 @@ class View(gui.View):
             self.startupInstructions["text"] = "If the ECU is online, the\nECU Status Message (0x703)\nhas not been recieved."
             gpio_interface.SetRgb(config.GPIO_RGB_PIN_R, False, False, True, -1)
 
+        elif(state == "Error_BSPD_Fault"):
+            self.displayNormal.grid_forget()
+            self.displayStartup.grid(column=0, row=0, sticky="NESW")
+
+            self.startupText["text"] = "BPSD Fault"
+            self.startupInstructions["text"] = "Please have an ESO\nreset the vehicle."
+            gpio_interface.SetRgb(config.GPIO_RGB_PIN_R, False, False, True, -1)
+
         elif(state == "Error_APPS_25_5"):
             self.displayNormal.grid_forget()
             self.displayStartup.grid(column=0, row=0, sticky="NESW")
@@ -252,13 +266,21 @@ class View(gui.View):
             self.startupInstructions["text"] = "Recalibrate the pedals.\nIf the error persists,\nmaintenance is required."
             gpio_interface.SetRgb(config.GPIO_RGB_PIN_R, False, False, True, -1)
 
+        elif(state == "Error_IMD_Fault"):
+                self.displayNormal.grid_forget()
+                self.displayStartup.grid(column=0, row=0, sticky="NESW")
+
+                self.startupText["text"] = "WARNING: IMD Fault"
+                self.startupInstructions["text"] = "Exit the vehicle immediately."
+                gpio_interface.SetRgb(config.GPIO_RGB_PIN_R, True, False, False, 0.25)
+
         elif(state == "Error_BMS_Self_Test_Fault"):
             self.displayNormal.grid_forget()
             self.displayStartup.grid(column=0, row=0, sticky="NESW")
 
             self.startupText["text"] = "WARNING: Accumulator Fault"
             self.startupInstructions["text"] = "Exit the vehicle immediately."
-            gpio_interface.SetRgb(config.GPIO_RGB_PIN_R, True, False, False, 0.5)
+            gpio_interface.SetRgb(config.GPIO_RGB_PIN_R, True, False, False, 0.25)
 
         elif(state == "Error_BMS_Sense_Line_Fault"):
             self.displayNormal.grid_forget()
@@ -266,7 +288,7 @@ class View(gui.View):
 
             self.startupText["text"] = "WARNING: Accumulator Fault"
             self.startupInstructions["text"] = "Exit the vehicle immediately."
-            gpio_interface.SetRgb(config.GPIO_RGB_PIN_R, True, False, False, 0.5)
+            gpio_interface.SetRgb(config.GPIO_RGB_PIN_R, True, False, False, 0.25)
 
         elif(state == "Error_BMS_Temperature_Fault"):
             self.displayNormal.grid_forget()
@@ -274,7 +296,7 @@ class View(gui.View):
 
             self.startupText["text"] = "WARNING: Accumulator Fault"
             self.startupInstructions["text"] = "Exit the vehicle immediately."
-            gpio_interface.SetRgb(config.GPIO_RGB_PIN_R, True, False, False, 0.5)
+            gpio_interface.SetRgb(config.GPIO_RGB_PIN_R, True, False, False, 0.25)
 
         elif(state == "Error_BMS_Voltage_Fault"):
             self.displayNormal.grid_forget()
@@ -282,4 +304,4 @@ class View(gui.View):
 
             self.startupText["text"] = "WARNING: Accumulator Fault"
             self.startupInstructions["text"] = "Exit the vehicle immediately."
-            gpio_interface.SetRgb(config.GPIO_RGB_PIN_R, True, False, False, 0.5)
+            gpio_interface.SetRgb(config.GPIO_RGB_PIN_R, True, False, False, 0.25)

@@ -46,7 +46,7 @@ def Setup(db, canT):
         interface.InsertRotary(config.GPIO_ROT_TORQUE_PIN_A, config.GPIO_ROT_TORQUE_PIN_B, TorqueEncoderInterrupt)
         interface.InsertRotary(config.GPIO_ROT_REGEN_PIN_A,  config.GPIO_ROT_REGEN_PIN_B,  RegenEncoderInterrupt)
 
-        # interface.InsertRgb(config.GPIO_RGB_PIN_R, config.GPIO_RGB_PIN_G, config.GPIO_RGB_PIN_B)
+        interface.InsertRgb(config.GPIO_RGB_PIN_R, config.GPIO_RGB_PIN_G, config.GPIO_RGB_PIN_B)
 
         # interface.InsertService(CanSendService)
 
@@ -137,7 +137,7 @@ class Main():
         try:
             logging.debug(f"GPIO - Inserting Rotary Interrupt for Pins: {pinA}, {pinB}...")
             self.rotaryInputs[pinA] = (gpiozero.Button(pinA), gpiozero.Button(pinB))
-            self.rotaryInputs[pinA][0].when_pressed = lambda x = pinA: self.RotaryInterrupt(x)
+            self.rotaryInputs[pinA][0].when_released = lambda x = pinA: self.RotaryInterrupt(x)
             self.rotaryInterrupts[pinA] = handler
         except Exception as e:
             logging.error("GPIO Rotary Interrupt Insertion Failed: " + str(e))
@@ -178,9 +178,9 @@ class Main():
             self.rgbStates[pin] = True
             for i in range(3):
                 if(self.rgbColors[pin][i] == True):
-                    self.rgbOutputs[pin][i].on()
-                else:
                     self.rgbOutputs[pin][i].off()
+                else:
+                    self.rgbOutputs[pin][i].on()
 
         self.rgbPeriods[pin] = period
 
@@ -189,15 +189,15 @@ class Main():
             self.rgbStates[pin] = False
 
             for i in range(3):
-                self.rgbOutputs[pin][i].off()
+                self.rgbOutputs[pin][i].on()
         else:
             self.rgbStates[pin] = True
 
             for i in range(3):
                 if(self.rgbColors[pin][i] == True):
-                    self.rgbOutputs[pin][i].on()
-                else:
                     self.rgbOutputs[pin][i].off()
+                else:
+                    self.rgbOutputs[pin][i].on()
 
     def ScanInterrupts(self):
         try:

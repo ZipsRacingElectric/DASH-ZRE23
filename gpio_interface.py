@@ -148,8 +148,8 @@ class Main():
             logging.debug(f"GPIO - Inserting RGB LED with pins {pinR} {pinG} {pinB}...")
             self.rgbOutputs[pinR] = (gpiozero.LED(pinR), gpiozero.LED(pinG), gpiozero.LED(pinB))
             self.rgbColors[pinR]  = (False,False,False)
-            self.rgbPeriods[pinR] = (-1, -1, -1)
-            self.rgbTimers[pinR]  = ( 0,  0,  0)
+            self.rgbPeriods[pinR] = -1
+            self.rgbTimers[pinR]  = 0
             self.rgbStates[pinR]  = False
         except Exception as e:
             logging.error("GPIO RGB Insertion Failed: " + str(e))
@@ -169,8 +169,6 @@ class Main():
             logging.error("Rotary Interrupt Scan Error: " + str(e))
 
     def SetRgb(self, pin, colorR, colorG, colorB, period):
-        rgb = self.rgbOutputs[pin]
-
         self.rgbColors[pin] = (colorR, colorG, colorB)
 
         if(period <= 0):
@@ -204,6 +202,7 @@ class Main():
             while(self.online):
                 # LED Outputs
                 for pin, led in self.rgbOutputs.items():
+                    if(self.rgbPeriods[pin] == -1): continue
                     if(self.rgbTimers[pin] > self.rgbPeriods[pin]):
                         self.ToggleRgb(pin)
                         self.rgbTimers[pin] = 0

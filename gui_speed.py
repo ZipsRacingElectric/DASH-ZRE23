@@ -1,7 +1,7 @@
 # Speed GUI View --------------------------------------------------------------------------------------------------------------
 # Author: Cole Barach
 # Date Created: 22.11.23
-# Date Updated: 23.01.30
+# Date Updated: 23.04.29
 #   This module contains all objects related to the Speed View of the GUI. The View object may be instanced to create a display
 #   for generic driving.
 
@@ -43,7 +43,7 @@ class View(gui.View):
         self.brakeBar   = lib_tkinter.GetProgressBar(self.root, column=0, row=0, minWidth=style["sideBarWidth"], sticky="NS", rowspan=2, style=style, orientation=Orientation.VERTICAL, label="BRAKE",    border=True, scaleFactor=100, styleOverrides=[("lowlight", "accentRed")])
         self.appsBar    = lib_tkinter.GetProgressBar(self.root, column=2, row=0, minWidth=style["sideBarWidth"], sticky="NS", rowspan=2, style=style, orientation=Orientation.VERTICAL, label="THROTTLE", border=True, scaleFactor=100, styleOverrides=[("lowlight", "accentGreen")])
         self.display    = lib_tkinter.GetFrame      (self.root, column=1, row=0, sticky="NESW", style=style, border=True)
-        buttonBar       = lib_tkinter.GetButtonBar  (self.root, column=1, row=1, minHeight=style["buttonBarHeight"], sticky="EW", style=style, orientation=Orientation.HORIZONTAL, commands=buttonCommands, labels=buttonLabels)
+        self.buttonBar  = lib_tkinter.GetButtonBar  (self.root, column=1, row=1, minHeight=style["buttonBarHeight"], sticky="EW", style=style, orientation=Orientation.HORIZONTAL, commands=buttonCommands, labels=buttonLabels)
 
         self.display.columnconfigure(0, weight=1)
         self.display.rowconfigure   (0, weight=1)
@@ -64,61 +64,62 @@ class View(gui.View):
         self.displayNormal.rowconfigure   (3, weight=0) # Torque Panel
 
         # Widgets
-        rpmPanel       = lib_tkinter.GetFrame       (self.displayNormal, column=0, row=0, style=style, sticky="EW", columnspan=5)
-        statPanel      = lib_tkinter.GetFrame       (self.displayNormal, column=0, row=1, style=style, sticky="W")
-        speedPanel     = lib_tkinter.GetFrame       (self.displayNormal, column=2, row=1, style=style, sticky="NESW")
-        regenPanel     = lib_tkinter.GetFrame       (self.displayNormal, column=0, row=2, style=style, sticky="EW", columnspan=5)
-        torquePanel    = lib_tkinter.GetFrame       (self.displayNormal, column=0, row=3, style=style, sticky="EW", columnspan=5)
+        self.rpmPanel       = lib_tkinter.GetFrame       (self.displayNormal, column=0, row=0, style=style, sticky="EW", columnspan=5)
+        self.statPanel      = lib_tkinter.GetFrame       (self.displayNormal, column=0, row=1, style=style, sticky="W")
+        self.speedPanel     = lib_tkinter.GetFrame       (self.displayNormal, column=2, row=1, style=style, sticky="NESW")
+        self.regenPanel     = lib_tkinter.GetFrame       (self.displayNormal, column=0, row=2, style=style, sticky="EW", columnspan=5)
+        self.torquePanel    = lib_tkinter.GetFrame       (self.displayNormal, column=0, row=3, style=style, sticky="EW", columnspan=5)
 
         # Speed Panel -------------------------------------------------------------------------------------------------------------------------------------------------
         # Partitioning
-        speedPanel.columnconfigure(0, weight=0)
-        speedPanel.columnconfigure(1, weight=0)
-        speedPanel.rowconfigure(0, weight=1)
+        self.speedPanel.columnconfigure(0, weight=0)
+        self.speedPanel.columnconfigure(1, weight=0)
+        self.speedPanel.rowconfigure(0, weight=1)
         # Widgets
-        self.speedStat = lib_tkinter.GetLabelStat(speedPanel, column=0, row=0, style=style, styleOverrides=[("font", "fontExtraLarge")])
-        speedLabel     = lib_tkinter.GetLabel    (speedPanel, column=1, row=0, style=style, text="\n\n\n\n MPH", styleOverrides=[("font", "fontLarge")])
+        self.speedStat  = lib_tkinter.GetLabelStat(self.speedPanel, column=0, row=0, style=style, styleOverrides=[("font", "fontExtraLarge")])
+        self.speedLabel = lib_tkinter.GetLabel    (self.speedPanel, column=1, row=0, style=style, text="\n\n\n\n MPH", styleOverrides=[("font", "fontLarge")])
 
         # RPM Panel ---------------------------------------------------------------------------------------------------------------------------------------------------
         # Partitioning
-        rpmPanel.columnconfigure(0, weight=1)
+        self.rpmPanel.columnconfigure(0, weight=1)
         # Widgets
-        self.rpmBar = lib_tkinter.GetStrataBar(rpmPanel, style, Orientation.HORIZONTAL, column=0, row=0, sticky="EW", minHeight=style["rpmBarHeight"], highlights=style["rpmHighlights"], lowlights=style["rpmLowlights"], domain=style["rpmDomain"], mask=style["rpmMask"], scaleFactor=config.RPM_MAX)
-        rpmDivider  = lib_tkinter.GetDivider  (rpmPanel, style, Orientation.HORIZONTAL, column=0, row=1, sticky="EW")
+        self.rpmBar = lib_tkinter.GetStrataBar(self.rpmPanel, style, Orientation.HORIZONTAL, column=0, row=0, sticky="EW", minHeight=style["rpmBarHeight"], highlights=style["rpmHighlights"], lowlights=style["rpmLowlights"], domain=style["rpmDomain"], mask=style["rpmMask"], scaleFactor=config.RPM_MAX)
+        rpmDivider  = lib_tkinter.GetDivider  (self.rpmPanel, style, Orientation.HORIZONTAL, column=0, row=1, sticky="EW")
         
         # Torque Panel ------------------------------------------------------------------------------------------------------------------------------------------------
         # Partitioning
-        torquePanel.columnconfigure(0, weight=1)
-        torquePanel.columnconfigure(1, weight=0)
+        self.torquePanel.columnconfigure(0, weight=1)
+        self.torquePanel.columnconfigure(1, weight=0)
         # Widgets
-        self.torqueBar = lib_tkinter.GetProgressBar(torquePanel, style, Orientation.HORIZONTAL, minHeight=style["torqueBarHeight"], column=0, row=0, sticky="EW", scaleFactor=config.TORQUE_LIMIT, border=True, styleOverrides=[("lowlight", "accentBlue"), ("borderWidth", "borderWidthLight")])
-        torqueLabel    = lib_tkinter.GetLabel      (torquePanel, style, column=1, row=0, text="T", styleOverrides=[("font", "fontExtraSmall")])
+        self.torqueBar = lib_tkinter.GetProgressBar(self.torquePanel, style, Orientation.HORIZONTAL, minHeight=style["torqueBarHeight"], column=0, row=0, sticky="EW", scaleFactor=config.TORQUE_LIMIT, border=True, styleOverrides=[("lowlight", "accentBlue"), ("borderWidth", "borderWidthLight")])
+        torqueLabel    = lib_tkinter.GetLabel      (self.torquePanel, style, column=1, row=0, text="T", styleOverrides=[("font", "fontExtraSmall")])
         
         # Regen Panel -------------------------------------------------------------------------------------------------------------------------------------------------
         # Partitioning
-        regenPanel.columnconfigure(0, weight=1)
-        regenPanel.columnconfigure(1, weight=0)
+        self.regenPanel.columnconfigure(0, weight=1)
+        self.regenPanel.columnconfigure(1, weight=0)
         # Widgets
-        self.regenBar = lib_tkinter.GetProgressBar(regenPanel, style, Orientation.HORIZONTAL, minHeight=style["torqueBarHeight"], column=0, row=0, sticky="EW", scaleFactor=config.REGEN_LIMIT, border=True, styleOverrides=[("lowlight", "accentGreen"), ("borderWidth", "borderWidthLight")])
-        regenLabel    = lib_tkinter.GetLabel      (regenPanel, style, column=1, row=0, text="R", styleOverrides=[("font", "fontExtraSmall")])
+        self.regenBar = lib_tkinter.GetProgressBar(self.regenPanel, style, Orientation.HORIZONTAL, minHeight=style["torqueBarHeight"], column=0, row=0, sticky="EW", scaleFactor=config.REGEN_LIMIT, border=True, styleOverrides=[("lowlight", "accentGreen"), ("borderWidth", "borderWidthLight")])
+        regenLabel    = lib_tkinter.GetLabel      (self.regenPanel, style, column=1, row=0, text="R", styleOverrides=[("font", "fontExtraSmall")])
         
         # Stat Panel --------------------------------------------------------------------------------------------------------------------------------------------------
         # Partitioning
-        statPanel.columnconfigure(1, minsize=style["panelStatWidth"])
-        statPanel.rowconfigure   (1, minsize=style["panelStatHeight"])
-        statPanel.rowconfigure   (2, minsize=style["panelStatHeight"])
-        statPanel.rowconfigure   (3, minsize=style["panelStatHeight"])
+        self.statPanel.columnconfigure(1, minsize=style["panelStatWidth"])
+        self.statPanel.rowconfigure   (1, minsize=style["panelStatHeight"])
+        self.statPanel.rowconfigure   (2, minsize=style["panelStatHeight"])
+        self.statPanel.rowconfigure   (3, minsize=style["panelStatHeight"])
+        self.statPanel.rowconfigure   (4, minsize=style["panelStatHeight"])
         # Widgets
-        self.chargeStat   = lib_tkinter.GetLabelStat(statPanel, style=style, column=1, row=1, sticky="E", styleOverrides=[("font", "fontLarge")])
-        self.temp1Stat    = lib_tkinter.GetLabelStat(statPanel, style=style, column=1, row=2, sticky="E", styleOverrides=[("font", "fontLarge")])
-        self.temp2Stat    = lib_tkinter.GetLabelStat(statPanel, style=style, column=1, row=3, sticky="E", styleOverrides=[("font", "fontLarge")])
-        self.temp3Stat    = lib_tkinter.GetLabelStat(statPanel, style=style, column=1, row=4, sticky="E", styleOverrides=[("font", "fontLarge")], precision=0)
-        statDividerTop    = lib_tkinter.GetDivider  (statPanel, style=style, column=0, row=0, sticky="EW", orientation=Orientation.HORIZONTAL, columnspan=2)
-        chargeLabel       = lib_tkinter.GetLabel    (statPanel, style=style, column=0, row=1, sticky="W", text="SoC:")
-        temp1Label        = lib_tkinter.GetLabel    (statPanel, style=style, column=0, row=2, sticky="W", text="Acc. Max:")
-        temp2Label        = lib_tkinter.GetLabel    (statPanel, style=style, column=0, row=3, sticky="W", text="Inv. Max:")
-        temp3Label        = lib_tkinter.GetLabel    (statPanel, style=style, column=0, row=4, sticky="W", text="Mtr. Max:")
-        statDividerBottom = lib_tkinter.GetDivider  (statPanel, style=style, column=0, row=5, sticky="EW", orientation=Orientation.HORIZONTAL, columnspan=2)
+        self.chargeStat   = lib_tkinter.GetLabelStat(self.statPanel, style=style, column=1, row=1, sticky="E", styleOverrides=[("font", "fontLarge")])
+        self.temp1Stat    = lib_tkinter.GetLabelStat(self.statPanel, style=style, column=1, row=2, sticky="E", styleOverrides=[("font", "fontLarge")])
+        self.temp2Stat    = lib_tkinter.GetLabelStat(self.statPanel, style=style, column=1, row=3, sticky="E", styleOverrides=[("font", "fontLarge")])
+        self.temp3Stat    = lib_tkinter.GetLabelStat(self.statPanel, style=style, column=1, row=4, sticky="E", styleOverrides=[("font", "fontLarge")], precision=0)
+        statDividerTop    = lib_tkinter.GetDivider  (self.statPanel, style=style, column=0, row=0, sticky="EW", orientation=Orientation.HORIZONTAL, columnspan=2)
+        self.chargeLabel  = lib_tkinter.GetLabel    (self.statPanel, style=style, column=0, row=1, sticky="W", text="SoC:")
+        self.temp1Label   = lib_tkinter.GetLabel    (self.statPanel, style=style, column=0, row=2, sticky="W", text="Acc. Max:")
+        self.temp2Label   = lib_tkinter.GetLabel    (self.statPanel, style=style, column=0, row=3, sticky="W", text="Inv. Max:")
+        self.temp3Label   = lib_tkinter.GetLabel    (self.statPanel, style=style, column=0, row=4, sticky="W", text="Mtr. Max:")
+        statDividerBottom = lib_tkinter.GetDivider  (self.statPanel, style=style, column=0, row=7, sticky="EW", orientation=Orientation.HORIZONTAL, columnspan=2)
 
         # Display (Startup) -------------------------------------------------------------------------------------------------------------------------------------------
         self.displayStartup = lib_tkinter.GetFrame(self.display, grid=False, style=style)
@@ -164,8 +165,6 @@ class View(gui.View):
             
         elif(self.database["Plausibility_APPS_25_5"] == 0):
             self.SetDisplayState("Error_APPS_25_5")
-        
-        #TODO: INSERT IMD Logic
 
         # Determine Drive State
         elif(self.database["State_Ready_to_Drive"] == True and self.database["ECU_CAN_Active"]):
@@ -197,6 +196,8 @@ class View(gui.View):
             self.regenBar.SetColor(self.style["lowlightGreen"])
 
     def SetDisplayState(self, state):
+        state = "Normal"
+
         if(state == "Normal"):
             self.displayStartup.grid_forget()
             self.displayNormal.grid(column=0, row=0, sticky="NESW")

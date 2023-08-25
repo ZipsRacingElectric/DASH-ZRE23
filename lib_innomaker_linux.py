@@ -68,14 +68,13 @@ class Main(CanInterface):
 def OpenChannel(id, bitrate):
     print(f"CAN - Channel {id} Opening...")
 
-    os.system(f'sudo ifconfig can{id} down')
+    os.system(f'sudo ip link set down can{id}')
     os.system(f'sudo ip link set can{id} type can bitrate {bitrate}')
-    os.system(f'sudo ifconfig can{id} txqueuelen 100000')
-    os.system(f'sudo ifconfig can{id} up')
+    os.system(f'sudo ip link set up can{id}')
 
     return can.interface.Bus(channel = f'can{id}', bustype = 'socketcan')
 
 def CloseChannel(id):
     print(f"CAN - Closing Channel {id}")
 
-    os.system(f'ifconfig can{id} down')
+    os.system(f'ip link set down can{id}')

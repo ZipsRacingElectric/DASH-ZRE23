@@ -92,7 +92,7 @@ def Setup(database):
                 import lib_canlib
                 library = lib_canlib.Main(database, messageHandler=HandleMessage, timingFunction=SetTimeouts, timingPeriod=config.CAN_TIME_PERIOD)
                 library.OpenChannel(config.CAN_BITRATE, 0)
-                library.OpenChannel(config.CAN_BITRATE, 1)
+                # library.OpenChannel(config.CAN_BITRATE, 1)
                 return library
             except Exception as e:
                 logging.error("Failed to Initialize CANLIB Library: " + str(e))
@@ -103,14 +103,14 @@ def Setup(database):
                     import lib_innomaker_win
                     library = lib_innomaker_win.Main(database, messageHandler=HandleMessage, timingFunction=SetTimeouts, timingPeriod=config.CAN_TIME_PERIOD)
                     library.OpenChannel(config.CAN_BITRATE, 0)
-                    library.OpenChannel(config.CAN_BITRATE, 1)
+                    # library.OpenChannel(config.CAN_BITRATE, 1)
                     return library
 
                 if(sys.platform == "linux"):
                     import lib_innomaker_linux
                     library = lib_innomaker_linux.Main(database, messageHandler=HandleMessage, timingFunction=SetTimeouts, timingPeriod=config.CAN_TIME_PERIOD)
                     library.OpenChannel(config.CAN_BITRATE, 0)
-                    library.OpenChannel(config.CAN_BITRATE, 1)
+                    # library.OpenChannel(config.CAN_BITRATE, 1)
                     return library
             except Exception as e:
                 logging.error("Failed to Initialize INNOMAKER Library: " + str(e))
@@ -173,6 +173,7 @@ def HandleMessage(database, id, data):
         if(id == idIndex):
             ClearTimeoutBms(database)
             database.decode_message(id, data)
+            CalculateBmsStats(database)
             return
     
     for index in range(config.CAN_ID_CELL_BALANCINGS_END - config.CAN_ID_CELL_BALANCINGS_START + 1):
@@ -180,6 +181,7 @@ def HandleMessage(database, id, data):
         if(id == idIndex):
             ClearTimeoutBms(database)
             database.decode_message(id, data)
+            CalculateBmsStats(database)
             return
 
     for index in range(config.CAN_ID_PACK_TEMPERATURES_END - config.CAN_ID_PACK_TEMPERATURES_START + 1):
@@ -187,6 +189,7 @@ def HandleMessage(database, id, data):
         if(id == idIndex):
             ClearTimeoutBms(database)
             database.decode_message(id, data)
+            CalculateBmsStats(database)
             return
 
     database.decode_message(id, data)
@@ -427,7 +430,7 @@ def CalculateBmsStats(database):
         database["Cell_Voltage_Min"] = None
         database["Cell_Voltage_Max"] = None
 
-        for index in range(90):
+        for index in range(54):
             strIndex = str(index).zfill(2)
             voltage = database[f"Voltage_Cell_{strIndex}"]
 
@@ -441,12 +444,12 @@ def CalculateBmsStats(database):
                 database["Cell_Voltage_Min"] = voltage
             if(database["Cell_Voltage_Max"] == None or voltage > database["Cell_Voltage_Max"]):
                 database["Cell_Voltage_Max"] = voltage
-        
+
         # Deltas
         database["Cell_Delta_Max"]  = None
         database["Cell_Delta_Mean"] = None
         deltaCount = 0
-        for index in range(90):
+        for index in range(54):
             strIndex = str(index).zfill(2)
             voltage = database[f"Voltage_Cell_{strIndex}"]
 
@@ -454,7 +457,7 @@ def CalculateBmsStats(database):
 
             delta = voltage - database["Cell_Voltage_Min"]
             if(database["Cell_Delta_Mean"] == None): database["Cell_Delta_Mean"] = 0
-            if(database["Cell_Delta_Max"]  == None or voltage > database["Cell_Delta_Max"]):
+            if(database["Cell_Delta_Max"]  == None or delta > database["Cell_Delta_Max"]):
                 database["Cell_Delta_Max"] = delta
             database["Cell_Delta_Mean"] += delta
             deltaCount += 1
@@ -464,7 +467,9 @@ def CalculateBmsStats(database):
         database["Pack_Temperature_Max"]  = None
         database["Pack_Temperature_Mean"] = None
         tempCount = 0
-        for index in range(45):
+        for index in range(27):
+            if(index == 3): continue
+
             strIndex = str(index).zfill(2)
             temperature = database[f"Temperature_Sensor_{strIndex}"]
 

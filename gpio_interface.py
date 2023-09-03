@@ -21,37 +21,39 @@ import can_interface
 # Functions -------------------------------------------------------------------------------------------------------------------
 def Setup(db, canT):
     try:
-        # global database
-        # global can_transmitter
-        # global interface
+        if(config.USE_GPIO != True): return None
 
-        # database = db
-        # can_transmitter = canT
+        global database
+        global can_transmitter
+        global interface
 
-        # interface = None
+        database = db
+        can_transmitter = canT
 
-        # if(sys.platform == "win32"): return None
+        interface = None
 
-        # interface = Main()
+        if(sys.platform == "win32"): return None
 
-        # database["Torque_Config_Limit"] = config.TORQUE_LIMIT / 10
-        # database["Torque_Config_Limit_Regen"] = 0
-        # database["State_Regen_Config_Enabled"] = False
+        interface = Main()
 
-        # # interface.InsertDigital(config.GPIO_BUTTON_START, StartButtonPress)
-        # interface.InsertDigital(config.GPIO_BUTTON_REGEN, RegenButtonPress)
-        # interface.InsertDigital(config.GPIO_BUTTON_WHEEL_L, LeftButtonPress)
-        # interface.InsertDigital(config.GPIO_BUTTON_WHEEL_R, RightButtonPress)
+        database["Torque_Config_Limit"] = config.TORQUE_LIMIT / 10
+        database["Torque_Config_Limit_Regen"] = 0
+        database["State_Regen_Config_Enabled"] = False
+
+        # interface.InsertDigital(config.GPIO_BUTTON_START, StartButtonPress)
+        interface.InsertDigital(config.GPIO_BUTTON_REGEN, RegenButtonPress)
+        interface.InsertDigital(config.GPIO_BUTTON_WHEEL_L, LeftButtonPress)
+        interface.InsertDigital(config.GPIO_BUTTON_WHEEL_R, RightButtonPress)
         
-        # interface.InsertRotary(config.GPIO_ROT_TORQUE_PIN_A, config.GPIO_ROT_TORQUE_PIN_B, TorqueEncoderInterrupt)
-        # interface.InsertRotary(config.GPIO_ROT_REGEN_PIN_A,  config.GPIO_ROT_REGEN_PIN_B,  RegenEncoderInterrupt)
+        interface.InsertRotary(config.GPIO_ROT_TORQUE_PIN_A, config.GPIO_ROT_TORQUE_PIN_B, TorqueEncoderInterrupt)
+        interface.InsertRotary(config.GPIO_ROT_REGEN_PIN_A,  config.GPIO_ROT_REGEN_PIN_B,  RegenEncoderInterrupt)
 
-        # interface.InsertRgb(config.GPIO_RGB_PIN_R, config.GPIO_RGB_PIN_G, config.GPIO_RGB_PIN_B)
+        interface.InsertRgb(config.GPIO_RGB_PIN_R, config.GPIO_RGB_PIN_G, config.GPIO_RGB_PIN_B)
 
-        # # interface.InsertService(CanSendService)
+        # interface.InsertService(CanSendService)
 
-        # return interface
-        return None
+        return interface
+        # return None
     except Exception as e:
         logging.error("GPIO Setup failure: " + str(e))
         raise
@@ -70,10 +72,18 @@ def RegenButtonPress():
     # can_interface.SendCommandDriveConfiguration(can_transmitter, database)
 
 def LeftButtonPress():
-    pass
+    if(database["Torque_Config_Limit"] == None): pass
+    if(database["Torque_Config_Limit"] >= 30): pass
+    database["Torque_Config_Limit"] += 11
+
+    can_transmitter.SendCommandDriveConfiguration()
 
 def RightButtonPress():
-    pass
+    if(database["Torque_Config_Limit"] == None): pass
+    if(database["Torque_Config_Limit"] <= 0): pass
+    database["Torque_Config_Limit"] -= 11
+
+    can_transmitter.SendCommandDriveConfiguration()
 
 def TorqueEncoderInterrupt(direction):
     pass

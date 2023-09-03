@@ -40,7 +40,7 @@ class View(gui_speed.View):
         self.statPanel.rowconfigure(5, minsize=style["panelStatHeight"])
 
         self.chargeLabel['text'] = "Acc. Max:"
-        self.temp1Label['text']  = "Acc. Mean:"
+        # self.temp1Label['text']  = "Acc. Mean:"
         self.temp2Label['text']  = "Inv. Max:"
         self.temp3Label['text']  = "Inv. Mean:"
         self.temp4Label = lib_tkinter.GetLabel    (self.statPanel, style=style, column=0, row=5, sticky="W", text="Mtr. Max: ")
@@ -52,7 +52,7 @@ class View(gui_speed.View):
         self.speedStat.Set(self.database["State_of_Charge"])
 
         self.chargeStat.Set(self.database["Pack_Temperature_Max"])
-        self.temp1Stat.Set(self.database ["Pack_Temperature_Mean"])
+        # self.temp1Stat.Set(self.database ["Pack_Temperature_Mean"])
         self.temp2Stat.Set(self.database ["Temperature_Inverter_Max"])
         self.temp3Stat.Set(self.database ["Temperature_Inverter_Mean"])
         self.temp4Stat.Set(self.database ["Temperature_Motor"])

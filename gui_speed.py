@@ -111,12 +111,12 @@ class View(gui.View):
         self.statPanel.rowconfigure   (4, minsize=style["panelStatHeight"])
         # Widgets
         self.chargeStat   = lib_tkinter.GetLabelStat(self.statPanel, style=style, column=1, row=1, sticky="E", styleOverrides=[("font", "fontLarge")])
-        self.temp1Stat    = lib_tkinter.GetLabelStat(self.statPanel, style=style, column=1, row=2, sticky="E", styleOverrides=[("font", "fontLarge")])
+        self.torqueStat   = lib_tkinter.GetLabelStat(self.statPanel, style=style, column=1, row=2, sticky="E", styleOverrides=[("font", "fontLarge")])
         self.temp2Stat    = lib_tkinter.GetLabelStat(self.statPanel, style=style, column=1, row=3, sticky="E", styleOverrides=[("font", "fontLarge")])
         self.temp3Stat    = lib_tkinter.GetLabelStat(self.statPanel, style=style, column=1, row=4, sticky="E", styleOverrides=[("font", "fontLarge")], precision=0)
         statDividerTop    = lib_tkinter.GetDivider  (self.statPanel, style=style, column=0, row=0, sticky="EW", orientation=Orientation.HORIZONTAL, columnspan=2)
         self.chargeLabel  = lib_tkinter.GetLabel    (self.statPanel, style=style, column=0, row=1, sticky="W", text="SoC:")
-        self.temp1Label   = lib_tkinter.GetLabel    (self.statPanel, style=style, column=0, row=2, sticky="W", text="Acc. Max:")
+        self.torqueLabel  = lib_tkinter.GetLabel    (self.statPanel, style=style, column=0, row=2, sticky="W", text="Torque:")
         self.temp2Label   = lib_tkinter.GetLabel    (self.statPanel, style=style, column=0, row=3, sticky="W", text="Inv. Max:")
         self.temp3Label   = lib_tkinter.GetLabel    (self.statPanel, style=style, column=0, row=4, sticky="W", text="Mtr. Max:")
         statDividerBottom = lib_tkinter.GetDivider  (self.statPanel, style=style, column=0, row=7, sticky="EW", orientation=Orientation.HORIZONTAL, columnspan=2)
@@ -186,7 +186,7 @@ class View(gui.View):
         self.regenBar.Set  (self.database["Torque_Config_Limit_Regen"])
         self.speedStat.Set (self.database["Motor_Speed_MPH"])
         self.chargeStat.Set(self.database["State_of_Charge"])
-        self.temp1Stat.Set (self.database["Pack_Temperature_Max"])
+        if(self.database["Torque_Config_Limit"] != None): self.torqueStat.Set(int(self.database["Torque_Config_Limit"] / 2.3))
         self.temp2Stat.Set (self.database["Temperature_Inverter_Max"])
         self.temp3Stat.Set (self.database["Temperature_Motor"])
 
@@ -196,8 +196,6 @@ class View(gui.View):
             self.regenBar.SetColor(self.style["lowlightGreen"])
 
     def SetDisplayState(self, state):
-        state = "Normal"
-
         if(state == "Normal"):
             self.displayStartup.grid_forget()
             self.displayNormal.grid(column=0, row=0, sticky="NESW")

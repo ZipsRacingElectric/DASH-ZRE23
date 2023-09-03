@@ -5,6 +5,8 @@
 #   This module contains all configurable data for the execution of the app. Values stored in this file
 #   may be referenced as needed throughout the program. These values should not change during runtime.
 
+USE_GPIO = False
+
 # GUI -------------------------------------------------------------------------------------------------------------------------
 GUI_WIDTH                        = 800
 GUI_HEIGHT                       = 480

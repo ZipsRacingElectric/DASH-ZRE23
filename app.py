@@ -37,6 +37,10 @@ if(__name__ == "__main__"):
         logging.debug("APP - Begining...")
         mainCan.Begin()                                            # Begin CAN
         if(mainGpio != None): mainGpio.Begin()                     # Begin GPIO
+
+        mainDatabase["Torque_Config_Limit"] = 22
+        mainDatabase["Torque_Config_Limit_Regen"] = 0
+
         mainGui.Begin()                                            # Begin GUI
 
         # GUI Begin function will not return until app is closed.

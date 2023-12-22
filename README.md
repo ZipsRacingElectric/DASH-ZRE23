@@ -20,7 +20,7 @@ start the car. Upon the starting of the car, the GUI will exit the low voltage v
 
 ### Speed View
 The Speed View is the simplest drive view, intended for general driving. The layout of this view is shown below.
-![alt text](images/speedView.png)
+![alt text](./screenshots/Dash1.png)
 - The bars on the left and right show the position of the brake and throttle pedals, respectively.
 - The bar on the top of the screen shows the current RPM as a portion of the maximum RPM, being 5500.
 - The two bars on the bottom of the screen show the torque and regen percentage.
@@ -33,6 +33,16 @@ The Speed View is the simplest drive view, intended for general driving. The lay
 The Endurance View is designed for use at endurance events. The endurance view is structured similarly to the Speed View, with the main difference
 being the usage of the center text as the vehicle state of charge, rather than a speed. The Stat Panel on the left of the screen is also extented,
 with the state of charge being removed and additional temperatures being added.
+
+### BMS View
+![alt text](./screenshots/Dash2.png)
+The BMS View is used for monitoring the status of the accumulator. Cell voltages, temperatures, and which cells are balancing, SOC, current sensor readings, max temp, max voltage, and cell voltage delta is displayed.
+
+### Testing View
+Testing view is where torque percentage can be changed.
+
+### Debug View
+Debug view acts as an integrated CANbus analyzer. The dashboard uses a local DBC file to update and display data sent over CAN in realtime.
 
 # Code Structure
 ## Application - app.py

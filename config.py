@@ -110,8 +110,8 @@ REGEN_LIMIT                      = 30
 
 RADIANS_PER_ROTATION             = 6.283185307                 # Number of Radians per Rotation (2 * PI)
 TIRE_RADIUS_INCHES               = 9                           # Radius of the Vehicle Rear Tire
-SPROCKET_TEETH_COUNT             = 40                          # Number of Teeth on Axle Sprocket
-MOTOR_TEETH_COUNT                = 13                          # Number of Teeth on Motor Sprocket
+SPROCKET_TEETH_COUNT             = 30                          # Number of Teeth on Axle Sprocket
+MOTOR_TEETH_COUNT                = 11                          # Number of Teeth on Motor Sprocket
 MINUTES_PER_HOUR                 = 60                          # Number of Minutes per Hour
 INCHES_PER_FOOT                  = 12                          # Number of Inches per Foot
 FEET_PER_MILE                    = 5280                        # Number of Feet per Mile

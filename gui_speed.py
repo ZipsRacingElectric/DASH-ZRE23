@@ -136,10 +136,10 @@ class View(gui.View):
 
     def Update(self):
         # Check for Errors
-        if(self.database["Error_IMD_Fault"] == 1):
-            self.SetDisplayState("Error_IMD_Fault")
+        #if(self.database["Error_IMD_Fault"] == 1):
+        #    self.SetDisplayState("Error_IMD_Fault")
 
-        elif(self.database["Error_BMS_Self_Test_Fault"] == 1):
+        if(self.database["Error_BMS_Self_Test_Fault"] == 1):
             self.SetDisplayState("Error_BMS_Self_Test_Fault")
             
         elif(self.database["Error_BMS_Sense_Line_Fault"] == 1):
@@ -265,13 +265,13 @@ class View(gui.View):
             self.startupInstructions["text"] = "Recalibrate the pedals.\nIf the error persists,\nmaintenance is required."
             gpio_interface.SetRgb(config.GPIO_RGB_PIN_R, False, False, True, -1)
 
-        elif(state == "Error_IMD_Fault"):
-                self.displayNormal.grid_forget()
-                self.displayStartup.grid(column=0, row=0, sticky="NESW")
-
-                self.startupText["text"] = "WARNING: IMD Fault"
-                self.startupInstructions["text"] = "Exit the vehicle immediately."
-                gpio_interface.SetRgb(config.GPIO_RGB_PIN_R, True, False, False, 0.1)
+        #elif(state == "Error_IMD_Fault"):
+                #self.displayNormal.grid_forget()
+                #self.displayStartup.grid(column=0, row=0, sticky="NESW")
+#
+                #self.startupText["text"] = "WARNING: IMD Fault"
+                #self.startupInstructions["text"] = "Exit the vehicle immediately."
+                #gpio_interface.SetRgb(config.GPIO_RGB_PIN_R, True, False, False, 0.1)
 
         elif(state == "Error_BMS_Self_Test_Fault"):
             self.displayNormal.grid_forget()

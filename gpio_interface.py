@@ -71,6 +71,16 @@ def RegenButtonPress():
     # global can_transmitter
     # can_interface.SendCommandDriveConfiguration(can_transmitter, database)
 
+def torqueUpies():
+    database["Torque_Config_Limit"] += 5
+
+    can_transmitter.SendCommandDriveConfiguration()
+
+def torqueDown():
+    database["Torque_Config_Limit"] += 5
+
+    can_transmitter.SendCommandDriveConfiguration()
+
 def LeftButtonPress():
     if(database["Torque_Config_Limit"] == None): pass
     if(database["Torque_Config_Limit"] >= 30): pass

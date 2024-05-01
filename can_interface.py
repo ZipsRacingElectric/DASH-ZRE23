@@ -430,7 +430,7 @@ def CalculateBmsStats(database):
         database["Cell_Voltage_Min"] = None
         database["Cell_Voltage_Max"] = None
 
-        for index in range(54):
+        for index in range(90):
             strIndex = str(index).zfill(2)
             voltage = database[f"Voltage_Cell_{strIndex}"]
 

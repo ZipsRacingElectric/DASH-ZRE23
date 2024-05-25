@@ -430,7 +430,7 @@ def CalculateBmsStats(database):
         database["Cell_Voltage_Min"] = None
         database["Cell_Voltage_Max"] = None
 
-        for index in range(54):
+        for index in range(90):
             strIndex = str(index).zfill(2)
             voltage = database[f"Voltage_Cell_{strIndex}"]
 
@@ -449,7 +449,7 @@ def CalculateBmsStats(database):
         database["Cell_Delta_Max"]  = None
         database["Cell_Delta_Mean"] = None
         deltaCount = 0
-        for index in range(54):
+        for index in range(90):
             strIndex = str(index).zfill(2)
             voltage = database[f"Voltage_Cell_{strIndex}"]
 
@@ -467,9 +467,7 @@ def CalculateBmsStats(database):
         database["Pack_Temperature_Max"]  = None
         database["Pack_Temperature_Mean"] = None
         tempCount = 0
-        for index in range(27):
-            if(index == 3): continue
-
+        for index in range(45):
             strIndex = str(index).zfill(2)
             temperature = database[f"Temperature_Sensor_{strIndex}"]
 

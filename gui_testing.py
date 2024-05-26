@@ -49,9 +49,9 @@ class View(gui_speed.View):
     def TorqueUp(self):
         if(self.database["Torque_Config_Limit"] == None): return
 
-        if(self.database["Torque_Config_Limit"] > 25): return
+        if(self.database["Torque_Config_Limit"] > 230): return
         
-        self.database["Torque_Config_Limit"] = self.database["Torque_Config_Limit"] + 5
+        self.database["Torque_Config_Limit"] = self.database["Torque_Config_Limit"] + 11
 
         self.database["Torque_Config_Limit_Regen"] = 0
         self.database["State_Regen_Config_Enabled"] = False
@@ -63,9 +63,9 @@ class View(gui_speed.View):
 
         if(self.database["Torque_Config_Limit"] == None): return
         
-        if(self.database["Torque_Config_Limit"] < 5): return
+        if(self.database["Torque_Config_Limit"] < 11): return
         
-        self.database["Torque_Config_Limit"] = self.database["Torque_Config_Limit"] - 5
+        self.database["Torque_Config_Limit"] = self.database["Torque_Config_Limit"] - 11
 
         self.database["Torque_Config_Limit_Regen"] = 0
         self.database["State_Regen_Config_Enabled"] = False

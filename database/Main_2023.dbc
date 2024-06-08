@@ -83,6 +83,13 @@ BO_ 1088 Status_BMS: 7 BMS
  SG_ Current_BMS_Hi : 16|16@1+ (0.1,0) [0|6553.5] "Amperes" Vector__XXX
  SG_ State_of_Charge : 0|16@1+ (0.1,0) [0|6553.5] "Percentage" Vector__XXX
 
+BO_ 1104 Status_Shutdown: 1 BMS
+ SG_ TSMP_Interlock_Status : 0|1@1+ (1,0) [0|1] "Boolean" Vector__XXX
+ SG_ TSMS_Status : 1|1@1+ (1,0) [0|1] "Boolean" Vector__XXX
+ SG_ Motor_Interlock_Status : 2|1@1+ (1,0) [0|1] "Boolean" Vector__XXX
+ SG_ HVD_Interlock_Status : 3|1@1+ (1,0) [0|1] "Boolean" Vector__XXX
+ SG_ Precharge_Status : 4|1@1+ (1,0) [0|1] "Boolean" Vector__XXX
+
 BO_ 1331 Calibrate_APPS_Range: 8 Dashboard
  SG_ APPS_2_Real_Min : 32|10@1+ (1,0) [0|1023] "ADC"  ECU
  SG_ APPS_2_Real_Max : 48|10@1+ (1,0) [0|1023] "ADC"  ECU
